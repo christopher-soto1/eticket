@@ -1,0 +1,8 @@
+instalar composer
+php 8.0.30
+instalar y habilitar imap
+descomentar imap
+descomentar ssl
+descomentar openssl
+con xamp o wamp
+MariaDB u otra
