@@ -1,0 +1,543 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html dir="ltr" lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="telephone=no" name="format-detection">
+  <title>Fortinet Xperts: el detrás de escena de FortiSASE, contado por su Product Manager</title><!--[if (mso 16)]>
+    <style type="text/css">
+    a {text-decoration: none;}
+    </style>
+    <![endif]--><!--[if gte mso 9]><style>sup { font-size: 100% !important; }</style><![endif]--><!--[if gte mso 9]>
+<noscript>
+         <xml>
+           <o:OfficeDocumentSettings>
+           <o:AllowPNG></o:AllowPNG>
+           <o:PixelsPerInch>96</o:PixelsPerInch>
+           </o:OfficeDocumentSettings>
+         </xml>
+      </noscript>
+<![endif]--><!--[if mso]><xml>
+    <w:WordDocument xmlns:w="urn:schemas-microsoft-com:office:word">
+      <w:DontUseAdvancedTypographyReadingMail></w:DontUseAdvancedTypographyReadingMail>
+    </w:WordDocument>
+    </xml><![endif]-->
+  <style type="text/css">.rollover:hover .rollover-first {
+  max-height:0px!important;
+  display:none!important;
+}
+.rollover:hover .rollover-second {
+  max-height:none!important;
+  display:block!important;
+}
+.rollover span {
+  font-size:0;
+}
+u + .body img ~ div div {
+  display:none;
+}
+#outlook a {
+  padding:0;
+}
+span.MsoHyperlink,
+span.MsoHyperlinkFollowed {
+  color:inherit;
+  mso-style-priority:99;
+}
+a.w {
+  mso-style-priority:100!important;
+  text-decoration:none!important;
+}
+a[x-apple-data-detectors],
+#MessageViewBody a {
+  color:inherit!important;
+  text-decoration:none!important;
+  font-size:inherit!important;
+  font-family:inherit!important;
+  font-weight:inherit!important;
+  line-height:inherit!important;
+}
+.m {
+  display:none;
+  float:left;
+  overflow:hidden;
+  width:0;
+  max-height:0;
+  line-height:0;
+  mso-hide:all;
+}
+.ba:hover {
+  border-color:#0030e0 #0030e0 #0030e0 #0030e0!important;
+  background:#da291c!important;
+}
+.ba:hover a.w,
+.ba:hover button.w {
+  background:#da291c!important;
+}
+@media only screen and (max-width:600px) {.bp { padding-top:10px!important } .bo { padding-bottom:5px!important } .bn { padding-right:0px!important } .bm { padding-left:0px!important } .bl { padding:0px!important }  *[class="gmail-fix"] { display:none!important } p, a { line-height:150%!important } h1, h1 a { line-height:120%!important } h2, h2 a { line-height:120%!important } h3, h3 a { line-height:120%!important } h4, h4 a { line-height:120%!important } h5, h5 a { line-height:120%!important } h6, h6 a { line-height:120%!important }  .bi p { } .bh p { }  h1 { font-size:28px!important; text-align:center } h2 { font-size:26px!important; text-align:center } h3 { font-size:20px!important; text-align:center } h4 { font-size:24px!important; text-align:left } h5 { font-size:20px!important; text-align:left } h6 { font-size:16px!important; text-align:left }       .k td a { 
+font-size:13px!important }  .bi p, .bi a { font-size:13px!important } .bh p, .bh a { font-size:11px!important }  .bd, .bd h1, .bd h2, .bd h3, .bd h4, .bd h5, .bd h6 { text-align:center!important }   .be, .be h1, .be h2, .be h3, .be h4, .be h5, .be h6 { text-align:left!important } .bc img, .bd img, .be img { display:inline!important } .bc .rollover:hover .rollover-second, .bd .rollover:hover .rollover-second, .be .rollover:hover .rollover-second { display:inline!important }   a.w, button.w { font-size:14px!important; padding:10px 20px 10px 20px!important; line-height:120%!important } a.w, button.w, .ba { display:inline-block!important }  .v, .v .w, .x, .x td, .k { display:inline-block!important } .s table, .t, .u { width:100%!important } .p table, .q table, .r table, .p, .r, .q { width:100%!important; max-width:600px!important } .adapt-img { width:100%!important; height:auto!important } 
+.n, .o { display:none!important }     .k td { width:1%!important } table.j, .esd-block-html table { width:auto!important } .h-auto { height:auto!important } .img-9536 { width:100px!important; height:auto!important } .img-4415 { height:100px!important }  .h .b, .h .b * { font-size:16px!important; line-height:150%!important } .g .f.c, .g .f.c * { font-size:20px!important; line-height:150%!important } .e .f.c, .e .f.c * { font-size:20px!important; line-height:150%!important } .d .b.c, .d .b.c * { font-size:16px!important; line-height:150%!important } .a .b.c, .a .b.c * { font-size:16px!important; line-height:150%!important } }
+@media screen and (max-width:384px) {.mail-message-content { width:414px!important } }</style>
+ </head>
+<body class="body" style="width:100%;height:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0">
+
+
+ 
+ 
+  <span style="display:none !important;font-size:0px;line-height:0;color:#ffffff;visibility:hidden;opacity:0;height:0;width:0;mso-hide:all">Una nueva edición para responder las preguntas que dejó la primera charla sobre SASE en la región.</span>
+  <div dir="ltr" lang="es" class="es-wrapper-color" style="background-color:#F6F6F6"><!--[if gte mso 9]>
+			<v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
+				<v:fill type="tile" color="#f6f6f6"></v:fill>
+			</v:background>
+		<![endif]-->
+   <table width="100%" cellspacing="0" cellpadding="0" class="es-wrapper" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;padding:0;Margin:0;width:100%;height:100%;background-repeat:repeat;background-position:center top;background-color:#F6F6F6">
+     <tr style="border-collapse:collapse">
+      <td valign="top" style="padding:0;Margin:0">
+       <table cellpadding="0" cellspacing="0" align="center" class="p" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:100%;table-layout:fixed !important">
+         <tr style="border-collapse:collapse">
+          <td align="center" class="es-info-area" style="padding:0;Margin:0">
+           <table cellspacing="0" cellpadding="0" bgcolor="#ffffff" align="center" class="bi" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#ffffff;width:600px" role="none">
+             <tr style="border-collapse:collapse">
+              <td align="left" style="padding:20px;Margin:0"><!--[if mso]><table style="width:560px" cellpadding="0" cellspacing="0"><tr><td style="width:270px" valign="top"><![endif]-->
+               <table cellpadding="0" cellspacing="0" align="left" class="t" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:left">
+                 <tr style="border-collapse:collapse">
+                  <td align="center" valign="top" style="padding:0;Margin:0;width:270px">
+                   <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td align="left" class="bg bd" style="padding:0;Margin:0;font-size:0px"><img src="https://zpepe.stripocdn.email/content/guids/CABINET_cc9e0300bf8e390beebedf5bd05c800a358a89e5241acd03f8dce5169e95b727/images/1a17545e5e53452a8098b5f77604d361_black_and_red_fortinet_logo_Zc7.png" alt="" width="144" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none" height="16"></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table><!--[if mso]></td><td style="width:20px"></td><td style="width:270px" valign="top"><![endif]-->
+               <table cellpadding="0" cellspacing="0" align="right" class="u" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:right">
+                 <tr style="border-collapse:collapse">
+                  <td align="left" style="padding:0;Margin:0;width:270px">
+                   <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td align="right" class="bg" style="padding:0;Margin:0;padding-top:5px"><h4 class="bd" style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:14px;font-style:normal;font-weight:normal;line-height:16.8px;color:#da291c">Online<strong> Webinar</strong></h4></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table><!--[if mso]></td></tr></table><![endif]--></td>
+             </tr>
+           </table></td>
+         </tr>
+       </table>
+       <table cellpadding="0" cellspacing="0" align="center" class="p" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:100%;table-layout:fixed !important">
+         <tr style="border-collapse:collapse">
+          <td align="center" style="padding:0;Margin:0">
+           <table align="center" cellpadding="0" cellspacing="0" class="bi" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:transparent;width:600px" role="none">
+             <tr style="border-collapse:collapse">
+              <td align="left" style="padding:0;Margin:0">
+               <table cellspacing="0" width="100%" cellpadding="0" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                 <tr style="border-collapse:collapse">
+                  <td align="left" style="padding:0;Margin:0;width:600px">
+                   <table cellspacing="0" width="100%" role="presentation" cellpadding="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td align="center" style="padding:0;Margin:0;font-size:0"><a target="_blank" href="https://apps.global.fortinet.com/e/er?s=3049749&lid=25792&elqTrackId=2c70511c2534419bbb6e93492a48c9e5&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF53DC055DAF28BA9C875277630AF47B566C50D004E84986CEF98A201E7E2545FB3" style="mso-line-height-rule:exactly;text-decoration:underline;color:#164AFF;font-size:14px"><img src="https://zpepe.stripocdn.email/content/guids/CABINET_4e8056ca44e12be0ca95178d833d53fb5b03e4bf0ea824a2460acac1f0511c8c/images/fortinetbannerfortinetxpertsemail.jpg" alt="Fortinet Xperts Sessions" width="600" title="Fortinet Xperts Sessions" class="adapt-img" height="250" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none"></a></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table></td>
+             </tr>
+             <tr style="border-collapse:collapse">
+              <td align="left" bgcolor="#2666b5" class="bp" style="padding:0;Margin:0;padding-top:20px;padding-right:20px;padding-left:20px;background-color:#2666b5"><!--[if mso]><table style="width:560px" cellpadding="0" cellspacing="0"><tr><td style="width:230px" valign="top"><![endif]-->
+               <table cellpadding="0" cellspacing="0" align="left" class="t" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:left">
+                 <tr style="border-collapse:collapse">
+                  <td align="center" valign="top" style="padding:0;Margin:0;width:230px">
+                   <table cellpadding="0" cellspacing="0" width="100%" bgcolor="transparent" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:transparent" role="presentation">
+                     <tr style="border-collapse:collapse">
+                      <td align="left" class="bd" style="padding:0;Margin:0;font-size:0px"><img src="https://zpepe.stripocdn.email/content/guids/CABINET_cc9e0300bf8e390beebedf5bd05c800a358a89e5241acd03f8dce5169e95b727/images/calendar200x200_0jX.png" alt="" width="65" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none" height="65"></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="left" style="padding:0;Margin:0"><h2 class="bd" style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:24px;font-style:normal;font-weight:bold;line-height:33.6px;color:#ffffff">Cuándo</h2></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="left" class="bd" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px;font-size:0">
+                       <table border="0" width="10%" height="100%" cellpadding="0" cellspacing="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:10% !important;display:inline-table" role="presentation">
+                         <tr style="border-collapse:collapse">
+                          <td style="padding:0;Margin:0;border-bottom:3px solid #ffffff;background:unset;height:0px;width:100%;margin:0px"></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p class="bd" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:24px;letter-spacing:0;color:#ffffff;font-size:16px">Martes 22 de Julio, 2025</p><p class="bd" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:24px;letter-spacing:0;color:#ffffff;font-size:16px">10:00 AM EST (Hora Miami)</p></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="left" class="bd" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><!--[if mso]><a href="https://everywhere.fortinet.com/ai-lp-es-wc-xperts-todosobrefortisase-jul?elqTrack=true" target="_blank" hidden>
+	<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" esdevVmlButton href="https://everywhere.fortinet.com/ai-lp-es-wc-xperts-todosobrefortisase-jul?elqTrack=true" style="height:47px; v-text-anchor:middle; width:230px" arcsize="50%" stroke="f"  fillcolor="#da291c">
+		<w:anchorlock></w:anchorlock>
+		<center style='color:#ffffff; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:16px; font-weight:700; line-height:16px;  mso-text-raise:1px'>REGÍSTRATE AHORA</center>
+	</v:roundrect></a>
+<![endif]--><!--[if !mso]><!-- --><span class="ba msohide" style="border-style:solid;border-color:transparent;background:#da291c;border-width:0px;display:inline-block;border-radius:30px;width:auto;mso-hide:all"><a href="https://apps.global.fortinet.com/e/er?s=3049749&lid=25792&elqTrackId=09b2ce997f724421a75bbec8b1ba0046&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF5D1EB0A8071D1C022F40F532AC8A9206CC50D004E84986CEF98A201E7E2545FB3" target="_blank" class="w" style="mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:16px;padding:10px 20px 10px 20px;display:inline-block;background:#da291c;border-radius:30px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:bold;font-style:normal;line-height:19.2px;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid #da291c">REGÍSTRATE
+ AHORA<img src="https://zpepe.stripocdn.email/content/guids/CABINET_29936052ba2cfe1a7ef446bcd25f069f/images/43611589546122850.png" alt="icon" width="16" align="absmiddle" style="display:inline-block;font-size:14px;border:0;outline:none;text-decoration:none;vertical-align:middle;margin-left:10px" height="9"></a></span><!--<![endif]--></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table><!--[if mso]></td><td style="width:20px"></td><td style="width:310px" valign="top"><![endif]-->
+               <table cellpadding="0" cellspacing="0" align="right" class="u" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:right">
+                 <tr style="border-collapse:collapse">
+                  <td align="left" style="padding:0;Margin:0;width:310px">
+                   <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td align="left" class="h" style="padding:0;Margin:0"><h4 class="bd b" style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:16px;font-style:normal;font-weight:normal;line-height:19.2px;color:#ffffff"><strong>Estrategias para proteger dispositivos conectados y redes industriales.</strong></h4></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="left" bgcolor="transparent" style="padding:0;Margin:0;padding-top:10px;padding-bottom:20px"><p class="bd" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#ffffff;font-size:14px">Después de la primera sesión sobre SASE, el interés que generó en toda la región fue contundente: comentarios, preguntas y una participación masiva nos confirmaron que había mucho más por conversar.</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#ffffff;font-size:14px"><br></p><p class="bd" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#ffffff;font-size:14px">Por
+ eso, en esta nueva edición de <strong>Fortinet Xperts</strong>, decidimos dar un paso más: invitar a quienes están directamente involucrados en la evolución de FortiSASE.</p></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table><!--[if mso]></td></tr></table><![endif]--></td>
+             </tr>
+           </table></td>
+         </tr>
+       </table>
+       <table cellpadding="0" cellspacing="0" align="center" class="p" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:100%;table-layout:fixed !important">
+         <tr style="border-collapse:collapse">
+          <td align="center" style="padding:0;Margin:0">
+           <table cellspacing="0" cellpadding="0" bgcolor="#ffffff" align="center" class="bi" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#ffffff;width:600px" role="none">
+             <tr style="border-collapse:collapse">
+              <td align="left" style="padding:0;Margin:0;padding-top:20px;padding-right:20px;padding-left:20px">
+               <table width="100%" cellspacing="0" cellpadding="0" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                 <tr style="border-collapse:collapse">
+                  <td valign="top" align="center" style="padding:0;Margin:0;width:560px">
+                   <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td align="center" class="e" style="padding:0;Margin:0;padding-bottom:10px"><h2 class="f c" style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:24px;font-style:normal;font-weight:bold;line-height:28.8px;color:#646464">En esta sesión aprenderá</h2></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="center" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px;padding-right:10px;font-size:0">
+                       <table border="0" width="10%" height="100%" cellpadding="0" cellspacing="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:10% !important;display:inline-table" role="presentation">
+                         <tr style="border-collapse:collapse">
+                          <td style="padding:0;Margin:0;border-bottom:3px solid #307fe2;background:unset;height:0px;width:100%;margin:0px"></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table></td>
+             </tr>
+             <tr style="border-collapse:collapse">
+              <td align="left" style="padding:0;Margin:0;padding-top:20px;padding-right:20px;padding-left:20px"><!--[if mso]><table style="width:560px" cellpadding="0" cellspacing="0"><tr><td style="width:270px" valign="top"><![endif]-->
+               <table cellspacing="0" cellpadding="0" align="left" class="t" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:left">
+                 <tr style="border-collapse:collapse">
+                  <td align="left" style="padding:0;Margin:0;width:270px">
+                   <table width="100%" cellspacing="0" cellpadding="0" class="j" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td valign="middle" align="left" style="padding:0;Margin:0;padding-right:15px;font-size:0px"><img src="https://zpepe.stripocdn.email/content/guids/CABINET_cc9e0300bf8e390beebedf5bd05c800a358a89e5241acd03f8dce5169e95b727/images/checklist_FgL.png" alt="" width="26" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none" height="26"></td>
+                      <td align="left" style="padding:0;Margin:0">
+                       <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                         <tr style="border-collapse:collapse">
+                          <td align="left" style="padding:5px;Margin:0"><p class="be" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#646464;font-size:14px">Cómo comenzar con SASE partiendo desde una red basada en FortiGate</p></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table><!--[if mso]></td><td style="width:20px"></td><td style="width:270px" valign="top"><![endif]-->
+               <table cellspacing="0" cellpadding="0" align="right" class="u" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:right">
+                 <tr style="border-collapse:collapse">
+                  <td align="left" style="padding:0;Margin:0;width:270px">
+                   <table width="100%" cellspacing="0" cellpadding="0" class="j" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td valign="middle" align="left" style="padding:0;Margin:0;padding-right:15px;font-size:0px"><img src="https://zpepe.stripocdn.email/content/guids/CABINET_cc9e0300bf8e390beebedf5bd05c800a358a89e5241acd03f8dce5169e95b727/images/bluechecklist_duo.png" alt="" width="26" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none" height="26"></td>
+                      <td align="left" style="padding:0;Margin:0">
+                       <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                         <tr style="border-collapse:collapse">
+                          <td align="left" style="padding:5px;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#646464;font-size:14px">Qué lo diferencia de ZTNA y por qué importa</p></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table><!--[if mso]></td></tr></table><![endif]--></td>
+             </tr>
+             <tr style="border-collapse:collapse">
+              <td align="left" style="Margin:0;padding-top:5px;padding-right:20px;padding-left:20px;padding-bottom:5px"><!--[if mso]><table dir="ltr" cellpadding="0" cellspacing="0"><tr><td><table dir="rtl" style="width:560px" cellpadding="0" cellspacing="0"><tr><td dir="ltr" style="width:270px" valign="top"><![endif]-->
+               <table cellspacing="0" cellpadding="0" align="right" class="u" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:right">
+                 <tr style="border-collapse:collapse">
+                  <td align="left" style="padding:0;Margin:0;width:270px">
+                   <table width="100%" cellspacing="0" cellpadding="0" class="j" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td valign="middle" align="left" style="padding:0;Margin:0;padding-right:15px;font-size:0px"><img src="https://zpepe.stripocdn.email/content/guids/CABINET_cc9e0300bf8e390beebedf5bd05c800a358a89e5241acd03f8dce5169e95b727/images/checklist_FgL.png" alt="" width="26" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none" height="26"></td>
+                      <td align="left" style="padding:0;Margin:0">
+                       <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                         <tr style="border-collapse:collapse">
+                          <td align="left" style="padding:5px;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#646464;font-size:14px">Casos reales en América Latina, incluyendo algunos poco convencionales</p></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table><!--[if mso]></td><td dir="ltr" style="width:20px"></td><td dir="ltr" style="width:270px" valign="top"><![endif]-->
+               <table cellspacing="0" cellpadding="0" align="left" class="t" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:left">
+                 <tr style="border-collapse:collapse">
+                  <td align="left" style="padding:0;Margin:0;width:270px">
+                   <table width="100%" cellspacing="0" cellpadding="0" class="j" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td valign="middle" align="left" style="padding:0;Margin:0;padding-right:15px;font-size:0px"><img src="https://zpepe.stripocdn.email/content/guids/CABINET_cc9e0300bf8e390beebedf5bd05c800a358a89e5241acd03f8dce5169e95b727/images/bluechecklist_duo.png" alt="" width="26" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none" height="26"></td>
+                      <td align="left" style="padding:0;Margin:0">
+                       <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                         <tr style="border-collapse:collapse">
+                          <td align="left" style="padding:5px;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#646464;font-size:14px">Qué ventajas ofrece en eficiencia operativa, costos y consolidación</p></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table><!--[if mso]></td></tr></table></td></tr></table><![endif]--></td>
+             </tr>
+             <tr style="border-collapse:collapse">
+              <td align="left" class="bo" style="Margin:0;padding-top:5px;padding-right:20px;padding-left:20px;padding-bottom:20px">
+               <table cellspacing="0" cellpadding="0" align="right" class="u" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:right">
+                 <tr style="border-collapse:collapse">
+                  <td align="left" style="padding:0;Margin:0;width:560px">
+                   <table width="100%" cellspacing="0" cellpadding="0" class="j" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td valign="middle" align="left" style="padding:0;Margin:0;padding-right:15px;font-size:0px"><img src="https://zpepe.stripocdn.email/content/guids/CABINET_cc9e0300bf8e390beebedf5bd05c800a358a89e5241acd03f8dce5169e95b727/images/checklist_FgL.png" alt="" width="26" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none" height="26"></td>
+                      <td align="left" style="padding:0;Margin:0">
+                       <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                         <tr style="border-collapse:collapse">
+                          <td align="left" style="padding:5px;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#646464;font-size:14px">Qué aportan funciones como IA, ZTNA sin agente y nuevos PoPs en la región</p></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table></td>
+             </tr>
+           </table></td>
+         </tr>
+       </table>
+       <table cellpadding="0" cellspacing="0" align="center" class="p" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:100%;table-layout:fixed !important">
+         <tr style="border-collapse:collapse">
+          <td align="center" style="padding:0;Margin:0">
+           <table cellspacing="0" cellpadding="0" bgcolor="#ffffff" align="center" class="bi" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#ffffff;width:600px" role="none">
+             <tr style="border-collapse:collapse">
+              <td align="left" bgcolor="#ffffff" style="Margin:0;padding-right:20px;padding-left:20px;padding-top:10px;padding-bottom:10px;background-color:#ffffff">
+               <table cellpadding="0" cellspacing="0" width="100%" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                 <tr style="border-collapse:collapse">
+                  <td align="center" valign="top" style="padding:0;Margin:0;width:560px">
+                   <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td align="center" style="padding:0;Margin:0"><!--[if mso]><a href="https://everywhere.fortinet.com/ai-lp-es-wc-xperts-todosobrefortisase-jul?elqTrack=true" target="_blank" hidden>
+	<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" esdevVmlButton href="https://everywhere.fortinet.com/ai-lp-es-wc-xperts-todosobrefortisase-jul?elqTrack=true" style="height:41px; v-text-anchor:middle; width:192px" arcsize="50%" stroke="f"  fillcolor="#307fe2">
+		<w:anchorlock></w:anchorlock>
+		<center style='color:#ffffff; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; font-weight:700; line-height:15px;  mso-text-raise:1px'>Inscríbase  aquí</center>
+	</v:roundrect></a>
+<![endif]--><!--[if !mso]><!-- --><span class="ba msohide" style="border-style:solid;border-color:#164AFF;background:#307fe2;border-width:0px;display:inline-block;border-radius:30px;width:auto;mso-hide:all"><a href="https://apps.global.fortinet.com/e/er?s=3049749&lid=25792&elqTrackId=5bce922f21324aa3a9881c7da619ad7c&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF5485CD4D6E9F54CA43DE90A484B1158CDC50D004E84986CEF98A201E7E2545FB3" target="_blank" class="w" style="mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:18px;padding:10px 20px 10px 20px;display:inline-block;background:#307fe2;border-radius:30px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:bold;font-style:normal;line-height:21.6px;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid #307fe2">Inscríbase aquí</a></span><!--<![endif]--></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table></td>
+             </tr>
+           </table></td>
+         </tr>
+       </table>
+       <table cellspacing="0" cellpadding="0" align="center" class="p" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:100%;table-layout:fixed !important">
+         <tr style="border-collapse:collapse">
+          <td align="center" style="padding:0;Margin:0">
+           <table bgcolor="#ffffff" align="center" cellpadding="0" cellspacing="0" class="bi" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#FFFFFF;width:600px">
+             <tr style="border-collapse:collapse">
+              <td bgcolor="#ffffff" align="left" style="padding:0;Margin:0;padding-top:20px;padding-right:20px;padding-left:20px;background-color:#ffffff">
+               <table cellpadding="0" cellspacing="0" width="100%" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                 <tr style="border-collapse:collapse">
+                  <td valign="top" align="center" style="padding:0;Margin:0;width:560px">
+                   <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td align="center" class="g" style="padding:0;Margin:0"><h2 class="bd f c" style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:24px;font-style:normal;font-weight:bold;line-height:28.8px;color:#464646">Speakers&nbsp;</h2></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="center" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px;padding-right:10px;font-size:0">
+                       <table cellspacing="0" border="0" width="10%" height="100%" cellpadding="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:10% !important;display:inline-table" role="presentation">
+                         <tr style="border-collapse:collapse">
+                          <td style="padding:0;Margin:0;height:0px;width:100%;margin:0px;border-bottom:3px solid #307fe2;background:unset"></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table></td>
+             </tr>
+             <tr style="border-collapse:collapse">
+              <td bgcolor="#ffffff" align="left" style="padding:20px;Margin:0;background-color:#ffffff"><!--[if mso]><table style="width:560px" cellpadding="0" cellspacing="0"><tr><td style="width:270px" valign="top"><![endif]-->
+               <table cellpadding="0" cellspacing="0" align="left" class="t" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:left">
+                 <tr style="border-collapse:collapse">
+                  <td align="center" class="bn" style="padding:0;Margin:0;width:270px">
+                   <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td align="center" style="padding:0;Margin:0;font-size:0px"><img src="https://images.global.fortinet.com/EloquaImages/clients/FortinetInc2/%7B7a62875a-abbe-40c4-8ada-869b7965df59%7D_Alex_Mehat.png" alt="Alexandra Mehat" height="150" title="Alexandra Mehat" class="img-4415" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none;border-radius:30px 0px 0px" width="150"></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+                 <tr style="border-collapse:collapse">
+                  <td align="center" class="bn" style="padding:0;Margin:0;width:270px">
+                   <table width="100%" bgcolor="#164aff" cellpadding="0" cellspacing="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#164aff" role="presentation">
+                     <tr style="border-collapse:collapse">
+                      <td bgcolor="#ffffff" align="center" class="d" style="padding:0;Margin:0;padding-top:10px;padding-bottom:5px"><h3 class="bd b c" style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:16px;font-style:normal;font-weight:bold;line-height:19.2px;color:#464646">Alexandra Mehat</h3></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="center" bgcolor="#ffffff" class="bd" style="padding:0;Margin:0;padding-top:5px;padding-bottom:5px;font-size:0">
+                       <table height="100%" cellpadding="0" cellspacing="0" border="0" width="20%" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;display:inline-table;width:20% !important" role="presentation">
+                         <tr style="border-collapse:collapse">
+                          <td style="padding:0;Margin:0;border-bottom:3px solid #307fe2;background:unset;height:0px;width:100%;margin:0px"></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="center" bgcolor="#ffffff" style="padding:0;Margin:0;padding-bottom:10px"><p class="bd" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#464646;font-size:14px">Product Marketing Manager Global de Fortinet para SASE</p></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table><!--[if mso]></td><td style="width:20px"></td><td style="width:270px" valign="top"><![endif]-->
+               <table align="right" cellpadding="0" cellspacing="0" class="u" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:right">
+                 <tr style="border-collapse:collapse">
+                  <td align="center" class="bn" style="padding:0;Margin:0;width:270px">
+                   <table cellspacing="0" width="100%" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td align="center" style="padding:0;Margin:0;font-size:0px"><img alt="Ignacio Conti" width="150" src="https://images.global.fortinet.com/EloquaImages/clients/FortinetInc2/%7B5c79ac09-6e7d-4027-b6c4-c07ca30e6ed1%7D_ignacio_conti.png" title="Ignacio Conti" class="img-9536" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none;border-radius:0px 30px 0px 0px" height="150"></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="center" bgcolor="#ffffff" class="a" style="padding:0;Margin:0;padding-top:10px;padding-bottom:5px"><h3 class="bd b c" style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:16px;font-style:normal;font-weight:bold;line-height:19.2px;color:#464646">Ignacio Conti</h3></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="center" bgcolor="#ffffff" class="bd" style="padding:0;Margin:0;padding-top:5px;padding-bottom:5px;font-size:0">
+                       <table border="0" width="20%" height="100%" cellpadding="0" cellspacing="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:20% !important;display:inline-table" role="presentation">
+                         <tr style="border-collapse:collapse">
+                          <td style="padding:0;Margin:0;background:unset;height:0px;width:100%;margin:0px;border-bottom:3px solid #307fe2"></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="center" bgcolor="#ffffff" style="padding:0;Margin:0;padding-bottom:10px"><p class="bd" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#464646;font-size:14px">Business Development Manager, SASE Team LATAM</p></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table><!--[if mso]></td></tr></table><![endif]--></td>
+             </tr>
+           </table></td>
+         </tr>
+       </table>
+       <table cellpadding="0" cellspacing="0" align="center" class="p" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:100%;table-layout:fixed !important">
+         <tr style="border-collapse:collapse">
+          <td align="center" style="padding:0;Margin:0">
+           <table bgcolor="#ffffff" align="center" cellpadding="0" cellspacing="0" class="bi" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#FFFFFF;width:600px">
+             <tr style="border-collapse:collapse">
+              <td align="left" bgcolor="#f0f0f0" class="bm" style="Margin:0;padding-top:5px;padding-bottom:10px;padding-right:10px;padding-left:10px;background-color:#f0f0f0;border-radius:30px 30px 0px 0px">
+               <table cellpadding="0" cellspacing="0" width="100%" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                 <tr style="border-collapse:collapse">
+                  <td align="left" style="padding:0;Margin:0;width:580px">
+                   <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr class="n" style="border-collapse:collapse">
+                      <td align="center" style="padding:10px;Margin:0;font-size:0">
+                       <table border="0" width="100%" height="100%" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                         <tr style="border-collapse:collapse">
+                          <td style="padding:0;Margin:0;border-bottom:0px solid #cccccc;background:unset;height:0px;width:100%;margin:0px"></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="center" bgcolor="#f0f0f0" style="Margin:0;padding-top:10px;padding-bottom:5px;padding-right:30px;padding-left:30px"><h3 class="bd" style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:22px;font-style:normal;font-weight:bold;line-height:26.4px;color:#464646"><strong>Fortinet Xperts no es solo una serie de charlas.</strong></h3></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="center" bgcolor="#f0f0f0" class="bd" style="padding:0;Margin:0;padding-top:5px;padding-bottom:5px;font-size:0">
+                       <table border="0" width="20%" height="100%" cellpadding="0" cellspacing="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;display:inline-table;width:20% !important" role="presentation">
+                         <tr style="border-collapse:collapse">
+                          <td style="padding:0;Margin:0;border-bottom:3px solid #307fe2;background:unset;height:0px;width:100%;margin:0px"></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="center" bgcolor="#f0f0f0" style="padding:0;Margin:0;padding-bottom:10px;padding-right:25px;padding-left:25px"><p class="bd" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:24px;letter-spacing:0;color:#464646;font-size:16px">Es el punto de encuentro de la comunidad de ciberseguridad de la región: técnicos, arquitectos, líderes de seguridad, CISOs y tomadores de decisión que buscan contenidos claros, útiles y directamente aplicables.</p><p class="bd" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:24px;letter-spacing:0;color:#464646;font-size:16px"><strong>Regístrate y participa de esta edición especial.</strong></p></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="center" style="padding:0;Margin:0"><!--[if mso]><a href="https://everywhere.fortinet.com/ai-lp-es-wc-xperts-todosobrefortisase-jul?elqTrack=true" target="_blank" hidden>
+	<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" esdevVmlButton href="https://everywhere.fortinet.com/ai-lp-es-wc-xperts-todosobrefortisase-jul?elqTrack=true" style="height:41px; v-text-anchor:middle; width:128px" arcsize="50%" stroke="f"  fillcolor="#307fe2">
+		<w:anchorlock></w:anchorlock>
+		<center style='color:#ffffff; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; font-weight:400; line-height:15px;  mso-text-raise:1px'>Registro</center>
+	</v:roundrect></a>
+<![endif]--><!--[if !mso]><!-- --><span class="ba msohide" style="border-style:solid;border-color:#307fe2;background:#307fe2;border-width:0px;display:inline-block;border-radius:30px;width:auto;mso-hide:all"><a href="https://apps.global.fortinet.com/e/er?s=3049749&lid=25792&elqTrackId=0fe560d37d434886be340b8d77754512&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF5DC04F0E6E439354B683604838F8F6596C50D004E84986CEF98A201E7E2545FB3" target="_blank" class="w" style="mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#ffffff;font-size:18px;padding:10px 20px 10px 20px;display:inline-block;background:#307fe2;border-radius:30px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:21.6px;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid #307fe2">Registro</a></span><!--<![endif]--></td>
+                     </tr>
+                     <tr class="n" style="border-collapse:collapse">
+                      <td align="center" style="padding:10px;Margin:0;font-size:0">
+                       <table border="0" width="100%" height="100%" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                         <tr style="border-collapse:collapse">
+                          <td style="padding:0;Margin:0;border-bottom:0px solid #cccccc;background:unset;height:0px;width:100%;margin:0px"></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table></td>
+             </tr>
+           </table></td>
+         </tr>
+       </table>
+       <table cellpadding="0" cellspacing="0" align="center" class="r" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:100%;table-layout:fixed !important;background-color:#000000;background-repeat:repeat;background-position:center top">
+         <tr style="border-collapse:collapse">
+          <td align="center" bgcolor="#ffffff" style="padding:0;Margin:0;background-color:#ffffff">
+           <table align="center" cellpadding="0" cellspacing="0" bgcolor="#ffffff" class="bh" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#ffffff;width:600px" role="none">
+             <tr style="border-collapse:collapse">
+              <td align="left" style="padding:20px;Margin:0">
+               <table cellpadding="0" cellspacing="0" width="100%" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                 <tr style="border-collapse:collapse">
+                  <td align="left" style="padding:0;Margin:0;width:560px">
+                   <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                     <tr style="border-collapse:collapse">
+                      <td align="center" class="bl" style="padding:0;Margin:0;padding-top:5px;padding-bottom:10px;padding-left:40px;font-size:0px"><a target="_blank" href="https://apps.global.fortinet.com/e/er?s=3049749&lid=3272&elqTrackId=8198eec5f26f4c219f17b841b99fb79c&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF59D53782F39432FACCAE909C82CD54802C50D004E84986CEF98A201E7E2545FB3" style="mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:12px"><img src="https://zpepe.stripocdn.email/content/guids/CABINET_cc9e0300bf8e390beebedf5bd05c800a358a89e5241acd03f8dce5169e95b727/images/1a17545e5e53452a8098b5f77604d361_black_and_red_fortinet_logo_Zc7.png" alt="FORTINET" width="139" title="FORTINET" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none" height="16"></a></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="center" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px;font-size:0">
+                       <table cellpadding="0" cellspacing="0" class="j x" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                         <tr style="border-collapse:collapse">
+                          <td align="center" valign="top" style="padding:0;Margin:0;padding-right:35px"><a target="_blank" href="https://apps.global.fortinet.com/e/er?s=3049749&lid=164&elqTrackId=c3504c777690451aa06e5f69c2dae50f&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF51817533DECF4BB46538CABF8CFC2024FC50D004E84986CEF98A201E7E2545FB3" style="mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:12px"><img src="https://zpepe.stripocdn.email/content/assets/img/social-icons/logo-colored/facebook-logo-colored.png" alt="Fb" title="Facebook" width="24" height="24" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none"></a></td>
+                          <td align="center" valign="top" style="padding:0;Margin:0;padding-right:35px"><a target="_blank" href="https://apps.global.fortinet.com/e/er?s=3049749&lid=877&elqTrackId=3cad9a7ddea34dd59c4f7e798ea2d9fa&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF585003F2240E5ED655953655FDCBE98F3C50D004E84986CEF98A201E7E2545FB3" style="mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:12px"><img src="https://zpepe.stripocdn.email/content/assets/img/social-icons/logo-colored/x-logo-colored.png" alt="X" title="X.com" width="24" height="24" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none"></a></td>
+                          <td align="center" valign="top" style="padding:0;Margin:0;padding-right:35px"><a target="_blank" href="https://apps.global.fortinet.com/e/er?s=3049749&lid=162&elqTrackId=e0fb3edb1ee04776bd9fd4df09f8cf77&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF533F1EEB3457F2DB41AB238166A5BADC7C50D004E84986CEF98A201E7E2545FB3" style="mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:12px"><img src="https://zpepe.stripocdn.email/content/assets/img/social-icons/logo-colored/instagram-logo-colored.png" alt="Ig" title="Instagram" width="24" height="24" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none"></a></td>
+                          <td align="center" valign="top" style="padding:0;Margin:0;padding-right:35px"><a target="_blank" href="https://apps.global.fortinet.com/e/er?s=3049749&lid=161&elqTrackId=1e2da047d98945f2a95c86ba408d48da&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF577CDEC60DB68CE3749DC394A904CCA57C50D004E84986CEF98A201E7E2545FB3" style="mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:12px"><img src="https://zpepe.stripocdn.email/content/assets/img/social-icons/logo-colored/youtube-logo-colored.png" alt="Yt" title="Youtube" width="24" height="24" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none"></a></td>
+                          <td align="center" valign="top" style="padding:0;Margin:0"><a target="_blank" href="https://apps.global.fortinet.com/e/er?s=3049749&lid=160&elqTrackId=9ff4fe280cd94a8e8f9e71ab3f4562cf&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF57134028B26E7EF9C3F1A4DA4331A5CFBC50D004E84986CEF98A201E7E2545FB3" style="mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:12px"><img src="https://zpepe.stripocdn.email/content/assets/img/social-icons/logo-colored/linkedin-logo-colored.png" alt="In" title="Linkedin" width="24" height="24" style="display:block;font-size:14px;border:0;outline:none;text-decoration:none"></a></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td style="padding:0;Margin:0">
+                       <table cellpadding="0" cellspacing="0" width="100%" class="k" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                         <tr class="links" style="border-collapse:collapse">
+                          <td align="center" valign="top" width="25%" style="Margin:0;border:0;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px">
+                           <div style="vertical-align:middle;display:block">
+                            <a target="_blank" href="https://apps.global.fortinet.com/e/er?s=3049749&lid=8&elqTrackId=0052922d386e4bf5acc844d165ad9987&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF5B4D92A0723CB28D7B79343F7DE1913EAC50D004E84986CEF98A201E7E2545FB3" style="mso-line-height-rule:exactly;text-decoration:none;font-family:arial, 'helvetica neue', helvetica, sans-serif;display:block;color:#666666;font-size:12px">Visit Us </a>
+                           </div></td>
+                          <td align="center" valign="top" width="25%" style="Margin:0;border:0;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;border-left:1px solid #cccccc">
+                           <div style="vertical-align:middle;display:block">
+                            <a target="_blank" href="https://apps.global.fortinet.com/e/er?s=3049749&lid=11&elqTrackId=b876a67a8c364d2d88aca1512dd062e5&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF5033FCABE94CED1A117CBC19E7DD00F22C50D004E84986CEF98A201E7E2545FB3" style="mso-line-height-rule:exactly;text-decoration:none;font-family:arial, 'helvetica neue', helvetica, sans-serif;display:block;color:#666666;font-size:12px">Privacy Policy</a>
+                           </div></td>
+                          <td align="center" valign="top" width="25%" style="Margin:0;border:0;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;border-left:1px solid #cccccc">
+                           <div style="vertical-align:middle;display:block">
+                            <a target="_blank" href="https://apps.global.fortinet.com/e/er?s=3049749&lid=4969&elqTrackId=a8ee2a3a784444189bfde71bb0ba974b&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF554422EF5E60946D65F0B387C4B47E812C50D004E84986CEF98A201E7E2545FB3" style="mso-line-height-rule:exactly;text-decoration:none;font-family:arial, 'helvetica neue', helvetica, sans-serif;display:block;color:#666666;font-size:12px">Terms of Use</a>
+                           </div></td>
+                          <td align="center" valign="top" width="25%" style="Margin:0;border:0;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;border-left:1px solid #cccccc">
+                           <div style="vertical-align:middle;display:block">
+                            <a target="_blank" href="https://apps.global.fortinet.com/e/er?s=3049749&lid=159&elqTrackId=7e557103edaf440da3f9b83cfc695c3e&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF5CB12A6065D3BEE22DEA076F860B39EDAC50D004E84986CEF98A201E7E2545FB3" style="mso-line-height-rule:exactly;text-decoration:none;font-family:arial, 'helvetica neue', helvetica, sans-serif;display:block;color:#666666;font-size:12px">Manage Your Subscription</a>
+                           </div></td>
+                         </tr>
+                       </table></td>
+                     </tr>
+                     <tr style="border-collapse:collapse">
+                      <td align="center" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;letter-spacing:0;color:#333333;font-size:12px"><a target="_blank" href="https://apps.global.fortinet.com/e/er?s=3049749&lid=8&elqTrackId=3e47b2350ebe43a0877c5cbb879612c4&elq=f793a87bd6db4ef29aa3c0ad457ee39e&elqaid=30076&elqat=1&elqak=8AF57CD61EE2046AC0BCAD1D30368D9806C8C50D004E84986CEF98A201E7E2545FB3" style="mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px">Fortinet, Inc.</a> | 909 Kifer Road | Sunnyvale, CA 94086 | +1-408-235-7700</p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;letter-spacing:0;color:#333333;font-size:12px">© 2025 Copyright&nbsp;</p></td>
+                     </tr>
+                   </table></td>
+                 </tr>
+               </table></td>
+             </tr>
+           </table></td>
+         </tr>
+       </table></td>
+     </tr>
+   </table>
+  </div>
+ 
+
+
+<img src='https://apps.global.fortinet.com/e/FooterImages/FooterImage1?elq=f793a87bd6db4ef29aa3c0ad457ee39e&siteid=3049749' alt="" border=0 width=1px height=1px style='display:block;'></body></html>
