@@ -891,6 +891,7 @@ class CorreoModel extends Model{
                         //echo $asunto;
                         if (stripos($asunto, 'de Ticket') !== false) {
                             //echo "Correo con uid '$uid_personalizado' corresponde a finalización automática, se omite.\n";
+                            //aplica para correos de finalizacion y de realizacion 29/09/2025
                             continue;
                         }
 
@@ -1597,7 +1598,7 @@ class CorreoModel extends Model{
     
             // Contenido
             $mail->isHTML(true);
-            $mail->Subject = 'Finalización de Ticket';
+            $mail->Subject = 'No reply - Finalización de Ticket';
             $mail->Body    = $mensajeHTML;
     
             $mail->send();
@@ -1608,6 +1609,164 @@ class CorreoModel extends Model{
             return false;
         }
     }
+    public function enviarCorreoRealizado($uid, $idusuario, $asunto, $fecha_envio, $correo_origen, $comentario)
+    {
+        $mail = new PHPMailer(true);
+
+        try {
+            // --- SMTP ---
+            $pwcorreo   = constant('PWCORREO');
+            $namecorreo = constant('CORREO');
+
+            $mail->isSMTP();
+            $mail->Host       = 'mail.iopa.cl';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = $namecorreo;
+            $mail->Password   = $pwcorreo;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port       = 465;
+
+            $mail->CharSet    = 'UTF-8';
+            $mail->Encoding   = 'base64';
+            $mail->SMTPDebug  = 0;
+
+            // --- Buscar ticket en BD ---
+            $uid_trim = trim($uid);
+            $query = $this->db->connect()->query("SELECT * FROM correo WHERE uid = '$uid_trim' LIMIT 1");
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+
+
+            $comentarioDesarrollador = !empty($result['comentario_desarrollador']) ? trim($result['comentario_desarrollador']) : 'Sin comentario del responsable.';
+            $desarrolladorAsignado   = !empty($result['asignado']) ? trim($result['asignado']) : 'Sin desarrollador asignado.';
+
+            // --- Determinar destinatario ---
+            $programacion = [
+                'n2@n2.cl',
+                'nstuardo@gmail.com',
+                'daniel.navarrete@iopa.cl',
+                'christopher.soto@iopa.cl',
+                'luis.farias@iopa.cl',
+                'dimas.delmoral@iopa.cl',
+                'marcos.huenchunir@iopa.cl'
+            ];
+
+            $soporteTI = [
+                'boris.sanchez@iopa.cl',
+                'luis.plaza@iopa.cl',
+                'nelson.leiva@iopa.cl'
+            ];
+
+            if (in_array($desarrolladorAsignado, $programacion)) {$mail->addAddress('catalina.henriquez@iopa.cl', 'Catalina Henriquez');} 
+            elseif (in_array($desarrolladorAsignado, $soporteTI)) {$mail->addAddress('luis.plaza@iopa.cl', 'Luis Plaza');} 
+            else {$mail->addAddress('christopher.soto@iopa.cl', 'Christopher Soto');}
+
+
+            // --- Ruta del HTML guardada en BD ---
+            $rutaHtml = $result && !empty($result['cuerpo']) ? $result['cuerpo'] : null;
+            $innerHtml = "<p style='color:#e74c3c;'>No se encontró contenido para el ticket ($uid_trim).</p>";
+
+            if ($rutaHtml) {
+                $fullPath = $_SERVER['DOCUMENT_ROOT'] . $rutaHtml;
+                if (file_exists($fullPath)) {
+                    $htmlContent = file_get_contents($fullPath);
+                    if (preg_match('@<body[^>]*>(.*?)</body>@is', $htmlContent, $m)) {
+                        $innerHtml = $m[1];
+                    } else {
+                        $innerHtml = $htmlContent;
+                    }
+
+                    // --- Procesar imágenes dentro del HTML ---
+                    $doc = new DOMDocument();
+                    libxml_use_internal_errors(true);
+                    $doc->loadHTML($htmlContent);
+                    libxml_clear_errors();
+
+                    $tags = $doc->getElementsByTagName('img');
+                    foreach ($tags as $tag) {
+                        $src = $tag->getAttribute('src');
+                        if ($src && strpos($src, 'imagenes_embebidas/') !== false) {
+                            $basename = basename($src);
+                            $cid = md5($basename);
+
+                            // reemplazo en el HTML
+                            $innerHtml = str_replace($src, "cid:$cid", $innerHtml);
+
+                            // path físico
+                            $imgPath = $_SERVER['DOCUMENT_ROOT'] . '/eticket/public/imagenes_embebidas/' . $basename;
+                            if (file_exists($imgPath)) {
+                                $mail->addEmbeddedImage($imgPath, $cid, $basename);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // --- Plantilla final del correo ---
+            $mensajeHTML = '
+            <html>
+            <head><meta charset="UTF-8"></head>
+            <body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                <div style="max-width: 800px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 8px;">
+                    <h2 style="text-align: center; color: #2c3e50; font-size: 20px;">Ticket Realizado ☑️</h2>
+                    <p>Estimado/a,</p>
+                    <p>El ticket ha sido marcado como <strong>realizado</strong>. A continuación, se detallan los comentarios y la información del ticket:</p>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                        <tr>
+                            <td style="padding: 5px; font-weight: bold; width: 40%; background-color: #ecf0f1;">ID Ticket:</td>
+                            <td style="padding: 5px;">#' . htmlspecialchars($uid_trim) . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px; font-weight: bold; background-color: #ecf0f1;">Asunto:</td>
+                            <td style="padding: 5px;">' . htmlspecialchars($asunto) . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px; font-weight: bold; background-color: #ecf0f1;">Fecha de creación:</td>
+                            <td style="padding: 5px;">' . htmlspecialchars($fecha_envio) . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px; font-weight: bold; background-color: #ecf0f1;">Comentario del desarrollador:</td>
+                            <td style="padding: 5px;">' . nl2br(htmlspecialchars($comentarioDesarrollador)) . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px; font-weight: bold; background-color: #ecf0f1;">Desarrollador:</td>
+                            <td style="padding: 5px;">' . htmlspecialchars($desarrolladorAsignado) . '</td>
+                        </tr>
+                    </table>
+
+                    <!-- Contenido HTML original del ticket -->
+                    <h3>Contenido del Ticket</h3>
+                    <div style="margin-top:18px; padding:12px; border:1px solid #e9e9e9; border-radius:6px; background:#fff;">
+                        ' . $innerHtml . '
+                    </div>
+
+                    <!-- Footer destacado -->
+                    <div style="margin-top:30px; padding:15px; background:#f4f6f7; border-top:2px solid #3498db; text-align:center; border-radius:8px;">
+                        <p style="font-size:13px; color:#2c3e50; margin:0;">
+                            <strong>⚠️ Este mensaje se generó automáticamente.</strong><br>
+                            Por favor, <strong style="color:#e74c3c;">no responder a este correo</strong>.
+                        </p>
+                        <p style="font-size:12px; color:#95a5a6; margin-top:8px;">
+                            IOPA System - E-Tickets &copy; ' . date('Y') . '
+                        </p>
+                    </div>
+                </div>
+            </body>
+            </html>';
+
+            $mail->isHTML(true);
+            $mail->Subject = 'No reply - Realización de Ticket';
+            $mail->Body    = $mensajeHTML;
+            $mail->AltBody = strip_tags("Ticket #$uid_trim - $asunto\n\n" . $comentarioDesarrollador);
+
+            $mail->send();
+            return true;
+        } catch (\Exception $e) {
+            error_log("Error al enviar correo (enviarCorreoRealizado): " . $e->getMessage());
+            return false;
+        }
+    }
+
 
     public function enviarRespuestaEstatica()
     {

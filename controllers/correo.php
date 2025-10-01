@@ -374,7 +374,13 @@ class Correo extends Controller{
                 elseif ($actualizado && $estado == 5) { echo "Estado actualizado a 'Eliminado'.";} 
                 //else{ echo "Error : no se pudo actualizar a 'Finalizado': ".$actualizado ."/ estado: ".$estado;}
 
-                elseif ($actualizado && $estado == 6) { echo "Estado actualizado a 'Realizado'.";} 
+                elseif ($actualizado && $estado == 6) { 
+                    //echo "Estado actualizado a 'Realizado'.";
+                    $correoEnviado = $this->model->enviarCorreoRealizado($uid, $idusuario, $asunto, $fecha_envio, $correo_origen, $comentario, $comentarioDesarrollador);
+    
+                    if ($correoEnviado) { echo "Estado actualizado a 'Realizado' y notificación enviada a jefatura correctamente.";} 
+                    else { echo "Estado actualizado a 'Realizado', pero error al enviar la notificación.";}
+                } 
                 //else{ echo "Error : no se pudo actualizar a 'Realizado': ".$actualizado ."/ estado: ".$estado;}
 
             } 
