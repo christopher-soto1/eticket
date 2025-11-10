@@ -107,7 +107,7 @@ $asignacion = $this->asignacion;
 
     <!-- Logout -->
     <li class="nav-item">
-      <a class="nav-link" href="<?php echo constant('URL'); ?>">
+      <a class="nav-link" href="<?= constant('URL'); ?>login/salir">
         <i class="fas fa-sign-out-alt"></i> Salir
       </a>
     </li>

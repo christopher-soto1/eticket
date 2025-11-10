@@ -37,9 +37,20 @@ class Login extends Controller
   }
   
 
-  function salir()
+/*   function salir()
   {
     $this->view->render('login/index');
+  } */
+
+  function salir()
+  {
+      session_start();
+      session_unset();  // Elimina todas las variables de sesión
+      session_destroy(); // Destruye la sesión por completo
+
+      // Redirige al login
+      header('Location: ' . constant('URL') . 'login');
+      exit();
   }
 }
 ?>

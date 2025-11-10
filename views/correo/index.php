@@ -4,6 +4,15 @@
 ini_set('max_execution_time', 4000);  // 300 segundos = 5 minutos
 ini_set('memory_limit', '512M');
 //error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
+
+session_start();
+if (!isset($_SESSION['usuario'])) {
+    session_unset();
+    session_destroy();
+    header("Location: " . constant('URL') . "login");
+    exit();
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -624,6 +633,15 @@ ini_set('memory_limit', '512M');
                 Estadísticas
               </button>
             </div>
+
+            <hr style="border: none; border-top: 1px solid white;">
+
+            <div class="d-flex justify-content-between mb-2 filtro-boton">
+              <a href="<?php echo constant('URL'); ?>proyectos/verTabla" class="btn btn-light btn-sm w-100 me-1" style="color: black;">
+                Proyectos
+              </a>
+            </div>
+
 
 
 <div id="respuestaEnvio" class="mt-3 text-info"></div>
