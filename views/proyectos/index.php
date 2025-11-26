@@ -80,6 +80,15 @@ $permiso = $this->permiso;
             <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#modalAgregarProyecto">
             + Agregar proyecto
             </button>
+            <!-- <a class="btn btn-success mb-3 btn-descargar-plantilla" onclick="descargarPlantilla()">
+                <i class="fas fa-download"></i> 
+                Plantilla de Proyectos
+            </a> -->
+            <a href="#" id="btnDescargarPlantilla" class="descargar-plantilla-funcional">
+                <i class="fas fa-download"></i>
+                Plantilla de Proyectos
+            </a>
+
 
         <?php if (!empty($this->totalRegistros)): ?>
         <table id="tablaProyectos" class="table table-striped table-bordered mt-3">
@@ -110,7 +119,7 @@ $permiso = $this->permiso;
                     <td><?= htmlspecialchars($registro->descripcion) ?></td>
 
                     <!-- Fecha creacion -->
-                    <td><?= date('d-m-Y', strtotime($registro->fecha_creacion)) ?></td>
+                    <td><?= date('Y-m-d', strtotime($registro->fecha_creacion)) ?></td>
 
                     <!-- Directorio -->
                     <!-- <td><?= htmlspecialchars($registro->ruta_directorio_global) ?></td> -->
@@ -157,6 +166,7 @@ $permiso = $this->permiso;
                                 data-nombre="<?= htmlspecialchars($registro->nombre_proyecto) ?>"
                                 data-descripcion="<?= htmlspecialchars($registro->descripcion) ?>"
                                 data-responsable="<?= htmlspecialchars($registro->responsable) ?>"
+                                data-fecha="<?= htmlspecialchars($registro->fecha_creacion) ?>"
                                 data-estado="<?= htmlspecialchars($registro->estado) ?>">
                         <i class="fa fa-edit"></i> Editar
                         </button>
@@ -555,6 +565,12 @@ $permiso = $this->permiso;
             var descripcion = button.data('descripcion');
             var responsable = button.data('responsable');
             var estado = button.data('estado');
+            var fecha = button.data('fecha'); // ✅ Capturamos la fecha del botón
+
+            // ✅ Si la fecha viene con hora, cortamos solo la parte AAAA-MM-DD
+            if (fecha && fecha.includes(' ')) {
+                fecha = fecha.split(' ')[0];
+            }
 
             var modal = $(this);
 
@@ -564,6 +580,7 @@ $permiso = $this->permiso;
             modal.find('#editar_descripcion').val(descripcion);
             modal.find('#editar_responsable').val(responsable);
             modal.find('#editar_estado').val(estado);
+            modal.find('#editar_fecha').val(fecha); // ✅ Cargamos fecha real
 
             // Título dinámico
             modal.find('.modal-title').text('Editar – ' + nombreProyecto);
@@ -820,6 +837,20 @@ $permiso = $this->permiso;
             });
         });
 
+        $('[data-target="#modalAgregarProyecto"]').on('click', function() {
+            console.log("Limpiando filtros de modal crear proyecto");
+            // Limpia todos los campos del formulario
+            $('#formNuevoProyecto')[0].reset();
+
+            // También puedes reiniciar selects manualmente si quieres volver a la opción vacía
+            $('#formNuevoProyecto select').val('');
+
+            // Opcional: establecer nuevamente la fecha actual
+            const hoy = new Date().toISOString().split('T')[0];
+            $('#formNuevoProyecto input[name="fecha_creacion"]').val(hoy);
+        });
+
+
     });
 
     // Botón para agregar más archivos - MANTENER AFUERA DE READY
@@ -857,6 +888,17 @@ $permiso = $this->permiso;
     tabla.on('draw.dt', function () {
         console.log("🔁 DataTable redibujado, verificando botones...");
         verificarBotones();
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const btn = document.getElementById("btnDescargarPlantilla");
+
+        if (btn) {
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                window.location.href = "/eticket/views/proyectos/descargar_plantilla.php";
+            });
+        }
     });
 
 
