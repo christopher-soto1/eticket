@@ -10,7 +10,8 @@
 <body>
 	<?php require 'views/header.php'?>
 	<div class="container">
-		<h3 class="center">Usuarios</h3>
+		<!-- <h3 class="center">Usuarios</h3> -->
+		 <hr>
 		<a href="<?php echo constant('URL')?>usuarios/nuevoUsuarios" class="btn btn-primary">+ Nuevo</a><br><br>
 	<form id="form-buscar" action="<?php echo constant('URL'); ?>usuarios/verPaginacionsearch/1" method="POST" >
 		Buscar
@@ -22,8 +23,8 @@
          		<tr>
                  <th>Id</th>
                  <th>Email</th>
-                 <th>Pass</th>
-                 <th>Foto</th>
+                 <!-- <th>Pass</th> -->
+                 <!-- <th>Foto</th> -->
                  <th>Acciones</th>
          		</tr>
          	</thead>
@@ -37,10 +38,10 @@
          		<tr>
          			<td><?php echo $usuarios->id;?></td>
          			<td><?php echo $usuarios->email;?></td>
-         			<td><?php echo $usuarios->pass;?></td>
-         			<td><img src='<?php echo constant('URL')?>public/uploads/<?php echo $usuarios->foto;?>' width='50px' height='50px'></td>
+         			<!-- <td><?php echo $usuarios->pass;?></td> -->
+         			<!-- <td><img src='<?php echo constant('URL')?>public/uploads/<?php echo $usuarios->foto;?>' width='50px' height='50px'></td> -->
          			<td><a class="btn btn-outline-secondary" href="<?php echo constant('URL').'usuarios/verUsuarios/'.$usuarios->id; ?>">Editar</a></td>
-         			<td><a class="btn btn-danger" href="<?php echo constant('URL').'usuarios/eliminarUsuarios/'.$usuarios->id; ?>" >Eliminar</a></td>
+         			<td><a class="btn btn-danger" href="<?php echo constant('URL').'usuarios/eliminarUsuarios/'.$usuarios->email; ?>" >Eliminar</a></td>
          		</tr>
          			<?php
                     }

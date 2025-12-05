@@ -268,7 +268,9 @@ function crearUsuarios(){
           	$permisos=$this->model->getmenu($_SESSION['usuario']); 	
          $this->view->usuariosperfil=$permisos;
           /*fin*/
-       $this->render('usuarios/index');	
+       /* $this->render('usuarios/index');	 */
+       header("Location: " . constant('URL') . "login/salir");
+      exit;
    }
 function eliminarUsuarios($param = null){
    $id=$param[0];

@@ -634,6 +634,17 @@ if (!isset($_SESSION['usuario'])) {
               </button>
             </div>
 
+           <?php 
+            $usuarios_permitidos = [
+                'christopher.soto@iopa.cl',
+                'nstuardo@gmail.com',
+                'n2@n2.cl',
+                'dimas.delmoral@iopa.cl',
+                'daniel.navarrete@iopa.cl',
+                'marcos.huenchunir@iopa.cl'
+              ];
+              
+           if (isset($_SESSION['usuario']) && in_array($_SESSION['usuario'], $usuarios_permitidos)) {?>
             <hr style="border: none; border-top: 1px solid white;">
 
             <div class="d-flex justify-content-between mb-2 filtro-boton">
@@ -641,6 +652,19 @@ if (!isset($_SESSION['usuario'])) {
                 Proyectos
               </a>
             </div>
+            <?php }?>
+
+            <?php
+              
+           if (isset($_SESSION['usuario']) && $_SESSION['usuario'] = 'christopher.soto@iopa.cl') {?>
+            <hr style="border: none; border-top: 1px solid white;">
+
+            <div class="d-flex justify-content-between mb-2 filtro-boton">
+              <a href="<?php echo constant('URL'); ?>usuarios/verPaginacion/1" class="btn btn-light btn-sm w-100 me-1" style="color: black;">
+                Agregar Usuarios
+              </a>
+            </div>
+            <?php }?>
 
 
 

@@ -104,25 +104,53 @@ $query=$this->db->connect()->prepare("UPDATE usuarios SET email=:email,pass=:pas
     }
     }
 public function insert($datos){
-       try{
-         $query=$this->db->connect()->prepare('INSERT INTO usuarios(id,email,pass,foto) VALUES  (:id,:email,:pass,:foto)');
-          $query->execute(['id'=>$datos['id'],'email'=>$datos['email'],'pass'=>md5(trim($datos['pass'])),'foto'=>$datos['foto']]);
-  /*llevar datos a perfil*/
-         $query2=$this->db->connect()->prepare("SELECT * FROM menu");
-          $query2->execute();
-           while($row2=$query2->fetch()){
-                $id       = $row2['id'];
-                $menu     = $row2['menu'];
-                $principal    = $row2['principal'];
-                $query3=$this->db->connect()->prepare('INSERT INTO usuariosperfil(idusuario,habilitado,menu,principal) VALUES  ("'.$datos['email'].'","S","'.$menu.'","'.$principal.'")');
-                $query3->execute();
-              }
-         /*fin llevar datos a perfil*/
-           return true;
-       }catch(PDOException $e){
-          return false;
-      }
-    } 
+    try{
+
+        $db = $this->db->connect();
+
+        // 1) Insertar usuario
+        $query = $db->prepare("
+            INSERT INTO usuarios (id, email, pass, foto)
+            VALUES (:id, :email, :pass, :foto)
+        ");
+        $query->execute([
+            ':id'    => $datos['id'],
+            ':email' => $datos['email'],
+            ':pass'  => md5(trim($datos['pass'])),
+            ':foto'  => $datos['foto']
+        ]);
+
+
+        // 2) Insertar perfiles predefinidos
+        $perfiles = [
+            ['menu'=>'correo',   'principal'=>'Tablas', 'permiso'=>'admin'],
+            ['menu'=>'tablas',   'principal'=>'', 'permiso'=>'admin'],
+            ['menu'=>'usuarios', 'principal'=>'Tablas', 'permiso'=>'admin'],
+            ['menu'=>'medicos',  'principal'=>'Tablas', 'permiso'=>'admin'],
+        ];
+
+        $sqlPerfil = "
+            INSERT INTO usuariosperfil (idusuario,  menu, habilitado, principal, permiso)
+            VALUES (:idusuario, :menu, 'S',  :principal, :permiso)
+        ";
+        $stmtPerfil = $db->prepare($sqlPerfil);
+
+        foreach($perfiles as $p){
+            $stmtPerfil->execute([
+                ':idusuario' => $datos['email'],
+                ':menu'      => $p['menu'],
+                ':principal' => $p['principal'],
+                ':permiso'   => $p['permiso']
+            ]);
+        }
+
+        return true;
+
+    } catch(PDOException $e){
+        return false;
+    }
+}
+
 public function insertcsv($datos){
        try{
          $query=$this->db->connect()->prepare('INSERT INTO usuarios(id,email,pass,foto) VALUES  (:id,:email,:pass,:foto)');
@@ -132,16 +160,33 @@ public function insertcsv($datos){
           return false;
       }
     } 
-    public function delete($id){
-$query=$this->db->connect()->prepare("DELETE FROM usuarios WHERE id=:id");
-    try{
-       $query->execute([
-         'id'=>$id,
-       ]);
-       return true;
-    }catch(PDOException $e){
-       return false;
+public function delete($email)
+{
+    try {
+        $db = $this->db->connect();
+        $db->beginTransaction();
+
+        // 1) Eliminar perfil primero (FK)
+        $stmt1 = $db->prepare("DELETE FROM usuariosperfil WHERE idusuario = :email");
+        $stmt1->execute([':email' => $email]);
+
+        // 2) Eliminar usuario
+        $stmt2 = $db->prepare("DELETE FROM usuarios WHERE email = :email");
+        $stmt2->execute([':email' => $email]);
+
+        $db->commit();
+        return true;
+
+    } catch (PDOException $e) {
+
+        // revertir cambios
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
+
+        return false;
     }
-    }
+}
+
 }
 ?>

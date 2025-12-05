@@ -10,7 +10,7 @@
 	<?php require 'views/header.php'?>
 	<div class="container">
 	<div id="main">
-		<h1 class="center">Nuevo usuarios</h1>
+	<hr>
     <div class="center"><?php echo $this->mensaje;?></div>
          <form action="<?php echo constant('URL');?>usuarios/crearUsuarios" method="POST" enctype="multipart/form-data">
            <div class="form-group">
@@ -21,7 +21,7 @@
           <label for="pass">pass</label>
           <input type="password" name="pass" value=""  class="form-control" >
           </div>
- <div class="form-group">
+ <div class="form-group" style="display:none;">
   <div class="panel">Subir Foto</div> 
   <input type="file" class="foto" name="foto"   id="foto" class="form-control" >
   <p class="help-block">Peso Maximo 200MB</p>
