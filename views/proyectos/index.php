@@ -358,7 +358,7 @@ $permiso = $this->permiso;
 
 <!-- MODAL VER DOCUMENTOS -->
 <div class="modal fade" id="modalVerDocumentos" tabindex="-1" role="dialog" aria-labelledby="modalVerDocumentosLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header bg-info text-white">
         <h5 class="modal-title" id="modalVerDocumentosLabel">Documentos del proyecto</h5>

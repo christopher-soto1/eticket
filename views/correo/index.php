@@ -641,7 +641,9 @@ if (!isset($_SESSION['usuario'])) {
                 'n2@n2.cl',
                 'dimas.delmoral@iopa.cl',
                 'daniel.navarrete@iopa.cl',
-                'marcos.huenchunir@iopa.cl'
+                'marcos.huenchunir@iopa.cl',
+                'luis.farias@iopa.cl',
+                'catalina.henriquez@iopa.cl'
               ];
               
            if (isset($_SESSION['usuario']) && in_array($_SESSION['usuario'], $usuarios_permitidos)) {?>
@@ -656,7 +658,7 @@ if (!isset($_SESSION['usuario'])) {
 
             <?php
               
-           if (isset($_SESSION['usuario']) && $_SESSION['usuario'] = 'christopher.soto@iopa.cl') {?>
+           if (isset($_SESSION['usuario']) && $_SESSION['usuario'] == 'christopher.soto@iopa.cl') {?>
             <hr style="border: none; border-top: 1px solid white;">
 
             <div class="d-flex justify-content-between mb-2 filtro-boton">
