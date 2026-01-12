@@ -1531,6 +1531,12 @@ class CorreoModel extends Model{
                 error_log("SMTP DEBUG: $str");
             };
 
+            /* Se quita respuesta del desarrollador para el usuario final - Christopher 12/01/2026*/
+            /* <tr>
+                <td style='padding: 5px; background-color: #ecf0f1; width: 35%;'><strong>Respuesta del responsable:</strong></td>
+                <td style='padding: 5px;'>$comentarioDesarrollador</td>
+            </tr> */
+
             $mensajeHTML = "
             <body style='background-color: #f9f9f9; padding: 20px; font-family: Arial, sans-serif;'>
                 <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);'>
@@ -1555,10 +1561,6 @@ class CorreoModel extends Model{
                         <tr>
                             <td style='padding: 5px; background-color: #ecf0f1; width: 35%;'><strong>Fecha de creación:</strong></td>
                             <td style='padding: 5px;'>$fecha_envio</td>
-                        </tr>
-                        <tr>
-                            <td style='padding: 5px; background-color: #ecf0f1; width: 35%;'><strong>Respuesta del responsable:</strong></td>
-                            <td style='padding: 5px;'>$comentarioDesarrollador</td>
                         </tr>
                         <tr>
                             <td style='padding: 5px; background-color: #ecf0f1; width: 35%;'><strong>Respuesta del usuario que cerró el ticket:</strong></td>
