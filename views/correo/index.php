@@ -1419,8 +1419,14 @@ if (!isset($_SESSION['usuario'])) {
                     <option value="0" ${correo.asignado == null ? 'selected' : ''}>Seleccionar usuario</option>
                     ${opciones}
                   </select>
+                  <div class="form-check mt-3">
+                      <input class="form-check-input" type="checkbox" id="checkNotificar" checked>
+                      <label class="form-check-label" for="checkNotificar">
+                          ¿Enviar notificación de recepción y asignación de ticket al usuario solicitante? (${correo.correo_origen}).
+                      </label>
+                  </div>
                   <br>
-                  <em>Se enviará una notificación al usuario que se seleccione, indicando la asignación de este ticket.</em>
+                  <em>Se enviará una notificación al <strong>desarrollador</strong> que se seleccione y al <strong>usuario</strong> que solicitó el requerimiento, indicando la asignación de este ticket.</em>
                 </form>
                 
                     `);
@@ -1488,7 +1494,7 @@ if (!isset($_SESSION['usuario'])) {
             </div>
             <div id="textareaContainerDesarrollador" class="mt-3" style="display: none;">
               <label for="comentarioEstadoDesarrollador">Comentario del responsable:</label>
-              <textarea id="comentarioEstadoDesarrollador" class="form-control" rows="3" placeholder="Escribe un comentario..."></textarea>
+              <textarea id="comentarioEstadoDesarrollador" class="form-control" rows="3" placeholder="Escribe un comentario...">${correo.comentario_desarrollador == null ? '' : correo.comentario_desarrollador}</textarea>
               <em>El comentario será registrado como información para el(los) usuario(s) final(es) asociado(s) a: <strong>${correo.correo_origen}</strong></em>
             </div>
             <input type="hidden" id="editarUid" value="${correo.uid}">
@@ -1904,6 +1910,7 @@ if (!isset($_SESSION['usuario'])) {
         document.addEventListener('click', function (e) {
           if (e.target && e.target.classList.contains('guardar-asignacion')) {
             var usuario = "<?php echo $_SESSION['idusuario']; ?>";
+            const notificar = document.getElementById('checkNotificar').checked ? 1 : 0;
             const uid = e.target.getAttribute('data-uid');
             const estado_actual = e.target.getAttribute('data-estado-actual');
             const select = document.getElementById('selectUsuario-' + uid);
@@ -1936,7 +1943,8 @@ if (!isset($_SESSION['usuario'])) {
               fecha_envio: fecha_envio,
               asunto: asunto,
               pagina: pagina,
-              usuario: usuario
+              usuario: usuario,
+              notificar: notificar
             };
 
             console.log("GUARDAR ASIGNACION (no modificar listener): ", payload);
@@ -1951,7 +1959,8 @@ if (!isset($_SESSION['usuario'])) {
                 idusuario,
                 fecha_envio,
                 asunto,
-                usuario
+                usuario,
+                notificar
               })
             })
               .then(response => response.json())
@@ -1960,7 +1969,9 @@ if (!isset($_SESSION['usuario'])) {
                 if (data.success) {
                   Swal.fire({
                     title: '¡Éxito!',
-                    text: data.message + (data.correo_enviado ? ', se notificó al usuario.' : ''),
+                    html: data.message + (parseInt(data.notificar) === 1 
+                                          ? '<br><strong>Se notificó</strong> al usuario solicitante.' 
+                                          : '<br><strong>No se notificó</strong> al usuario solicitante.'),
                     icon: 'success',
                     confirmButtonText: 'Cerrar'
                   }).then(() => {

@@ -771,7 +771,188 @@ class CorreoModel extends Model{
         file_put_contents($htmlPath, $bodyHtml);
     }
     
+    /* NUEVA FUNCION IMPLEMENTADA 30/01/2026 */
     public function obtenerYGuardarCorreos() {
+        ini_set('max_execution_time', 3000);
+        ini_set('memory_limit', '512M');
+
+        $location = constant('URL');
+        $pwcorreo = constant('PWCORREO');
+        $namecorreo = constant('CORREO');
+        date_default_timezone_set('America/Santiago');
+
+        $imap_base = '{mail.iopa.cl:993/imap/ssl}';
+        $username = $namecorreo;
+        $password = $pwcorreo;
+
+        $totalProcesados = 0;
+        $carpetas = ['INBOX', 'INBOX.Sent'];
+
+        foreach ($carpetas as $carpeta) {
+            $mbox = imap_open($imap_base . $carpeta, $username, $password) or die("No se pudo conectar a $carpeta: " . imap_last_error());
+            
+            // --- NUEVA LÓGICA DE OBTENCIÓN EFICIENTE ---
+            $check = imap_check($mbox);
+            $total_mensajes = $check->Nmsgs;
+
+            if ($total_mensajes > 0) {
+                // Definimos un margen de 500 para seguridad total en producción
+                $rango_inicio = max(1, $total_mensajes - 500); 
+                // Obtenemos solo el resumen de los últimos 500
+                $emails_overview = imap_fetch_overview($mbox, "$rango_inicio:$total_mensajes", 0);
+                // Invertimos para procesar el más reciente primero
+                $emails_overview = array_reverse($emails_overview);
+
+                foreach ($emails_overview as $message) {
+                    $email_num = $message->msgno; // Número de mensaje para funciones imap_...
+                    $uid = $message->uid;
+
+                    // Asignar prefijo según la carpeta
+                    $prefijo = '';
+                    if ($carpeta === 'INBOX') { $prefijo = 'R-'; } 
+                    elseif ($carpeta === 'INBOX.Sent') { $prefijo = 'E-'; }
+                    $uid_personalizado = $prefijo . $uid;
+
+                    // Verificar si ya existe el correo (Tu lógica original)
+                    $query = $this->db->connect()->prepare('SELECT COUNT(*) FROM correo WHERE uid = :uid');
+                    $query->execute(['uid' => $uid_personalizado]);
+                    $exists = $query->fetchColumn();
+
+                    if ($exists == 0) {
+                        // --- TODO LO QUE SIGUE ES TU FUNCIÓN ORIGINAL SIN CAMBIOS ---
+                        $nombre_carpeta = 'Desconocida';
+                        if ($carpeta === 'INBOX') { $nombre_carpeta = 'Bandeja de entrada'; } 
+                        elseif ($carpeta === 'INBOX.Sent') { $nombre_carpeta = 'Enviado'; }
+
+                        $structure = imap_fetchstructure($mbox, $email_num);
+                        preg_match('/<(.+)>/', $message->message_id ?? '', $matches);
+                        $message_id_simplificado = explode('@', $matches[1] ?? '')[0] ?? null;
+
+                        $resultado = $this->getBodyRecursive($mbox, $email_num, $structure, $message_id_simplificado);
+                        $body = is_array($resultado) ? $resultado['body'] : $resultado;
+                        $imagenesEmbebidas = is_array($resultado) ? $resultado['imagenes'] : [];
+
+                        // ----------- IN_REPLY_TO -----------
+                        preg_match('/<(.+)>/', $message->in_reply_to ?? '', $matches_reply);
+                        $in_reply_to_simplificado = explode('@', $matches_reply[1] ?? '')[0] ?? null;
+                        
+                        // ----------- MULTIRESPUESTA -----------
+                        $multirespuesta = !empty($in_reply_to_simplificado) ? 1 : 0;
+
+                        // ----------- REFERENCES -----------
+                        $references = isset($message->references) ? trim($message->references) : null;
+                        if ($references) {
+                            $references = preg_replace_callback('/<([^@>]+)@[^>]+>/', function ($matches) {
+                                return "<{$matches[1]}@iopa.cl>";
+                            }, $references);
+                        }
+
+                        $asunto = isset($message->subject) ? imap_utf8($message->subject) : 'Sin asunto';
+
+                        // Lista de correos spam
+                        $querySpam = $this->db->connect()->prepare("SELECT correo_spam FROM correo_spam WHERE estado = 1 AND deleted_at IS NULL");
+                        $querySpam->execute();
+                        $spamList = $querySpam->fetchAll(PDO::FETCH_COLUMN);
+
+                        $correo_origen = 'Desconocido';
+                        if (isset($message->from)) {
+                            if (preg_match('/<(.+?)>/', $message->from, $matches_from)) {
+                                $correo_origen = $matches_from[1];
+                            } elseif (filter_var($message->from, FILTER_VALIDATE_EMAIL)) {
+                                $correo_origen = $message->from;
+                            }
+                        }
+
+                        if ($carpeta == 'INBOX' && in_array($correo_origen, $spamList)) {
+                            continue;
+                        }
+
+                        if (stripos($asunto, 'de Ticket') !== false) {
+                            continue;
+                        }
+
+                        $fecha_envio = $message->date ?? null;
+                        $timestamp = strtotime($fecha_envio);
+                        $fecha_formateada = $timestamp ? date('Y-m-d H:i:s', $timestamp) : null;
+
+                        $header = imap_fetchheader($mbox, $email_num);
+                        $header = preg_replace("/\r\n[ \t]+/", " ", $header);
+
+                        // ----------- DESTINATARIOS -----------
+                        preg_match('/^To:\s*(.*)$/mi', $header, $matches_to);
+                        $destinatarios = 'No disponible';
+                        if (!empty($matches_to[1])) {
+                            preg_match_all('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $matches_to[1], $emails_to);
+                            if (!empty($emails_to[0])) {
+                                $destinatarios = implode(',', $emails_to[0]);
+                            }
+                        }
+
+                        // ----------- CC -----------
+                        $cc = '';
+                        if (isset($message) && property_exists($message, 'cc') && !empty($message->cc)) {
+                            preg_match_all('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $message->cc, $emails_cc);
+                            if (!empty($emails_cc[0])) {
+                                $cc = implode(',', $emails_cc[0]);
+                            }
+                        } else {
+                            preg_match('/^Cc:\s*(.*)$/mi', $header, $matches_cc);
+                            if (!empty($matches_cc[1])) {
+                                preg_match_all('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $matches_cc[1], $emails_cc);
+                                if (!empty($emails_cc[0])) {
+                                    $cc = implode(',', $emails_cc[0]);
+                                }
+                            }
+                        }
+
+                        $this->guardarCorreoComoHTML($uid_personalizado, $body, json_encode($imagenesEmbebidas));
+
+                        $queryINSERT = $this->db->connect()->prepare('
+                            INSERT INTO correo (
+                                id_correo_original, message_id, in_reply_to, uid, multirespuesta,
+                                correo_origen, correo_destino, asunto, fecha_envio, cuerpo,
+                                imagenes_embebidas, `references`, cc, carpeta, estado, created_at, updated_at, deleted_at
+                            ) VALUES (
+                                :id_correo_original, :message_id, :in_reply_to, :uid, :multirespuesta,
+                                :correo_origen, :correo_destino, :asunto, :fecha_envio, :cuerpo,
+                                :imagenes_embebidas, :references, :cc, :carpeta, :estado, :created_at, :updated_at, :deleted_at
+                            )');
+
+                        $queryINSERT->execute([
+                            'id_correo_original' => null,
+                            'message_id' => $message_id_simplificado,
+                            'in_reply_to' => $in_reply_to_simplificado,
+                            'uid' => $uid_personalizado,
+                            'multirespuesta' => $multirespuesta,
+                            'correo_origen' => $correo_origen,
+                            'correo_destino' => $destinatarios,
+                            'asunto' => $asunto,
+                            'fecha_envio' => $fecha_formateada,
+                            'cuerpo' => "/eticket/public/correos_html/$uid_personalizado.html",
+                            'imagenes_embebidas' => json_encode($imagenesEmbebidas),
+                            'references' => $references,
+                            'cc' => $cc,
+                            'carpeta' => $nombre_carpeta,
+                            'estado' => 1,
+                            'created_at' => date('Y-m-d H:i:s'),
+                            'updated_at' => null,
+                            'deleted_at' => null
+                        ]);
+
+                        $totalProcesados++;
+                    }
+                }
+            }
+            imap_close($mbox);
+        }
+
+        echo "Total de correos procesados: $totalProcesados\n";
+        return $totalProcesados;
+    }
+    /* NUEVA FUNCION IMPLEMENTADA 30/01/2026 */
+
+    /* FUNCION DEPRECADA POR RENDIMIENTO, REVERTIR LA FECHA EN EL NOMBRE DE LA FUNCION A 'public function obtenerYGuardarCorreos' PARA VOLVER A LA FUNCION ORIGINAL */
+    public function obtenerYGuardarCorreos2() {
         ini_set('max_execution_time', 3000);
         ini_set('memory_limit', '512M');
 
@@ -977,7 +1158,7 @@ class CorreoModel extends Model{
         echo "Total de correos procesados: $totalProcesados\n";
         return $totalProcesados;
     }
-
+    /* FUNCION DEPRECADA POR RENDIMIENTO, REVERTIR LA FECHA EN EL NOMBRE DE LA FUNCION A 'public function obtenerYGuardarCorreos' PARA VOLVER A LA FUNCION ORIGINAL */
 
     public function getBodyRecursive($inbox, $emailNumber, $structure, $uid, $partNumber = '', &$imageCounter = 1) {
         $htmlBody = '';
@@ -1160,7 +1341,7 @@ class CorreoModel extends Model{
     /* -------------------- IMAP -------------------- */
     
     
-    /* -------------------- COTANDORES ADMIN -------------------- */
+    /* -------------------- CONTANDORES ADMIN -------------------- */
     public function getTicketsNoAsignados()
     {
         try {
@@ -1409,7 +1590,7 @@ class CorreoModel extends Model{
         }
     }
 
-    public function enviarCorreoAsignacion($uid, $idusuario, $asunto, $fecha_envio) {
+    public function enviarCorreoAsignacion($uid, $idusuario, $asunto, $fecha_envio, $notificar) {
         $mail = new PHPMailer(true);
         $pwcorreo = constant('PWCORREO');
         $namecorreo = constant('CORREO');
@@ -1485,14 +1666,105 @@ class CorreoModel extends Model{
     
             // Contenido
             $mail->isHTML(true);
-            $mail->Subject = 'Asignación de Ticket';
+            $mail->Subject = 'NO REPLY - Asignación de Ticket';
             $mail->Body    = $mensajeHTML;
     
             $mail->send();
+
+            // --- LLAMADA A LA SEGUNDA FUNCIÓN ANTES DEL RETURN ---
+            if ($notificar == 1){
+                $this->enviarCorreoAsignacionUsuarioSolicitante($uid, $asunto);
+            }
+            
             return true;
     
         } catch (Exception $e) {
             error_log("Error al enviar correo: {$mail->ErrorInfo}");
+            return false;
+        }
+    }
+
+    public function enviarCorreoAsignacionUsuarioSolicitante($uid, $asunto) {
+        try {
+            // 1. Obtener datos mediante la query
+            $db = $this->db->connect();
+            $query = $db->prepare("SELECT
+                                        correo_origen as solicitante,
+                                        uid as uid,
+                                        CASE 
+                                            WHEN asignado IS NULL OR asignado = '' THEN 'Proceso de asignación'
+                                            ELSE asignado 
+                                        END AS asignado,
+                                        asunto as asunto
+                                    FROM correo 
+                                    WHERE uid = :uid");
+            $query->execute(['uid' => $uid]);
+            $datos = $query->fetch(PDO::FETCH_OBJ);
+
+            if (!$datos) return false;
+
+            // 2. Procesar nombres (formato nombre.apellido@iopa.cl)
+            $formatearNombre = function($correo) {
+                $nombre_parte = explode('@', $correo)[0];
+                $partes = explode('.', $nombre_parte);
+                return ucwords(implode(' ', $partes));
+            };
+
+            $nombreSolicitante = $formatearNombre($datos->solicitante);
+            #$nombreDesarrollador = $formatearNombre($correo_desarrollador);
+
+            // 3. Configurar PHPMailer para el segundo envío
+            $mail = new PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host       = 'mail.iopa.cl';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = constant('CORREO');
+            $mail->Password   = constant('PWCORREO');
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port       = 465;
+            $mail->CharSet    = 'UTF-8';
+
+            /* <p style='margin: 5px 0;'><strong>Desarrollador Asignado:</strong> $nombreDesarrollador ($correo_desarrollador)</p> */
+
+            $mensajeHTML = "
+            <body style='background-color: #f4f4f4; padding: 20px; font-family: Arial, sans-serif;'>
+                <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
+                    <h2 style='color: #2c3e50; text-align: center;'>📩 NO REPLY - Recepción de Ticket</h2>
+                    <p>Estimado(a) <strong>$nombreSolicitante</strong>,</p>
+                    <p>Le informamos que hemos recibido su solicitud y se ha generado un ticket de seguimiento en nuestra plataforma.</p>
+                    
+                    <div style='background-color: #f9f9f9; border-left: 4px solid #2980b9; padding: 15px; margin: 20px 0;'>
+                        <p style='margin: 5px 0;'><strong>Ticket ID:</strong> #$uid</p>
+                        <p style='margin: 5px 0;'><strong>Asunto:</strong> $asunto</p>
+                    </div>
+
+                    <p style='color: #555; font-style: italic; font-size: 13px; line-height: 1.5;'>
+                        <strong>Nota:</strong> Su solicitud ha sido asignada formalmente a un desarrollador y ya se encuentra en la bandeja del especialista. 
+                        El inicio del desarrollo técnico queda sujeto a la cola de trabajo y carga actual del asignado; mientras el proceso continúe, 
+                        se le notificará oportunamente si surge alguna duda o una vez que el ticket sea finalizado.
+                    </p>
+
+                    <p>Agradecemos su paciencia. Puede revisar el estado de su requerimiento ingresando al portal.</p>
+
+                    <hr style='margin: 30px 0; border: 0; border-top: 1px solid #eee;'>
+                    <p style='font-size: 12px; color: #999999; text-align: center;'>
+                        <strong>❗ Este es un mensaje automático. Por favor, no responda a este correo.</strong><br>
+                        Iopa System: E-Tickets | Todos los derechos reservados &copy; " . date('Y') . "
+                    </p>
+                </div>
+            </body>";
+
+            $mail->setFrom('soporte@iopa.cl', 'Soporte IOPA');
+            $mail->addAddress($datos->solicitante);
+            $mail->isHTML(true);
+            $mail->Subject = 'NO REPLY - Recepción de Ticket';
+            $mail->Body = $mensajeHTML;
+
+            $mail->send();
+            return true;
+
+        } catch (Exception $e) {
+            error_log("Error en envío a solicitante: " . $e->getMessage());
             return false;
         }
     }

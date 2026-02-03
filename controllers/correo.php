@@ -306,8 +306,8 @@ class Correo extends Controller{
             return;
         }
     
-        if (!isset($data['uid']) || !isset($data['idusuario'])) {
-            $response['message'] = 'Datos incompletos: uid y/o idusuario';
+        if (!isset($data['uid']) || !isset($data['idusuario']) || !isset($data['notificar'])) {
+            $response['message'] = 'Datos incompletos: uid, idusuario y/o notificar';
             echo json_encode($response);
             return;
         }
@@ -317,13 +317,15 @@ class Correo extends Controller{
         $fecha_envio = $data['fecha_envio'];
         $asunto = $data['asunto'];
         $usuario = $data['usuario'];
+        $notificar = $data['notificar'];
     
         if ($this->model->asignarUsuario($uid, $idusuario, $usuario)) {
-            $correo_enviado = $this->model->enviarCorreoAsignacion($uid, $idusuario, $asunto, $fecha_envio);
+            $correo_enviado = $this->model->enviarCorreoAsignacion($uid, $idusuario, $asunto, $fecha_envio, $notificar);
             $response = [
                 'success' => true,
-                'message' => 'Usuario asignado correctamente',
-                'correo_enviado' => $correo_enviado
+                'message' => 'Desarrollador asignado correctamente',
+                'correo_enviado' => $correo_enviado,
+                'notificar' => $notificar
             ];
         } else {
             $response['message'] = 'Error al asignar usuario';
