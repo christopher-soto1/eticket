@@ -370,7 +370,13 @@ class Correo extends Controller{
                 elseif ($actualizado && $estado == 2) { echo "Estado actualizado a 'Asignado'.";} 
                 //else{ echo "Error : no se pudo actualizar a 'Asignado' actualizado: ".$actualizado ."/ estado: ".$estado;}
 
-                elseif ($actualizado && $estado == 4) { echo "Estado actualizado a 'En progreso'.";} 
+                elseif ($actualizado && $estado == 4) { 
+                    //echo "Estado actualizado a 'En progreso'.";
+                    $correoEnviado = $this->model->enviarCorreoEnProgresoUsuario($uid, $idusuario, $asunto, $fecha_envio, $correo_origen, $comentario);
+
+                    if ($correoEnviado) { echo "Estado actualizado a 'En Progreso' y correo enviado correctamente.";} 
+                    else { echo "Estado actualizado a 'En Progreso', pero error al enviar el correo.";}
+                } 
                 //else{ echo "Error : no se pudo actualizar a 'En progreso' actualizado: ".$actualizado ."/ estado: ".$estado;}
 
                 elseif ($actualizado && $estado == 5) { echo "Estado actualizado a 'Eliminado'.";} 

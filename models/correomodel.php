@@ -1595,6 +1595,8 @@ class CorreoModel extends Model{
         $pwcorreo = constant('PWCORREO');
         $namecorreo = constant('CORREO');
 
+        $nombreDestinatario = $this->obtenerNombreCompletoDesdeCorreo($idusuario);
+
 
         try {
             // Configuración del servidor SMTP
@@ -1618,46 +1620,38 @@ class CorreoModel extends Model{
 
             
             $mensajeHTML = "
-            <body style='background-color: #f4f4f4; padding: 20px; font-family: Arial, sans-serif;'>
-            <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
-                <h2 style='color: #2c3e50; text-align: center;'>📬 Notificación de Asignación de Ticket</h2>
-                <p>Hola,</p>
-                <p>Se te ha asignado un nuevo ticket. A continuación encontrarás los detalles:</p>
-                <table style='width: 100%; border-collapse: collapse; margin: 20px 0;'>
-                <tr>
-                    <td style='padding: 8px; background-color: #ecf0f1;'><strong>ID Ticket:</strong></td>
-                    <td style='padding: 8px;'>#$uid</td>
-                </tr>
-                <tr>
-                    <td style='padding: 8px; background-color: #ecf0f1;'><strong>Asunto:</strong></td>
-                    <td style='padding: 8px;'>$asunto</td>
-                </tr>
-                <tr>
-                    <td style='padding: 8px; background-color: #ecf0f1;'><strong>Prioridad:</strong></td>
-                    <td style='padding: 8px;'>Alta</td>
-                </tr>
-                <tr>
-                    <td style='padding: 8px; background-color: #ecf0f1;'><strong>Fecha:</strong></td>
-                    <td style='padding: 8px;'>$fecha_envio</td>
-                </tr>
-                </table>
-                <p>Puedes revisar y dar seguimiento a este ticket desde el sistema de gestión.</p>
-                <p style='text-align: center; margin-top: 30px;'>
-                <a href='" . constant('URL') . "' style='background-color: #2980b9; color: #ffffff; padding: 12px 20px; text-decoration: none; border-radius: 5px;'>Ir al sistema</a>
-                </p>
-                <hr style='margin: 30px 0;'>
-                <p style='font-size: 12px; color: #999999; text-align: center;'>
-                <strong>❗ Este mensaje fue enviado automáticamente por el sistema de tickets de IOPA.</strong><br>
-                Por favor, no respondas a este correo ya que no está monitoreado.
-                </p>
-                <p style='font-size: 12px; color: #999999; text-align: center;'>
-                Iopa System: E-Tickets<br>
-                Todos los derechos reservados &copy; " . date('Y') . "
-                <br>
-                </p>
-            </div>
-            </body>
-            ";
+                <body style='background-color: #f4f4f4; padding: 20px; font-family: Arial, sans-serif;'>
+                    <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
+                        <h2 style='color: #2c3e50; text-align: center;'>📬 Asignación de Ticket</h2>
+                        <p>Estimado(a) <strong>$nombreDestinatario</strong>,</p>
+                        <p>Se le informa que se ha <strong>asignado un nuevo ticket</strong> a su bandeja de entrada. A continuación, se detallan los datos del requerimiento:</p>
+                        
+                        <div style='background-color: #f9f9f9; border-left: 4px solid #2980b9; padding: 15px; margin: 20px 0;'>
+                            <p style='margin: 5px 0;'><strong>Ticket ID:</strong> #$uid</p>
+                            <p style='margin: 5px 0;'><strong>Asunto:</strong> $asunto</p>
+                            <p style='margin: 5px 0;'><strong>Prioridad:</strong> <span style='color: #e74c3c; font-weight: bold;'>Alta</span></p>
+                            <p style='margin: 5px 0;'><strong>Fecha:</strong> $fecha_envio</p>
+                        </div>
+
+                        <p style='color: #555; font-size: 14px; line-height: 1.5;'>
+                            Por favor, ingrese al sistema para revisar los detalles técnicos y dar inicio a la gestión del requerimiento dentro de los plazos establecidos.
+                        </p>
+
+                        <p style='text-align: center; margin-top: 30px;'>
+                            <a href='" . constant('URL') . "' style='background-color: #2c3e50; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;'>Acceder al Sistema de Tickets</a>
+                        </p>
+
+                        <hr style='margin: 30px 0; border: 0; border-top: 1px solid #eee;'>
+                        
+                        <p style='font-size: 12px; color: #999999; text-align: center;'>
+                            <strong>❗ Este mensaje fue enviado automáticamente por el sistema de tickets de IOPA.</strong><br>
+                            Por favor, no responda a este correo ya que no está monitoreado.
+                        </p>
+                        <p style='font-size: 12px; color: #999999; text-align: center; margin-top: 8px;'>
+                            Iopa System: E-Tickets | Todos los derechos reservados &copy; " . date('Y') . "
+                        </p>
+                    </div>
+                </body>";
 
         
             // Remitente y destinatario
@@ -1666,7 +1660,7 @@ class CorreoModel extends Model{
     
             // Contenido
             $mail->isHTML(true);
-            $mail->Subject = 'NO REPLY - Asignación de Ticket';
+            $mail->Subject = '#' . trim($uid) . ' - Asignación de Ticket';
             $mail->Body    = $mensajeHTML;
     
             $mail->send();
@@ -1729,7 +1723,7 @@ class CorreoModel extends Model{
             $mensajeHTML = "
             <body style='background-color: #f4f4f4; padding: 20px; font-family: Arial, sans-serif;'>
                 <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
-                    <h2 style='color: #2c3e50; text-align: center;'>📩 NO REPLY - Recepción de Ticket</h2>
+                    <h2 style='color: #2c3e50; text-align: center;'>📩 Recepción de Ticket</h2>
                     <p>Estimado(a) <strong>$nombreSolicitante</strong>,</p>
                     <p>Le informamos que hemos recibido su solicitud y se ha generado un ticket de seguimiento en nuestra plataforma.</p>
                     
@@ -1744,7 +1738,7 @@ class CorreoModel extends Model{
                         se le notificará oportunamente si surge alguna duda o una vez que el ticket sea finalizado.
                     </p>
 
-                    <p>Agradecemos su paciencia. Puede revisar el estado de su requerimiento ingresando al portal.</p>
+                    <p>Agradecemos su paciencia.</p>
 
                     <hr style='margin: 30px 0; border: 0; border-top: 1px solid #eee;'>
                     <p style='font-size: 12px; color: #999999; text-align: center;'>
@@ -1757,7 +1751,7 @@ class CorreoModel extends Model{
             $mail->setFrom('soporte@iopa.cl', 'Soporte IOPA');
             $mail->addAddress($datos->solicitante);
             $mail->isHTML(true);
-            $mail->Subject = 'NO REPLY - Recepción de Ticket';
+            $mail->Subject = '#' . trim($uid) .' - Recepción de Ticket';
             $mail->Body = $mensajeHTML;
 
             $mail->send();
@@ -1774,6 +1768,7 @@ class CorreoModel extends Model{
         $pwcorreo = constant('PWCORREO');
         $namecorreo = constant('CORREO');
         $uid_trim= trim($uid);
+        $nombreDestinatario = $this->obtenerNombreCompletoDesdeCorreo($correo_origen);
         
         // Recuperar comentario desarrollador desde la BD directamente
         $query = $this->db->connect()->prepare("SELECT comentario_desarrollador FROM correo WHERE uid = '$uid_trim';");
@@ -1810,60 +1805,35 @@ class CorreoModel extends Model{
             </tr> */
 
             $mensajeHTML = "
-            <body style='background-color: #f9f9f9; padding: 20px; font-family: Arial, sans-serif;'>
-                <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);'>
+            <body style='background-color: #f4f4f4; padding: 20px; font-family: Arial, sans-serif;'>
+                <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
+                    <h2 style='color: #2c3e50; text-align: center;'>✅ Ticket Finalizado</h2>
+                    <p>Estimado(a) <strong>$nombreDestinatario</strong>,</p>
+                    <p>Le informamos que su solicitud ha sido <strong>resuelta</strong> y el ticket ha sido marcado como <strong>finalizado</strong> exitosamente en nuestro sistema.</p>
                     
-                    <div style='text-align: center;'>
-                        <h2 style='color: #27ae60; font-size: 20px;'>✅ Ticket Finalizado</h2>
+                    <div style='background-color: #f9f9f9; border-left: 4px solid #27ae60; padding: 15px; margin: 20px 0;'>
+                        <p style='margin: 5px 0;'><strong>ID Ticket:</strong> #$uid</p>
+                        <p style='margin: 5px 0;'><strong>Asunto:</strong> $asunto</p>
+                        <p style='margin: 5px 0;'><strong>Fecha de creación:</strong> $fecha_envio</p>
+                        <p style='margin: 5px 0;'><strong>Respuesta de cierre:</strong> $comentario</p>
+                        <p style='margin: 5px 0;'><strong>Cerrado por:</strong> $idusuario</p>
                     </div>
 
-                    <p>Estimado usuario,</p>
-
-                    <p>Te informamos que tu solicitud ha sido <strong>resuelta</strong> y el ticket ha sido <strong>finalizado</strong> exitosamente en nuestro sistema.</p>
-
-                    <table style='width: 100%; border-collapse: collapse; margin: 15px 0;'>
-                        <tr>
-                            <td style='padding: 5px; background-color: #ecf0f1; width: 35%;'><strong>ID Ticket:</strong></td>
-                            <td style='padding: 5px;'>#$uid</td>
-                        </tr>
-                        <tr>
-                            <td style='padding: 5px; background-color: #ecf0f1; width: 35%;'><strong>Asunto del ticket:</strong></td>
-                            <td style='padding: 5px;'>$asunto</td>
-                        </tr>
-                        <tr>
-                            <td style='padding: 5px; background-color: #ecf0f1; width: 35%;'><strong>Fecha de creación:</strong></td>
-                            <td style='padding: 5px;'>$fecha_envio</td>
-                        </tr>
-                        <tr>
-                            <td style='padding: 5px; background-color: #ecf0f1; width: 35%;'><strong>Respuesta del usuario que cerró el ticket:</strong></td>
-                            <td style='padding: 5px;'>$comentario</td>
-                        </tr>
-                        <tr>
-                            <td style='padding: 5px; background-color: #ecf0f1; width: 35%;'><strong>Ticket cerrado por el usuario:</strong></td>
-                            <td style='padding: 5px;'>$idusuario</td>
-                        </tr>
-                    </table>
-
-                    <p>Gracias por utilizar nuestro sistema de atención. Si tienes alguna otra duda o necesitas asistencia adicional, no dudes en crear un nuevo ticket.</p>
-
-                    <div style='text-align: center; margin-top: 20px;'>
-                        <a href='" . constant('URL') . "' style='background-color: #3498db; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Ir al Sistema</a>
-                    </div>
-
-                    <hr style='margin: 30px 0;'>
-                    
-                    <p style='font-size: 12px; color: #7f8c8d; text-align: center;'>
-                        Este mensaje fue generado automáticamente por el sistema de E-Tickets de IOPA.<br>
-                        Por favor, no respondas a este correo.
+                    <p style='color: #555; font-size: 14px; line-height: 1.5;'>
+                        Agradecemos su paciencia. Si requiere asistencia adicional sobre este u otro tema, no dude en generar un nuevo requerimiento.
                     </p>
 
-                    <p style='font-size: 12px; color: #7f8c8d; text-align: center;'>
+                    <hr style='margin: 30px 0; border: 0; border-top: 1px solid #eee;'>
+                    
+                    <p style='font-size: 12px; color: #999999; text-align: center;'>
+                        <strong>❗ Este mensaje fue generado automáticamente por el sistema de E-Tickets de IOPA.</strong><br>
+                        Por favor, no responda a este correo ya que no es monitoreado.
+                    </p>
+                    <p style='font-size: 12px; color: #999999; text-align: center; margin-top: 8px;'>
                         IOPA System - E-Tickets &copy; " . date('Y') . "
                     </p>
-
                 </div>
-            </body>
-            ";
+            </body>";
             //
         
             // Remitente y destinatario
@@ -1872,7 +1842,7 @@ class CorreoModel extends Model{
     
             // Contenido
             $mail->isHTML(true);
-            $mail->Subject = 'No reply - Finalización de Ticket';
+            $mail->Subject = '#' . $uid_trim . ' Finalización de Ticket';
             $mail->Body    = $mensajeHTML;
     
             $mail->send();
@@ -1883,6 +1853,7 @@ class CorreoModel extends Model{
             return false;
         }
     }
+
     public function enviarCorreoRealizado($uid, $idusuario, $asunto, $fecha_envio, $correo_origen, $comentario)
     {
         $mail = new PHPMailer(true);
@@ -1930,9 +1901,18 @@ class CorreoModel extends Model{
                 'nelson.leiva@iopa.cl'
             ];
 
-            if (in_array($desarrolladorAsignado, $programacion)) {$mail->addAddress('catalina.henriquez@iopa.cl', 'Catalina Henriquez');} 
-            elseif (in_array($desarrolladorAsignado, $soporteTI)) {$mail->addAddress('luis.plaza@iopa.cl', 'Luis Plaza');} 
-            else {$mail->addAddress('christopher.soto@iopa.cl', 'Christopher Soto');}
+            if (in_array($desarrolladorAsignado, $programacion)) {
+                $mail->addAddress('catalina.henriquez@iopa.cl', 'Catalina Henriquez');
+                $nombreDestinatario = 'catalina.henriquez@iopa.cl';
+            } 
+            elseif (in_array($desarrolladorAsignado, $soporteTI)) {
+                $mail->addAddress('luis.plaza@iopa.cl', 'Luis Plaza');
+                $nombreDestinatario = 'luis.plaza@iopa.cl';
+            } 
+            else {
+                $mail->addAddress('christopher.soto@iopa.cl', 'Christopher Soto');
+                $nombreDestinatario = 'christopher.soto@iopa.cl';
+            }
 
 
             // --- Ruta del HTML guardada en BD ---
@@ -1976,60 +1956,42 @@ class CorreoModel extends Model{
             }
 
             // --- Plantilla final del correo ---
-            $mensajeHTML = '
-            <html>
-            <head><meta charset="UTF-8"></head>
-            <body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
-                <div style="max-width: 800px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 8px;">
-                    <h2 style="text-align: center; color: #2c3e50; font-size: 20px;">Ticket Realizado ☑️</h2>
-                    <p>Estimado/a,</p>
-                    <p>El ticket ha sido marcado como <strong>realizado</strong>. A continuación, se detallan los comentarios y la información del ticket:</p>
-
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                        <tr>
-                            <td style="padding: 5px; font-weight: bold; width: 40%; background-color: #ecf0f1;">ID Ticket:</td>
-                            <td style="padding: 5px;">#' . htmlspecialchars($uid_trim) . '</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 5px; font-weight: bold; background-color: #ecf0f1;">Asunto:</td>
-                            <td style="padding: 5px;">' . htmlspecialchars($asunto) . '</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 5px; font-weight: bold; background-color: #ecf0f1;">Fecha de creación:</td>
-                            <td style="padding: 5px;">' . htmlspecialchars($fecha_envio) . '</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 5px; font-weight: bold; background-color: #ecf0f1;">Comentario del desarrollador:</td>
-                            <td style="padding: 5px;">' . nl2br(htmlspecialchars($comentarioDesarrollador)) . '</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 5px; font-weight: bold; background-color: #ecf0f1;">Desarrollador:</td>
-                            <td style="padding: 5px;">' . htmlspecialchars($desarrolladorAsignado) . '</td>
-                        </tr>
-                    </table>
-
-                    <!-- Contenido HTML original del ticket -->
-                    <h3>Contenido del Ticket</h3>
-                    <div style="margin-top:18px; padding:12px; border:1px solid #e9e9e9; border-radius:6px; background:#fff;">
-                        ' . $innerHtml . '
+            $mensajeHTML = "
+            <body style='background-color: #f4f4f4; padding: 20px; font-family: Arial, sans-serif;'>
+                <div style='max-width: 800px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
+                    <h2 style='color: #2c3e50; text-align: center;'>Ticket Realizado ☑️</h2>
+                    <p>Estimado(a) <strong>$nombreDestinatario</strong>,</p>
+                    <p>Se informa que el ticket ha sido marcado como <strong>realizado</strong>. A continuación, se detallan los comentarios y la información del requerimiento:</p>
+                    
+                    <div style='background-color: #f9f9f9; border-left: 4px solid #27ae60; padding: 15px; margin: 20px 0;'>
+                        <p style='margin: 5px 0;'><strong>ID Ticket:</strong> #" . htmlspecialchars($uid_trim) . "</p>
+                        <p style='margin: 5px 0;'><strong>Asunto:</strong> " . htmlspecialchars($asunto) . "</p>
+                        <p style='margin: 5px 0;'><strong>Fecha de creación:</strong> " . htmlspecialchars($fecha_envio) . "</p>
+                        <p style='margin: 5px 0;'><strong>Comentario del desarrollador:</strong><br><span style='color: #555;'>" . nl2br(htmlspecialchars($comentarioDesarrollador)) . "</span></p>
+                        <p style='margin: 5px 0;'><strong>Desarrollador:</strong> " . htmlspecialchars($desarrolladorAsignado) . "</p>
                     </div>
 
-                    <!-- Footer destacado -->
-                    <div style="margin-top:30px; padding:15px; background:#f4f6f7; border-top:2px solid #3498db; text-align:center; border-radius:8px;">
-                        <p style="font-size:13px; color:#2c3e50; margin:0;">
-                            <strong>⚠️ Este mensaje se generó automáticamente.</strong><br>
-                            Por favor, <strong style="color:#e74c3c;">no responder a este correo</strong>.
+                    <h3 style='color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 10px;'>Contenido del Ticket</h3>
+                    <div style='margin-top:10px; padding:15px; border:1px solid #e9e9e9; border-radius:6px; background:#fafafa; overflow-x: auto;'>
+                        " . $innerHtml . "
+                    </div>
+
+                    <hr style='margin: 30px 0; border: 0; border-top: 1px solid #eee;'>
+                    
+                    <div style='padding:15px; background:#f4f6f7; text-align:center; border-radius:8px;'>
+                        <p style='font-size:13px; color:#2c3e50; margin:0;'>
+                            <strong>❗ Este mensaje se generó automáticamente.</strong><br>
+                            Por favor, <strong style='color:#e74c3c;'>no responder a este correo</strong>.
                         </p>
-                        <p style="font-size:12px; color:#95a5a6; margin-top:8px;">
-                            IOPA System - E-Tickets &copy; ' . date('Y') . '
+                        <p style='font-size:12px; color:#95a5a6; margin-top:8px;'>
+                            IOPA System - E-Tickets &copy; " . date('Y') . "
                         </p>
                     </div>
                 </div>
-            </body>
-            </html>';
+            </body>";
 
             $mail->isHTML(true);
-            $mail->Subject = 'No reply - Realización de Ticket';
+            $mail->Subject = '#' . $uid_trim . ' Realización de Ticket';
             $mail->Body    = $mensajeHTML;
             $mail->AltBody = strip_tags("Ticket #$uid_trim - $asunto\n\n" . $comentarioDesarrollador);
 
@@ -2041,6 +2003,95 @@ class CorreoModel extends Model{
         }
     }
 
+    public function enviarCorreoEnProgresoUsuario($uid, $idusuario, $asunto, $fecha_envio, $correo_origen, $comentario)
+    {
+        $mail = new PHPMailer(true);
+
+        try {
+            // 1. Obtener Área de Soporte dinámicamente
+            $uid_trim = trim($uid);
+            $areaSoporte = 'Informática'; // Valor por defecto
+
+            $queryArea = $this->db->connect()->query("
+                SELECT area 
+                FROM usuariosperfil 
+                WHERE idusuario = (SELECT asignado FROM correo WHERE uid = '$uid_trim') 
+                LIMIT 1
+            ");
+            $resArea = $queryArea->fetch(PDO::FETCH_ASSOC);
+            
+            if ($resArea && !empty($resArea['area'])) {
+                $areaSoporte = $resArea['area'];
+            }
+
+            // 2. Procesar nombre del solicitante (formato nombre.apellido@iopa.cl)
+            $formatearNombre = function($correo) {
+                $nombre_parte = explode('@', $correo)[0];
+                $partes = explode('.', $nombre_parte);
+                return ucwords(implode(' ', $partes));
+            };
+            $nombreSolicitante = $formatearNombre($correo_origen);
+
+            // 3. Configuración SMTP
+            $mail->isSMTP();
+            $mail->Host       = 'mail.iopa.cl';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = constant('CORREO');
+            $mail->Password   = constant('PWCORREO');
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port       = 465;
+            $mail->CharSet    = 'UTF-8';
+            $mail->Encoding   = 'base64';
+
+            // 4. Plantilla HTML con formato "Asignación Usuario Solicitante"
+            $mensajeHTML = "
+            <body style='background-color: #f4f4f4; padding: 20px; font-family: Arial, sans-serif;'>
+                <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
+                    <h2 style='color: #2c3e50; text-align: center;'>⚙️ Ticket en Progreso</h2>
+                    <p>Estimado(a) <strong>$nombreSolicitante</strong>,</p>
+                    <p>Le informamos que su solicitud ha cambiado de estado y actualmente se encuentra <strong>en proceso de atención técnica</strong>.</p>
+                    
+                    <div style='background-color: #f9f9f9; border-left: 4px solid #f39c12; padding: 15px; margin: 20px 0;'>
+                        <p style='margin: 5px 0;'><strong>Ticket ID:</strong> #$uid_trim</p>
+                        <p style='margin: 5px 0;'><strong>Asunto:</strong> $asunto</p>
+                        <p style='margin: 5px 0;'><strong>Área Responsable:</strong> $areaSoporte</p>
+                    </div>
+
+                    <p style='color: #555; font-style: italic; font-size: 13px; line-height: 1.5;'>
+                        <strong>Nota:</strong> El personal del área de <strong>$areaSoporte</strong> ya está trabajando en su requerimiento. 
+                        Mientras el proceso continúe, el sistema le notificará automáticamente cualquier cambio significativo o 
+                        una vez que el ticket haya sido finalizado exitosamente.
+                    </p>
+
+                    <p>Agradecemos su paciencia mientras resolvemos su solicitud.</p>
+
+                    <hr style='margin: 30px 0; border: 0; border-top: 1px solid #eee;'>
+                    <p style='font-size: 12px; color: #999999; text-align: center;'>
+                        <strong>❗ Este es un mensaje automático. Por favor, no responda a este correo.</strong><br>
+                        Iopa System: E-Tickets | Todos los derechos reservados &copy; " . date('Y') . "
+                    </p>
+                </div>
+            </body>";
+
+            // 5. Envío
+            $mail->setFrom(constant('CORREO'), 'Soporte IOPA');
+            $mail->addAddress($correo_origen); 
+            $mail->isHTML(true);
+            
+            // Asunto solicitado terminando en "de ticket"
+            $mail->Subject = '#' . $uid_trim . ' - Actualización de Ticket ';
+            
+            $mail->Body = $mensajeHTML;
+            $mail->AltBody = "Su ticket #$uid_trim ($asunto) está en progreso por el área de $areaSoporte.";
+
+            $mail->send();
+            return true;
+
+        } catch (\Exception $e) {
+            error_log("Error en enviarCorreoEnProgresoUsuario: " . $e->getMessage());
+            return false;
+        }
+    }
 
     public function enviarRespuestaEstatica()
     {
