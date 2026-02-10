@@ -1643,7 +1643,7 @@ class CorreoModel extends Model{
 
                         <hr style='margin: 30px 0; border: 0; border-top: 1px solid #eee;'>
                         
-                        <p style='font-size: 12px; color: #999999; text-align: center;'>
+                        <p style='font-size: 12px; color: #000000; text-align: center;'>
                             <strong>❗ Este mensaje fue enviado automáticamente por el sistema de tickets de IOPA.</strong><br>
                             Por favor, no responda a este correo ya que no está monitoreado.
                         </p>
@@ -1741,7 +1741,7 @@ class CorreoModel extends Model{
                     <p>Agradecemos su paciencia.</p>
 
                     <hr style='margin: 30px 0; border: 0; border-top: 1px solid #eee;'>
-                    <p style='font-size: 12px; color: #999999; text-align: center;'>
+                    <p style='font-size: 12px; color: #000000; text-align: center;'>
                         <strong>❗ Este es un mensaje automático. Por favor, no responda a este correo.</strong><br>
                         Iopa System: E-Tickets | Todos los derechos reservados &copy; " . date('Y') . "
                     </p>
@@ -1825,7 +1825,7 @@ class CorreoModel extends Model{
 
                     <hr style='margin: 30px 0; border: 0; border-top: 1px solid #eee;'>
                     
-                    <p style='font-size: 12px; color: #999999; text-align: center;'>
+                    <p style='font-size: 12px; color: #000000; text-align: center;'>
                         <strong>❗ Este mensaje fue generado automáticamente por el sistema de E-Tickets de IOPA.</strong><br>
                         Por favor, no responda a este correo ya que no es monitoreado.
                     </p>
@@ -1902,8 +1902,12 @@ class CorreoModel extends Model{
             ];
 
             if (in_array($desarrolladorAsignado, $programacion)) {
-                $mail->addAddress('catalina.henriquez@iopa.cl', 'Catalina Henriquez');
-                $nombreDestinatario = 'catalina.henriquez@iopa.cl';
+                # ---------- COMENTADO MIENTRAS CATA ESTA DE VACACIONES ----------
+                #$mail->addAddress('catalina.henriquez@iopa.cl', 'Catalina Henriquez');
+                #$nombreDestinatario = 'catalina.henriquez@iopa.cl';
+                # ---------- COMENTADO MIENTRAS CATA ESTA DE VACACIONES ----------
+                $mail->addAddress('christopher.soto@iopa.cl', 'Christopher Soto');
+                $nombreDestinatario = 'christopher.soto@iopa.cl';
             } 
             elseif (in_array($desarrolladorAsignado, $soporteTI)) {
                 $mail->addAddress('luis.plaza@iopa.cl', 'Luis Plaza');
@@ -2066,7 +2070,7 @@ class CorreoModel extends Model{
                     <p>Agradecemos su paciencia mientras resolvemos su solicitud.</p>
 
                     <hr style='margin: 30px 0; border: 0; border-top: 1px solid #eee;'>
-                    <p style='font-size: 12px; color: #999999; text-align: center;'>
+                    <p style='font-size: 12px; color: #000000; text-align: center;'>
                         <strong>❗ Este es un mensaje automático. Por favor, no responda a este correo.</strong><br>
                         Iopa System: E-Tickets | Todos los derechos reservados &copy; " . date('Y') . "
                     </p>
@@ -2312,7 +2316,11 @@ class CorreoModel extends Model{
             // ----------- FIN IN_REPLY_TO -----------
 
             $mail->Subject = $asunto;
-            $nombre_completo = $this->obtenerNombreCompletoDesdeCorreo($correo_origen);
+            if ($correo_origen == 'soporte@iopa.cl') {
+                $nombre_completo = 'Usuario'; #fix para evitar que cuando el sistema se auto responde a si mismo, este escriba estimado soporte
+            } else {
+                $nombre_completo = $this->obtenerNombreCompletoDesdeCorreo($correo_origen);
+            }
             $mail->isHTML(true);
             $mail->Body = "
             <div style='font-family: Arial, sans-serif; font-size: 14px; color: #333; line-height: 1.6;'>
