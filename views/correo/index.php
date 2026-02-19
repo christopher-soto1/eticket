@@ -1489,7 +1489,7 @@ if (!isset($_SESSION['usuario'])) {
             </select>
             <div id="textareaContainer" class="mt-3" style="display: none;">
               <label for="comentarioEstado">Comentario:</label>
-              <textarea id="comentarioEstado" class="form-control" rows="3" placeholder="Escribe un comentario..."></textarea>
+              <textarea id="comentarioEstado" class="form-control" rows="3" placeholder="Escribe un comentario...">${correo.respuesta_correo == null ? '' : correo.respuesta_correo}</textarea>
               <em>El comentario será enviado en forma de respuesta automática al correo de origen: <strong>${correo.correo_origen}</strong></em>
             </div>
             <div id="textareaContainerDesarrollador" class="mt-3" style="display: none;">
@@ -1497,6 +1497,15 @@ if (!isset($_SESSION['usuario'])) {
               <textarea id="comentarioEstadoDesarrollador" class="form-control" rows="3" placeholder="Escribe un comentario...">${correo.comentario_desarrollador == null ? '' : correo.comentario_desarrollador}</textarea>
               <em>El comentario será registrado como información para el(los) usuario(s) final(es) asociado(s) a: <strong>${correo.correo_origen}</strong></em>
             </div>
+
+            <div id="checkEnvioCorreoFinalizado" class="form-check mt-3" style="display: none;">
+                <input class="form-check-input" type="checkbox" id="checkNotificarCorreoFinalizado" checked>
+                <label class="form-check-label" for="checkNotificarCorreoFinalizado">
+                    ¿Enviar notificación de finalización de ticket al usuario solicitante? <em><strong>${correo.correo_origen}</strong></em>.
+                </label>
+            </div>
+            <br>
+
             <input type="hidden" id="editarUid" value="${correo.uid}">
           </form>
           
@@ -1513,6 +1522,7 @@ if (!isset($_SESSION['usuario'])) {
                 const selectedValue = $(this).val();
                 if (selectedValue == "3") { // Finalizado
                   $('#textareaContainer').show();
+                  $('#checkEnvioCorreoFinalizado').show();
                 } else {
                   $('#textareaContainer').hide();
                 }
@@ -1521,6 +1531,7 @@ if (!isset($_SESSION['usuario'])) {
               // Si ya está seleccionado "Finalizado" al abrir el modal, mostramos el textarea VALIDAR
               if (correo.estado == 3) {
                 $('#textareaContainer').show();
+                $('#checkEnvioCorreoFinalizado').show();
               }
               // ---------------  FIN TEXT AREA FINALIZADO ---------------
 
@@ -1539,6 +1550,7 @@ if (!isset($_SESSION['usuario'])) {
                 $('#textareaContainerDesarrollador').show();
               }
               // ---------------  FIN TEXT AREA DESARROLLADOR ---------------
+              
 
               new bootstrap.Modal(document.getElementById('modalEditar')).show();
             }
@@ -2038,6 +2050,7 @@ if (!isset($_SESSION['usuario'])) {
             var nuevoEstadoPalabra = '';
             var estado_actualPalabra = '';
             let estado_actual = e.target.getAttribute('data-estado-actual');
+            var notificar = document.getElementById('checkNotificarCorreoFinalizado').checked ? 1 : 0;
 
             estado_actual = parseInt(estado_actual, 10);
             nuevoEstado = parseInt(nuevoEstado, 10);
@@ -2119,7 +2132,8 @@ if (!isset($_SESSION['usuario'])) {
               estado_actualPalabra: estado_actualPalabra,
               nuevoEstado: nuevoEstado,
               nuevoEstadoPalabra: nuevoEstadoPalabra,
-              comentarioDesarrollador: comentarioDesarrollador
+              comentarioDesarrollador: comentarioDesarrollador,
+              notificar: notificar
 
             };
             console.log("ESTADO (ADMIN): ", payload);
@@ -2172,16 +2186,25 @@ if (!isset($_SESSION['usuario'])) {
                       &nuevoEstado=${encodeURIComponent(nuevoEstado)}
                       &nuevoEstadoPalabra=${encodeURIComponent(nuevoEstadoPalabra)}
                       &estado_actual=${encodeURIComponent(estado_actual)}
-                      &estado_actualPalabra=${encodeURIComponent(estado_actualPalabra)}`
+                      &estado_actualPalabra=${encodeURIComponent(estado_actualPalabra)}
+                      &notificar=${encodeURIComponent(notificar)}`
             })
               .then(response => response.text())
               .then(data => {
                 console.log("Respuesta:", data);
 
                 if (data.includes("Estado actualizado")) {
+                  let mensaje;
+
+                  if (parseInt(notificar) === 0) {
+                    mensaje = `Estado actualizado a <strong>'Finalizado'</strong> y <strong>sin notificación de finalización a usuario</strong>.`;
+                  } else {
+                    mensaje = data; // mensaje que viene del servidor
+                  }
+
                   Swal.fire({
                     title: '¡Éxito!',
-                    text: data, // Muestra el mensaje completo que venga del servidor
+                    html: mensaje, // Muestra el mensaje completo que venga del servidor
                     icon: 'success',
                     confirmButtonText: 'Cerrar'
                   }).then(() => {
@@ -2493,6 +2516,7 @@ if (!isset($_SESSION['usuario'])) {
             cancelButtonText: 'Cancelar'
           }).then((result) => {
             if (result.isConfirmed) {
+              //console.log("El usuario confirmó");
               Swal.fire({
                 title: 'Sincronizando correos...',
                 text: 'Por favor, no cierres esta ventana.',
@@ -2505,12 +2529,13 @@ if (!isset($_SESSION['usuario'])) {
               $.ajax({
                 url: '<?= constant("URL") ?>correo/obtenerCorreos',
                 method: 'POST',
+                dataType: 'json', // 👈 IMPORTANTE
                 success: function (response) {
-                  console.log(response);
+                  console.log("RESPONSE: ", response);
                   Swal.fire({
                     icon: 'success',
                     title: '¡Sincronización completa!',
-                    text: 'La sincronización ha finalizado exitosamente.',
+                    html: `Se sincronizaron <strong>${response.procesados} correo(s)</strong> correctamente.`,
                   }).then(() => {
                     // Recargar la página después de cerrar el modal
                     //location.reload();

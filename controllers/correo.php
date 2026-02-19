@@ -353,23 +353,31 @@ class Correo extends Controller{
             $nuevoEstado = $_POST['nuevoEstado'] ?? null;
             #$nuevoEstadoPalabra = $_POST['nuevoEstadoPalabra'] ?? null;
             $nuevoEstadoPalabra = isset($_POST['nuevoEstadoPalabra']) ? trim($_POST['nuevoEstadoPalabra']) : null;
+            $notificar = isset($_POST['notificar']) ? trim($_POST['notificar']) : null;
             
     
             if ($uid && $estado) {
                 $actualizado = $this->model->actualizarEstado($uid, $estado, $comentario, $comentarioDesarrollador, $idusuario, $estado_actual, $estado_actualPalabra, $nuevoEstado, $nuevoEstadoPalabra);
                 
+                /* FINALIZADO */
                 if ($actualizado && $estado == 3) {
-                    $correoEnviado = $this->model->enviarCorreoFinalizado($uid, $idusuario, $asunto, $fecha_envio, $correo_origen, $comentario, $comentarioDesarrollador);
-    
-                    if ($correoEnviado) { echo "Estado actualizado a 'Finalizado' y correo enviado correctamente.";} 
-                    else { echo "Estado actualizado a 'Finalizado', pero error al enviar el correo.";}
+                    if ($notificar == 1){
+                        $correoEnviado = $this->model->enviarCorreoFinalizado($uid, $idusuario, $asunto, $fecha_envio, $correo_origen, $comentario, $comentarioDesarrollador);
+                        if ($correoEnviado) { echo "Estado actualizado a 'Finalizado' y correo enviado correctamente.";} 
+                        else { echo "Estado actualizado a 'Finalizado', pero error al enviar el correo.";}
+                    }
+                    else{
+                        echo "Estado actualizado a 'Finalizado' y sin notificación de finalización a usuario.";
+                    }
                 }
+
+                /* NO ASIGNADO */
                 elseif ($actualizado && $estado == 1) { echo "Estado actualizado a 'No asignado'.";}
-                //else{ echo "Error : no se pudo actualizar a 'Sin asignar' actualizado: ".$actualizado ."/ estado: ".$estado;}
 
+                /* ASIGNADO */
                 elseif ($actualizado && $estado == 2) { echo "Estado actualizado a 'Asignado'.";} 
-                //else{ echo "Error : no se pudo actualizar a 'Asignado' actualizado: ".$actualizado ."/ estado: ".$estado;}
 
+                /* EN PROGRESO */
                 elseif ($actualizado && $estado == 4) { 
                     //echo "Estado actualizado a 'En progreso'.";
                     $correoEnviado = $this->model->enviarCorreoEnProgresoUsuario($uid, $idusuario, $asunto, $fecha_envio, $correo_origen, $comentario);
@@ -377,10 +385,8 @@ class Correo extends Controller{
                     if ($correoEnviado) { echo "Estado actualizado a 'En Progreso' y correo enviado correctamente.";} 
                     else { echo "Estado actualizado a 'En Progreso', pero error al enviar el correo.";}
                 } 
-                //else{ echo "Error : no se pudo actualizar a 'En progreso' actualizado: ".$actualizado ."/ estado: ".$estado;}
 
                 elseif ($actualizado && $estado == 5) { echo "Estado actualizado a 'Eliminado'.";} 
-                //else{ echo "Error : no se pudo actualizar a 'Finalizado': ".$actualizado ."/ estado: ".$estado;}
 
                 elseif ($actualizado && $estado == 6) { 
                     //echo "Estado actualizado a 'Realizado'.";

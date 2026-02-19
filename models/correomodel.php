@@ -867,7 +867,8 @@ class CorreoModel extends Model{
                             continue;
                         }
 
-                        if (stripos($asunto, 'de Ticket') !== false) {
+                        if (stripos($asunto, 'de Ticket') !== false || 
+                            stripos($asunto, 'Vacaciones' ) !== false) {
                             continue;
                         }
 
@@ -946,7 +947,7 @@ class CorreoModel extends Model{
             imap_close($mbox);
         }
 
-        echo "Total de correos procesados: $totalProcesados\n";
+        //echo "Total de correos procesados: $totalProcesados\n";
         return $totalProcesados;
     }
     /* NUEVA FUNCION IMPLEMENTADA 30/01/2026 */
@@ -1901,21 +1902,23 @@ class CorreoModel extends Model{
                 'nelson.leiva@iopa.cl'
             ];
 
+            $mail->setFrom('soporte@iopa.cl', 'Soporte IOPA');
+
             if (in_array($desarrolladorAsignado, $programacion)) {
                 # ---------- COMENTADO MIENTRAS CATA ESTA DE VACACIONES ----------
                 #$mail->addAddress('catalina.henriquez@iopa.cl', 'Catalina Henriquez');
-                #$nombreDestinatario = 'catalina.henriquez@iopa.cl';
+                #$nombreDestinatario = 'Catalina Henriquez';
                 # ---------- COMENTADO MIENTRAS CATA ESTA DE VACACIONES ----------
                 $mail->addAddress('christopher.soto@iopa.cl', 'Christopher Soto');
-                $nombreDestinatario = 'christopher.soto@iopa.cl';
+                $nombreDestinatario = 'Christopher Soto';
             } 
             elseif (in_array($desarrolladorAsignado, $soporteTI)) {
                 $mail->addAddress('luis.plaza@iopa.cl', 'Luis Plaza');
-                $nombreDestinatario = 'luis.plaza@iopa.cl';
+                $nombreDestinatario = 'Luis Plaza';
             } 
             else {
                 $mail->addAddress('christopher.soto@iopa.cl', 'Christopher Soto');
-                $nombreDestinatario = 'christopher.soto@iopa.cl';
+                $nombreDestinatario = 'Christopher Soto';
             }
 
 
@@ -1927,6 +1930,7 @@ class CorreoModel extends Model{
                 $fullPath = $_SERVER['DOCUMENT_ROOT'] . $rutaHtml;
                 if (file_exists($fullPath)) {
                     $htmlContent = file_get_contents($fullPath);
+                    $htmlContent = mb_convert_encoding($htmlContent, 'UTF-8', 'auto');
                     if (preg_match('@<body[^>]*>(.*?)</body>@is', $htmlContent, $m)) {
                         $innerHtml = $m[1];
                     } else {
@@ -1961,6 +1965,11 @@ class CorreoModel extends Model{
 
             // --- Plantilla final del correo ---
             $mensajeHTML = "
+            <html>
+            <head>
+            <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+            <meta charset='UTF-8'>
+            </head>
             <body style='background-color: #f4f4f4; padding: 20px; font-family: Arial, sans-serif;'>
                 <div style='max-width: 800px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
                     <h2 style='color: #2c3e50; text-align: center;'>Ticket Realizado ☑️</h2>
@@ -1992,7 +2001,8 @@ class CorreoModel extends Model{
                         </p>
                     </div>
                 </div>
-            </body>";
+            </body>
+            </html>";
 
             $mail->isHTML(true);
             $mail->Subject = '#' . $uid_trim . ' Realización de Ticket';

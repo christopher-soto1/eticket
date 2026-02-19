@@ -1,0 +1,3 @@
+# Opción 3: Ignorar contenido pero mantener estructura
+/public/*
+!/public/.gitkeep
