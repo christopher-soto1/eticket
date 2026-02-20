@@ -2234,18 +2234,27 @@ class CorreoModel extends Model{
     }
 
     /* -------------------- OBTENER LISTADO DE USUARIOS PERMITIDOS -------------------- */
-    public function historial() {
+    /* public function historial() {
         $query = $this->db->connect()->prepare("SELECT * FROM logs ORDER BY fecha DESC;");
         $query->execute();
         return $query->fetchAll(PDO::FETCH_OBJ);
+    } */
+
+    /* public function obtenerHistorialPorUid($uid)
+    {
+        $query = $this->db->connect()->prepare("SELECT * FROM logs WHERE uid = :uid ORDER BY fecha DESC");
+        $query->execute(['uid' => $uid]);
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    } */
+
+    public function historialPorUid($uid)
+    {
+        $query = $this->db->connect()->prepare("SELECT * FROM logs WHERE uid = :uid ORDER BY fecha DESC");
+        $query->execute(['uid' => $uid]);
+
+        return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function obtenerHistorialPorUid($uid)
-{
-    $query = $this->db->connect()->prepare("SELECT * FROM logs WHERE uid = :uid ORDER BY fecha DESC");
-    $query->execute(['uid' => $uid]);
-    return $query->fetchAll(PDO::FETCH_OBJ);
-}
 
     public function obtenerCorreosRespuestas(){
         $query = $this->db->connect()->prepare("SELECT * FROM correo where (multirespuesta = 1 or in_reply_to!='')  and (estado!=0 or deleted_at is null) ORDER BY fecha_envio DESC;");

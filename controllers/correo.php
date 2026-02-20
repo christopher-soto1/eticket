@@ -103,9 +103,9 @@ class Correo extends Controller{
         $this->view->estadisticasEnProgreso = $estadisticasEnProgreso;
         //MODAL ESTADISTICAS
 
-        //MODAL HISTORIAL
-        $historial = $this->model->historial();
-        $this->view->historial = $historial;
+        //MODAL HISTORIAL DEPRECATED 19-02-2026
+        //$historial = $this->model->historial();
+        //$this->view->historial = $historial;
         //MODAL HISTORIAL
 
         //MODAL CORREOS RESPUESTA
@@ -125,7 +125,7 @@ class Correo extends Controller{
             $this->view->correo = $correo;
             $this->view->estadisticas = $estadisticas;
             $this->view->estadisticasEnProgreso = $estadisticasEnProgreso;
-            $this->view->historial = $historial;
+            //$this->view->historial = $historial;
             $this->view->correoRespuesta = $correoRespuesta;
             $this->view->paginas = $paginas;
             $this->view->paginaactual = $id;
@@ -144,7 +144,7 @@ class Correo extends Controller{
             $this->view->correo = $correo;
             $this->view->estadisticas = $estadisticas;
             $this->view->estadisticasEnProgreso = $estadisticasEnProgreso;
-            $this->view->historial = $historial;
+            //$this->view->historial = $historial;
             $this->view->correoRespuesta = $correoRespuesta;
             $this->view->paginas = $paginas;
             $this->view->paginaactual = $id;
@@ -154,22 +154,46 @@ class Correo extends Controller{
         }
     }
 
-    public function obtenerHistorial()
-{
-    if (isset($_POST['uid'])) {
-        require_once 'models/correo.php';
-        $correoModel = new CorreoModel();
+    /* public function obtenerHistorial()
+    {
+        if (isset($_POST['uid'])) {
+            require_once 'models/correo.php';
+            $correoModel = new CorreoModel();
 
-        $uid = $_POST['uid'];
-        $historial = $correoModel->obtenerHistorialPorUid($uid);
+            $uid = $_POST['uid'];
+            $historial = $correoModel->obtenerHistorialPorUid($uid);
 
-        // Devolver como JSON
-        header('Content-Type: application/json');
-        echo json_encode($historial);
-    } else {
-        echo json_encode([]);
+            // Devolver como JSON
+            header('Content-Type: application/json');
+            echo json_encode($historial);
+        } else {
+            echo json_encode([]);
+        }
+    } */
+
+    public function obtenerHistorialPorUid()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $uid = $_POST['uid'];
+
+            $historial = $this->model->historialPorUid($uid);
+
+            header('Content-Type: application/json');
+            echo json_encode($historial);
+            exit;
+        }
     }
-}
+
+    public function salir()
+    {
+        session_start();
+        session_unset();
+        session_destroy();
+
+        header("Location: " . constant('URL') . "login");
+        exit();
+    }
+
     public function filtrar()
     {
         // Recibir los datos JSON de la solicitud

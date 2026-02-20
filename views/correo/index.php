@@ -6,12 +6,28 @@ ini_set('memory_limit', '512M');
 //error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
 
 session_start();
+
+$timeout = 1 * 60 * 60; // 4 horas en segundos
+
 if (!isset($_SESSION['usuario'])) {
     session_unset();
     session_destroy();
     header("Location: " . constant('URL') . "login");
     exit();
 }
+
+if (isset($_SESSION['LAST_ACTIVITY']) && 
+    (time() - $_SESSION['LAST_ACTIVITY'] > $timeout)) {
+
+    session_unset();
+    session_destroy();
+    header("Location: " . constant('URL') . "login");
+    exit();
+}
+
+// actualizar actividad
+$_SESSION['LAST_ACTIVITY'] = time();
+
 
 ?>
 <!DOCTYPE html>
@@ -1097,6 +1113,44 @@ if (!isset($_SESSION['usuario'])) {
         </div>
       </div>
 
+      <!-- MODAL DESCONEXION -->
+      <div class="modal fade" id="modalSesion" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content shadow-lg border-0 rounded-lg">
+
+            <!-- Header -->
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title">
+                <i class="fas fa-exclamation-triangle mr-2"></i> Sesión expirada
+              </h5>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body text-center py-4">
+              <p class="mb-3" style="font-size: 16px;">
+                Tu sesión ha expirado por seguridad.
+              </p>
+
+              <p class="text-muted mb-4">
+                Has superado el tiempo máximo de <strong>1 hora de sesión</strong>.
+              </p>
+
+              <i class="fas fa-clock fa-3x text-danger mb-3"></i>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer justify-content-center border-0 pb-4">
+              <a href="<?= constant('URL'); ?>login" class="btn btn-danger px-4">
+                <i class="fas fa-sign-in-alt mr-1"></i> Volver a iniciar sesión
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+
       <script>
 
         if (window.matchMedia("(pointer: coarse)").matches) {
@@ -1112,9 +1166,38 @@ if (!isset($_SESSION['usuario'])) {
           const usuarios = <?php echo json_encode($this->asignaciones); ?>;
           var estadisticas = <?php echo json_encode($this->estadisticas); ?>;
           var estadisticasEnProgreso = <?php echo json_encode($this->estadisticasEnProgreso); ?>;
-
           //console.log("estadisticasEnProgreso");
           //console.log(estadisticasEnProgreso);
+
+          // ----------------- TIEMPO DE PARA DESCONEXION DE LA SESION ACTUAL -----------------
+          let tiempoTotal = <?= 1 * 60 * 60 * 1000 ?>; // 4 horas
+          let tiempoPopup = tiempoTotal - (120 * 1000); // 20 segundos antes
+          //let tiempoTotal = 30 * 1000; // 30 segundos //debugg
+          //let tiempoPopup = 25 * 1000; // popup antes //debugg
+          console.log("La sesión se cerrará en:", (tiempoTotal / (1000 * 60 * 60)).toFixed(2), "horas");
+          // ----------------- TIEMPO DE PARA DESCONEXION DE LA SESION ACTUAL -----------------
+
+          // mostrar popup
+          setTimeout(() => {
+              //console.log("⚠ Mostrando popup");
+              $('#modalSesion').modal('show');
+          }, tiempoPopup);
+
+          // cerrar sesión
+          setTimeout(() => {
+              console.log("🚪 Cerrando sesión");
+              window.location.href = '<?= constant('URL'); ?>correo/salir';
+          }, tiempoTotal);
+
+          // seguir (solo cierra popup, NO reinicia nada)
+          $('#stayLogged').on('click', function () {
+              $('#modalSesion').modal('hide');
+          });
+
+          // salir
+          $('#logoutNow').on('click', function () {
+              window.location.href = '<?= constant('URL'); ?>correo/salir';
+          });
 
 
           // CONTENIDO
@@ -1671,8 +1754,8 @@ if (!isset($_SESSION['usuario'])) {
             $('#modalEstadisticasBody').html(tabla);
           });
 
-          // HISTORIAL
-          $('.open-historial').on('click', function () {
+          // HISTORIAL DEPRECADA
+          /* $('.open-historial').on('click', function () {
             var historial = <?php echo json_encode($this->historial); ?>;
             //console.log(historial);
             const uid = $(this).data('id');
@@ -1682,37 +1765,37 @@ if (!isset($_SESSION['usuario'])) {
               $('#modalHistorialLabel').text('Historial de Ticket #' + uid);
 
               let contenido = `
-      <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-        <table class="table table-bordered table-sm table-hover">
-          <thead class="thead-light">
-            <tr>
-              <th>#</th>
-              <th>Usuario</th>
-              <th>Acción</th>
-              <th>Detalle</th>
-              <th>Fecha</th>
-            </tr>
-          </thead>
-          <tbody>
-    `;
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                  <table class="table table-bordered table-sm table-hover">
+                    <thead class="thead-light">
+                      <tr>
+                        <th>#</th>
+                        <th>Usuario</th>
+                        <th>Acción</th>
+                        <th>Detalle</th>
+                        <th>Fecha</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+              `;
 
               registros.forEach((registro, index) => {
                 contenido += `
-          <tr>
-            <td>${index + 1}</td>
-            <td>${registro.usuario}</td>
-            <td>${registro.accion}</td>
-            <td>${registro.detalle}</td>
-            <td>${registro.fecha}</td>
-          </tr>
-        `;
-              });
+                      <tr>
+                        <td>${index + 1}</td>
+                        <td>${registro.usuario}</td>
+                        <td>${registro.accion}</td>
+                        <td>${registro.detalle}</td>
+                        <td>${registro.fecha}</td>
+                      </tr>
+                    `;
+                          });
 
-              contenido += `
-          </tbody>
-        </table>
-      </div>
-    `;
+                          contenido += `
+                      </tbody>
+                    </table>
+                  </div>
+                `;
 
               $('#modalHistorialBody').html(contenido);
             } else {
@@ -1720,7 +1803,62 @@ if (!isset($_SESSION['usuario'])) {
               $('#modalHistorialBody').html('<p>No se encontraron registros en el historial.</p>');
             }
 
+          }); */
+
+          //HISTORIAL NEW 19-02-2026
+          $('.open-historial').on('click', function () {
+              const uid = $(this).data('id');
+
+              $('#modalHistorialLabel').text('Historial de Ticket #' + uid);
+              $('#modalHistorialBody').html('<p>Cargando...</p>');
+
+              $.ajax({
+                  url: '<?php echo constant('URL'); ?>correo/obtenerHistorialPorUid', // ajusta según tu MVC
+                  method: 'POST',
+                  data: { uid: uid },
+                  success: function (response) {
+
+                      let contenido = `
+                          <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                              <table class="table table-bordered table-sm table-hover">
+                                  <thead class="thead-light">
+                                      <tr>
+                                          <th>#</th>
+                                          <th>Usuario</th>
+                                          <th>Acción</th>
+                                          <th>Detalle</th>
+                                          <th>Fecha</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                      `;
+
+                      if (response.length > 0) {
+                          response.forEach((registro, index) => {
+                              contenido += `
+                                  <tr>
+                                      <td>${index + 1}</td>
+                                      <td>${registro.usuario}</td>
+                                      <td>${registro.accion}</td>
+                                      <td>${registro.detalle}</td>
+                                      <td>${registro.fecha}</td>
+                                  </tr>
+                              `;
+                          });
+                      } else {
+                          contenido += `<p>No se encontraron registros en el historial.</p>`;
+                      }
+
+                      contenido += `</tbody></table></div>`;
+
+                      $('#modalHistorialBody').html(contenido);
+                  },
+                  error: function () {
+                      $('#modalHistorialBody').html('<p>Error al cargar historial</p>');
+                  }
+              });
           });
+
 
           // HILO
           $('.open-hilo').on('click', function () {
