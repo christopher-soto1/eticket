@@ -569,7 +569,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
               <label class="filtro-input" for="correo_origen">Correo de origen</label>
               <i class="fas fa-envelope filtro-icono" title="Correo de origen"
                 style="display: none;margin-left: 20px;margin-bottom: 20px;"></i>
-              <input type="text" placeholder="'gonzales' o 'gonzales@iopa.cl'"
+              <input type="text" placeholder="gonzalez o gonzalez@iopa.cl"
                 class="form-control form-control-sm mb-2 filtro-input" id="correo_origen" name="correo_origen">
             </div>
 
@@ -578,7 +578,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
               <label class="filtro-input" for="id_ticket">ID Ticket</label>
               <i class="fas fa-hashtag filtro-icono" title="ID del ticket"
                 style="display: none; margin-left: 20px; margin-bottom: 20px;"></i>
-              <input type="text" placeholder="'R-123' o 'r-123' o '123'"
+              <input type="text" placeholder="R-123 o r-123 o 123"
                     class="form-control form-control-sm mb-2 filtro-input" id="id_ticket" name="id_ticket">
             </div>
 
@@ -1170,11 +1170,11 @@ $_SESSION['LAST_ACTIVITY'] = time();
           //console.log(estadisticasEnProgreso);
 
           // ----------------- TIEMPO DE PARA DESCONEXION DE LA SESION ACTUAL -----------------
-          let tiempoTotal = <?= 1 * 60 * 60 * 1000 ?>; // 4 horas
+          let tiempoTotal = <?= 4 * 60 * 60 * 1000 ?>; // 4 horas
           let tiempoPopup = tiempoTotal - (120 * 1000); // 20 segundos antes
           //let tiempoTotal = 30 * 1000; // 30 segundos //debugg
           //let tiempoPopup = 25 * 1000; // popup antes //debugg
-          console.log("La sesión se cerrará en:", (tiempoTotal / (1000 * 60 * 60)).toFixed(2), "horas");
+          //console.log("La sesión se cerrará en:", (tiempoTotal / (1000 * 60 * 60)).toFixed(2), "horas");
           // ----------------- TIEMPO DE PARA DESCONEXION DE LA SESION ACTUAL -----------------
 
           // mostrar popup
@@ -1216,7 +1216,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
               UID_clickeado: uid,
               Message_ID_clickeado: message_id
             };
-            console.log("CONTENIDO - HILO: ",payload);
+            //console.log("CONTENIDO - HILO: ",payload);
             // ------------ DEBUG ------------
 
             const hiloDescendente = [];
@@ -2464,7 +2464,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
             asunto: asunto
           };
 
-          console.log("FUNCION DE FILTRADO:", payload);
+          //console.log("FUNCION DE FILTRADO:", payload);
 
           if (fechaInicio && fechaFin && new Date(fechaInicio) > new Date(fechaFin)) {
             Swal.fire({
@@ -2522,7 +2522,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
 
         // ----- FUNCION DE LIMPIADO CONTROLADO DE UID (solo R, E, guión y números) -----
         $(document).on('input', '#id_ticket', function () {
-          console.log("LIMPIADO");
+          //console.log("LIMPIADO");
           let valor = $(this).val();
 
           // Eliminar todo lo que no sea r, e, números o guión
@@ -2728,7 +2728,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
             pagina: pagina
           };
 
-          console.log("SPAM:", payload);
+          //console.log("SPAM:", payload);
 
           Swal.fire({
             title: '¿Marcar como spam?',
