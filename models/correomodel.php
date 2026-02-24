@@ -588,7 +588,7 @@ class CorreoModel extends Model{
                     COUNT(CASE WHEN c.estado = 3 THEN 1 END) AS finalizados
                     FROM correo c
                     JOIN usuarios u ON u.email = c.asignado
-                    WHERE c.estado IN (2, 3, 4, 6)
+                    WHERE c.estado IN (2, 3, 4, 6) and deleted_at is null
                     GROUP BY c.asignado, u.email
                     order by finalizados DESC;";
             //Para debuguear
@@ -646,7 +646,8 @@ class CorreoModel extends Model{
                             )
                     END AS tiempo_transcurrido
 
-                    FROM correo WHERE estado = 4 ORDER BY asignado, created_at;";
+                    FROM correo WHERE estado = 4 and deleted_at is null 
+                    ORDER BY asignado, created_at;";
             //Para debuguear
             //echo "<p> estadisticasEnProgreso() </p>";
             //echo "<pre>";
@@ -2348,8 +2349,8 @@ class CorreoModel extends Model{
 
                 <p>Gracias por su mensaje. A continuación, le entregamos la respuesta de nuestro equipo:</p>
 
-                <div style='background-color: #e6f3ff; padding: 15px; border-left: 4px solid #007BFF; border-radius: 5px; margin-bottom: 20px;'>
-                    " . nl2br(htmlspecialchars($texto_respuesta)) . "
+                <div style='background-color: #e6f3ff; padding: 15px; border-left: 4px solid #007BFF; border-radius: 5px; margin-bottom: 20px; color: #2c3e50;'>
+                    ".$texto_respuesta."
                 </div>
 
                 <p>Si desea complementar esta solicitud, puede responder a este mismo correo.</p>

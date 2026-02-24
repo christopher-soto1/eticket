@@ -59,7 +59,7 @@
   <!-- Logo / Encabezado -->
   <div class="card card-outline card-primary" style="width: 90%;">
     <div class="card-header text-center">
-      <a href="#" class="h1"><b>IOPA</b> System</a>
+      <a href="#" class="h1"><b>IOPA</b> System <br> E-Tickets</a>
     </div>
 
     <div class="card-body">
@@ -82,21 +82,12 @@
         </div>
 
         <div class="row">
-          <div class="col-8">
-            <div class="icheck-primary">
-              <input type="checkbox" id="remember" name="remember" checked>
-              <label for="remember">Recordarme</label>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
             </div>
-          </div>
-          <div class="col-4">
-            <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
-          </div>
         </div>
       </form>
 
-      <p class="mb-1 mt-3">
-        <a href="#">¿Olvidaste tu contraseña?</a>
-      </p>
     </div>
   </div>
 </div>

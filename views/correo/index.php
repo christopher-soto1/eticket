@@ -7,7 +7,7 @@ ini_set('memory_limit', '512M');
 
 session_start();
 
-$timeout = 1 * 60 * 60; // 4 horas en segundos
+$timeout = 8 * 60 * 60; // 4 horas en segundos
 
 if (!isset($_SESSION['usuario'])) {
     session_unset();
@@ -74,6 +74,10 @@ $_SESSION['LAST_ACTIVITY'] = time();
   <!-- Daterangepicker -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
   <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js"></script>
+
   <style>
     .main-sidebar {
       left: 0 !important;
@@ -623,8 +627,8 @@ $_SESSION['LAST_ACTIVITY'] = time();
             <!-- Botones -->
             <div class="d-flex justify-content-between filtro-boton">
               <button class="btn btn-primary btn-sm w-50 me-1" onclick="filtrarCards();">Filtrar</button>
-              <button style="margin-left: 5px;" class="btn btn-secondary btn-sm w-50" id="limpiar_filtros">Limpiar y
-                recargar</button>
+              <button style="margin-left: 5px;" class="btn btn-secondary btn-sm w-50" id="limpiar_filtros"><i class="fas fa-eraser"></i></button>
+              <button style="margin-left: 5px; background-color: #007bff !important; border-color: #007bff !important; color: white;" class="btn btn-primary btn-sm w-50" id="reload"><i class="fas fa-home"></i></button>
             </div>
 
             <hr style="border: none; border-top: 1px solid white;">
@@ -694,109 +698,6 @@ $_SESSION['LAST_ACTIVITY'] = time();
         </div>
         <!-- /.sidebar -->
       </aside>
-
-      <!-- FILTROS ANTIGUOS: display none-->
-      <div class="card card-primary" style="display: none;max-width: 800px; margin: 0 auto; padding: 20px;">
-        <div class="card-header text-center">
-          <h3 class="card-title">Filtros de Búsqueda</h3>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <!-- Filtro por rango de fechas -->
-            <div class="col-md-4 col-12 mb-1">
-              <div class="form-group">
-                <label for="fecha_inicio">Fecha de Inicio</label>
-                <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio"
-                  placeholder="Seleccionar fecha de inicio">
-              </div>
-            </div>
-            <div class="col-md-4 col-12 mb-1">
-              <div class="form-group">
-                <label for="fecha_fin">Fecha de Fin</label>
-                <input type="date" class="form-control" id="fecha_fin" name="fecha_fin"
-                  placeholder="Seleccionar fecha de fin">
-              </div>
-            </div>
-
-            <!-- Usuario asignado (solo admin) -->
-            <?php if ($permiso == 'admin') { ?>
-              <div class="col-md-4 col-12 mb-1">
-                <div class="form-group">
-                  <label for="usuario_asignado">Usuario Asignado</label>
-                  <select class="form-control select2" id="usuario_asignado" name="usuario_asignado" style="width: 100%;">
-                    <option value="0">Seleccionar usuario</option>
-                    <?php foreach ($this->usuariosAsignables as $usuario): ?>
-                      <option value="<?php echo $usuario->idusuario; ?>">
-                        <?php echo $usuario->idusuario; ?>
-                      </option>
-                    <?php endforeach; ?>
-                  </select>
-                </div>
-              </div>
-            <?php } ?>
-
-            <!-- Estado -->
-            <div class="col-md-4 col-12 mb-1">
-              <div class="form-group">
-                <label for="estado">Estado</label>
-                <select class="form-control" id="estado" name="estado">
-                  <option value="0">Seleccionar estado</option>
-                  <?php if ($permiso == 'admin') { ?>
-                    <option value="1">Sin asignar</option> <?php } ?>
-                  <option value="2">Asignado</option>
-                  <option value="4">En progreso</option>
-                  <option value="6">Realizado</option>
-                  <option value="3">Finalizado</option>
-                  <?php if ($permiso == 'admin') { ?>
-                    <option value="5">Eliminado</option> <?php } ?>
-                </select>
-              </div>
-            </div>
-
-            <!-- Correo de origen -->
-            <div class="col-md-4 col-12 mb-1">
-              <div class="form-group">
-                <label for="correo_origen">Correo de origen</label>
-                <input type="text" class="form-control" id="correo_origen" name="correo_origen"
-                  placeholder="Correo de origen" autocomplete="off">
-              </div>
-            </div>
-
-            <!-- Nuevo Filtro: Días desde creación -->
-            <div class="col-md-4 col-12 mb-1">
-              <div class="form-group">
-                <label for="dias_creacion">Días desde la creación</label>
-                <select id="dias_creacion" name="dias_creacion" class="form-control">
-                  <option value="0">Seleccionar días de creación</option>
-                  <option value="hoy">Hoy</option>
-                  <option value="1">Hace 1 día</option>
-                  <option value="2">Hace 2 días</option>
-                  <option value="3">Hace 3 días</option>
-                  <option value="5">Hace 5 días</option>
-                  <option value="mas_de_5">Más de 5 días</option>
-                </select>
-              </div>
-            </div>
-
-          </div>
-
-          <div class="d-flex justify-content-between align-items-center mt-1 flex-wrap">
-
-            <!-- Botones de filtrar y limpiar -->
-            <div>
-              <button id="btnSincronizar" class="btn btn-light">Sincronizar E-Tickets</button>
-            </div>
-            <div class="d-flex gap-2">
-              <button type="button" class="btn btn-primary" onclick="filtrarCards();">Filtrar</button>
-              <button style="margin-left: 2px;" type="button" class="btn btn-secondary" id="limpiar_filtros">Limpiar
-                Filtros</button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-      <!-- FILTROS ANTIGUOS: display none-->
-
 
       <!-- Rescata permisos para la consulta -->
       <meta id="permiso" data-permiso="<?php echo $permiso; ?>">
@@ -892,6 +793,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
       <div id="container-full">
         <?php
         $correos = $this->correo;
+        //var_dump($correos);
         $estadisticas = $this->estadisticas;
         $historial = $this->historial;
 
@@ -1164,13 +1066,12 @@ $_SESSION['LAST_ACTIVITY'] = time();
         $(document).ready(function () {
           const correos = <?php echo json_encode($this->correo); ?>;
           const usuarios = <?php echo json_encode($this->asignaciones); ?>;
-          var estadisticas = <?php echo json_encode($this->estadisticas); ?>;
-          var estadisticasEnProgreso = <?php echo json_encode($this->estadisticasEnProgreso); ?>;
-          //console.log("estadisticasEnProgreso");
-          //console.log(estadisticasEnProgreso);
+          //var estadisticas = <?php echo json_encode($this->estadisticas); ?>;
+          //var estadisticasEnProgreso = <?php echo json_encode($this->estadisticasEnProgreso); ?>;
+          //console.log(usuarios);
 
           // ----------------- TIEMPO DE PARA DESCONEXION DE LA SESION ACTUAL -----------------
-          let tiempoTotal = <?= 4 * 60 * 60 * 1000 ?>; // 4 horas
+          let tiempoTotal = <?= 8 * 60 * 60 * 1000 ?>; // 4 horas
           let tiempoPopup = tiempoTotal - (120 * 1000); // 20 segundos antes
           //let tiempoTotal = 30 * 1000; // 30 segundos //debugg
           //let tiempoPopup = 25 * 1000; // popup antes //debugg
@@ -1185,7 +1086,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
 
           // cerrar sesión
           setTimeout(() => {
-              console.log("🚪 Cerrando sesión");
+              //console.log("🚪 Cerrando sesión");
               window.location.href = '<?= constant('URL'); ?>correo/salir';
           }, tiempoTotal);
 
@@ -1203,6 +1104,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
           // CONTENIDO
           $('.open-contenido-modal').on('click', function () {
             const uid = $(this).data('id');
+            //const correos = <?php echo json_encode($this->correo); ?>;
             const correo = correos.find(c => c.uid == uid);
 
             // HILO EN CADENA
@@ -1356,10 +1258,10 @@ $_SESSION['LAST_ACTIVITY'] = time();
                   html += `
                     <!-- AREA SI EXISTEN RESPUESTAS PREVIAS -->
                     <div id="textareaResponderConHilo" style="display: none;">
-                      <div class="form-group">
-                        <label class="form-label" style="color: black;">Respuesta:</label>
-                        <textarea class="form-control mb-2" rows="4" placeholder="Escribe una respuesta para continuar con el hilo..."></textarea>
-                      </div>
+                                          <div class="form-group">
+                      <label class="form-label" style="color: black;">Respuesta:</label>
+                      <textarea id="editorRespuestaUsuario" class="form-control mb-2" rows="4" placeholder="Escribe una respuesta para el usuario..."></textarea>
+                    </div>
 
                       <div class="alert alert-info small mb-0">
                         Esta respuesta se enviará automáticamente como continuación del ticket.<hr> 
@@ -1444,15 +1346,49 @@ $_SESSION['LAST_ACTIVITY'] = time();
 
                 
                 // ---------------  TEXT AREA RESPUESTA AL USUARIO ---------------
-                $('#btnResponderUsuarioFinal').on('click', function () {
-                  if (hiloDescendente.length > 0) {
-                    $('#textareaResponderConHilo').toggle();
-                    $('#textareaResponderSinHilo').hide();
-                  } else {
-                    $('#textareaResponderSinHilo').toggle();
-                    $('#textareaResponderConHilo').hide();
-                  }
+
+                // ---------------  TEXT AREA RESPUESTA AL USUARIO ---------------
+
+                // Inicializamos el editor de una vez (pero estará oculto con su contenedor)
+                $('#editorRespuestaUsuario').trumbowyg({
+                  lang: 'es',
+                  fixedFullWidth: true,
+                  autogrow: true, // Se expande solo al escribir
+                  minimalLinks: true,
+                  defaultLinkTarget: '_blank',
+                  btns: [
+                      ['viewHTML'],
+                      ['undo', 'redo'], // Historial
+                      ['formatting'],
+                      ['strong', 'em', 'del'], // Negrita, cursiva, tachado
+                      ['link'],
+                      ['insertImage'], // Si quieres permitir URLs de imagen
+                      ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
+                      ['unorderedList', 'orderedList'],
+                      ['horizontalRule'],
+                      ['removeformat'],
+                      ['fullscreen']
+                  ],
+                  // Elimina basura de Word al pegar
+                  removeformatPasted: true 
+              });
+
+                $('#btnResponderUsuarioFinal').on('click', function (e) {
+                    e.preventDefault(); // Evita cualquier comportamiento extraño del botón
+                    
+                    // Tu lógica de hilos existente
+                    if (hiloDescendente.length > 0) {
+                        $('#textareaResponderConHilo').toggle();
+                        $('#textareaResponderSinHilo').hide();
+                    } else {
+                        $('#textareaResponderSinHilo').toggle();
+                        $('#textareaResponderConHilo').hide();
+                    }
+
+                    // Refrescar el editor por si estaba oculto
+                    $('#editorRespuestaUsuario').trumbowyg('execCmd', {cmd: 'enable'});
                 });
+
                 // ---------------  FIN TEXT RESPUESTA AL USUARIO ---------------
             }
 
@@ -1461,6 +1397,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
           // DETALLE
           $('.open-detalle-modal').on('click', function () {
             const uid = $(this).data('id');
+            //const correos = <?php echo json_encode($this->correo); ?>;
             const correo = correos.find(c => c.uid == uid);
 
             if (correo) {
@@ -1482,6 +1419,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
           // ASIGNACION
           $('.open-asignacion-modal').on('click', function () {
             const uid = $(this).data('id');
+            //const correos = <?php echo json_encode($this->correo); ?>;
             const fecha_envio = $(this).data('fecha');
             const asunto = $(this).data('asunto');
             const correo = correos.find(c => c.uid == uid);
@@ -1533,9 +1471,12 @@ $_SESSION['LAST_ACTIVITY'] = time();
           // ESTADO
           $('.open-editar-modal').on('click', function () {
             const uid = $(this).data('id');
+            //const correos = <?php echo json_encode($this->correo); ?>;
             const correo = correos.find(c => c.uid == uid);
             const asignado = $(this).data('asignado');
             const estado_actual = $(this).data('estado-actual');
+            //console.log("estado_actual:", estado_actual);
+            const esFinalizado = (estado_actual == 3) ? 'readonly style="background-color: #e9ecef;"' : '';
 
             if (correo) {
               const estados = {
@@ -1571,13 +1512,13 @@ $_SESSION['LAST_ACTIVITY'] = time();
               ${options}
             </select>
             <div id="textareaContainer" class="mt-3" style="display: none;">
-              <label for="comentarioEstado">Comentario:</label>
-              <textarea id="comentarioEstado" class="form-control" rows="3" placeholder="Escribe un comentario...">${correo.respuesta_correo == null ? '' : correo.respuesta_correo}</textarea>
+              <label for="comentarioEstado">Comentario de cierre:</label>
+              <textarea id="comentarioEstado" class="form-control" rows="3" ${esFinalizado} placeholder="Escribe un comentario para el usuario final...">${correo.respuesta_correo == null ? '' : correo.respuesta_correo}</textarea>
               <em>El comentario será enviado en forma de respuesta automática al correo de origen: <strong>${correo.correo_origen}</strong></em>
             </div>
             <div id="textareaContainerDesarrollador" class="mt-3" style="display: none;">
               <label for="comentarioEstadoDesarrollador">Comentario del responsable:</label>
-              <textarea id="comentarioEstadoDesarrollador" class="form-control" rows="3" placeholder="Escribe un comentario...">${correo.comentario_desarrollador == null ? '' : correo.comentario_desarrollador}</textarea>
+              <textarea id="comentarioEstadoDesarrollador" class="form-control" rows="3" placeholder="Escribe un comentario respecto a la realización del ticket...">${correo.comentario_desarrollador == null ? '' : correo.comentario_desarrollador}</textarea>
               <em>El comentario será registrado como información para el(los) usuario(s) final(es) asociado(s) a: <strong>${correo.correo_origen}</strong></em>
             </div>
 
@@ -1671,6 +1612,8 @@ $_SESSION['LAST_ACTIVITY'] = time();
 
           // ESTADISTICAS
           $('.open-estadisticas').on('click', function () {
+            var estadisticas = <?php echo json_encode($this->estadisticas); ?>;
+            var estadisticasEnProgreso = <?php echo json_encode($this->estadisticasEnProgreso); ?>;
             if (estadisticas.length === 0) {
               $('#modalEstadisticasBody').html('<p class="text-muted">No hay estadísticas disponibles.</p>');
               return;
@@ -2013,7 +1956,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
             fusion: fusion
           };
 
-          console.log("RESPONDER AL USUARIO:", payload);
+          //console.log("RESPONDER AL USUARIO:", payload);
 
           $.ajax({
           url: "<?php echo constant('URL'); ?>correo/enviarRespuestaUsuario",
@@ -2026,10 +1969,15 @@ $_SESSION['LAST_ACTIVITY'] = time();
                 title: 'Respuesta enviada',
                 text: 'La respuesta fue enviada correctamente, Sincroniza los E-Tickets para ver tu respuesta en el hilo.',
                 confirmButtonText: 'OK'
-              });
-              // Opcional: Limpiar textarea
-              $('#textareaResponderSinHilo textarea, #textareaResponderConHilo textarea').val('');
-              $('#textareaResponderSinHilo, #textareaResponderConHilo').hide();
+              }).then((result) => {
+                    $('#textareaResponderSinHilo textarea, #textareaResponderConHilo textarea').val('');
+                    $('#textareaResponderSinHilo, #textareaResponderConHilo').hide();
+                    //console.log("ejecutarSincronizacion");
+                    ejecutarSincronizacion();
+                    //console.log("filtrarCards(pagina)");
+                    //filtrarCards(pagina); // Aquí ejecutas tu función
+                    
+                });
             } 
             else {
               Swal.fire({
@@ -2097,7 +2045,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
               notificar: notificar
             };
 
-            console.log("GUARDAR ASIGNACION (no modificar listener): ", payload);
+            //console.log("GUARDAR ASIGNACION (no modificar listener): ", payload);
 
             fetch('<?= constant("URL"); ?>correo/asignar', {
               method: 'POST',
@@ -2274,7 +2222,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
               notificar: notificar
 
             };
-            console.log("ESTADO (ADMIN): ", payload);
+            //console.log("ESTADO (ADMIN): ", payload);
 
             if (!uid || !nuevoEstado || nuevoEstado === "0") {
               alert("Selecciona un estado válido");
@@ -2576,9 +2524,15 @@ $_SESSION['LAST_ACTIVITY'] = time();
           $('#correo_origen').val('');
           $('#asunto').val('');
           $('#id_ticket').val('');
-          location.reload();
+          //location.reload();
         });
         // ----- BORRAR FILTROS -----
+
+        // ----- ACTUALIZAR PAGINA -----
+        $(document).on('click', '#reload', function () {
+          location.reload();
+        });
+        // ----- ACTUALIZAR PAGINA -----
 
 
         // ----- ELIMINAR -----
@@ -2799,7 +2753,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
         // Ejecuta la función cuando el DOM esté completamente cargado
         document.addEventListener('DOMContentLoaded', detectTouchDevice);
 
-        //
+        // RESPUESTA PARA HILO
         $('#responder-hilo').on('click', function (e) {
           e.preventDefault();
 
@@ -2859,6 +2813,40 @@ $_SESSION['LAST_ACTIVITY'] = time();
           });
         });
 
+        function ejecutarSincronizacion() {
+            var pagina = <?php echo $pagina_actual; ?>;
+
+            Swal.fire({
+                title: 'Sincronizando correos...',
+                text: 'Por favor, no cierres esta ventana.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            $.ajax({
+                url: '<?= constant("URL") ?>correo/obtenerCorreos',
+                method: 'POST',
+                dataType: 'json',
+                success: function (response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Sincronización completa!',
+                        html: `Se sincronizaron <strong>${response.procesados} correo(s)</strong> correctamente.`,
+                    }).then(() => {
+                        filtrarCards(pagina);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error al sincronizar',
+                        text: 'Hubo un problema durante la sincronización.',
+                    });
+                }
+            });
+        }
 
       </script>
 
@@ -2867,6 +2855,10 @@ $_SESSION['LAST_ACTIVITY'] = time();
     <?php require 'views/footer.php' ?>
 
   </div> <!-- wrapper -->
+
+  <!-- PARA ENVIAR CORREOS EN FORMATO HTML -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js"></script>
 
 </body>
 
