@@ -12,7 +12,6 @@ $asignacion = $this->asignacion;
   //console.log("ID usuario:", usuarioID);
 </script>
 
-
 <section class="content">
   <div class="container-fluid">
     <div class="row justify-content-center" id="contenedor_cards">
@@ -52,7 +51,6 @@ $asignacion = $this->asignacion;
               <div class="card-tools">
               </div>
             </div>
-            <!-- asd -->
 
             <div class="card-body p-2">
               <div class="row align-items-start">

@@ -2,15 +2,92 @@
 error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
 $permiso = $this->permiso;
 $asignacion = $this->asignacion;
+
+//ini_set('display_errors', 1);
+//error_reporting(E_ALL);
+ini_set('max_execution_time', 4000);  // 300 segundos = 5 minutos
+ini_set('memory_limit', '512M');
+//error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
+
+session_start();
+
+$timeout = 8 * 60 * 60; // 4 horas en segundos
+
+if (!isset($_SESSION['usuario'])) {
+    session_unset();
+    session_destroy();
+    header("Location: " . constant('URL') . "login");
+    exit();
+}
+
+if (isset($_SESSION['LAST_ACTIVITY']) && 
+    (time() - $_SESSION['LAST_ACTIVITY'] > $timeout)) {
+
+    session_unset();
+    session_destroy();
+    header("Location: " . constant('URL') . "login");
+    exit();
+}
+
+// actualizar actividad
+$_SESSION['LAST_ACTIVITY'] = time();
+
+
 ?>
 <!DOCTYPE html>
 <html>
 
 <head>
-  <meta charset="UTF-8">
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="<?php echo constant('URL'); ?>public/uploads/logo.png">
+  <title>E-Tickets</title>
+  <?php
+  include_once 'models/usuariosperfil.php';
+  $correoModel = new CorreoModel();
+  foreach ($this->usuariosperfil as $row) {
+    $usuariosperfil = new Usuariosperfil();
+    $usuariosperfil = $row;
+    $idusuario = $usuariosperfil->id_usuario;
+    $menu = $usuariosperfil->menu;
+    $habilitado = $usuariosperfil->habilitado;
+    $principal = $usuariosperfil->principal;
+    //$permiso = $usuariosperfil->permiso;
+  }
+  // Accede al primer elemento del array (aunque todos los elementos contienen el mismo valor de idusuario)
+  $usuariosperfil0 = $this->usuariosperfil[0];
+  $idusuario0 = $usuariosperfil0->idusuario;
+  $menu = $usuariosperfil0->menu;
+  $habilitado = $usuariosperfil0->habilitado;
+  $principal = $usuariosperfil0->principal;
+  $permiso = $usuariosperfil0->permiso;
+
+  $_SESSION['permiso'] = $permiso;
+  $_SESSION['idusuario'] = $idusuario0;
+
+  $permiso = $this->permiso;
+  $asignacion = $this->asignacion;
+
+  $usuarios_permitidos = [
+                'christopher.soto@iopa.cl',
+                'nstuardo@gmail.com',
+                'dimas.delmoral@iopa.cl',
+                'daniel.navarrete@iopa.cl',
+                'marcos.huenchunir@iopa.cl',
+                'luis.farias@iopa.cl',
+                'catalina.henriquez@iopa.cl'
+              ];
+  ?>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+  <!-- Moment.js (requerido por daterangepicker) -->
+  <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
+  <!-- Daterangepicker -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+  <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
   <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700">
@@ -33,18 +110,22 @@ $asignacion = $this->asignacion;
   <!-- Animate.css (opcional si usas animaciones) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
-  <!-- JQUERY -->
-  <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-  
-  
+
+  <style>
+    .main-sidebar {
+      left: 0 !important;
+    }
+
+    .content-wrapper {
+      margin-left: 0 !important;
+      margin-top: -35 !important;
+
+    }
+  </style>
 </head>
 
-<body>
-
 <nav class="navbar navbar-expand navbar-dark bg-primary">
-  <!-- Left navbar: Push menu + Inicio -->
   <ul class="navbar-nav">
-    <!-- Botón menú (hamburguesa) -->
     <li class="nav-item">
       <a class="nav-link" data-widget="pushmenu" href="#" role="button">
         <i class="fas fa-bars"></i>
@@ -52,11 +133,28 @@ $asignacion = $this->asignacion;
     </li>
 
     <!-- Link fijo a Inicio -->
-    <li class="nav-item d-none d-sm-inline-block" style="margin-left: 30px;">
-      <a href="#" class="nav-link">
-      <i class="fas fa-chart-bar"></i> IOPA System: E-Tickets
-      </a>
+    <li class="nav-item d-none d-sm-inline-block ml-3">
+        <a href="" class="nav-link font-weight-bold" onclick="reload();" data-tooltip="tooltip" title="Recargar página">
+            <i class="fas fa-ticket-alt mr-1"></i> IOPA System <span class="font-weight-light">| E-Tickets</span>
+        </a>
     </li>
+
+    <?php if (isset($_SESSION['usuario']) && in_array($_SESSION['usuario'], $usuarios_permitidos)) { ?>
+
+    <li class="nav-item d-none d-md-block">
+        <span class="nav-link disabled text-white-50">|</span>
+    </li>
+
+    
+
+    <li class="nav-item d-none d-sm-inline-block ml-3">
+        <a href="<?= constant('URL'); ?>proyectos/verTabla" class="nav-link font-weight-bold" onclick="reload();" data-tooltip="tooltip" title="Ir a proyectos IOPA">
+            <i class="fas fa-tasks mr-1"></i> IOPA System <span class="font-weight-light">| Proyectos IOPA</span>
+        </a>
+    </li>
+
+    <?php }?>
+    
 
     <!-- Formularios -->
     <?php
@@ -77,33 +175,16 @@ $asignacion = $this->asignacion;
 
   <!-- Right navbar -->
   <ul class="navbar-nav ml-auto">
-    <!-- Dropdown: Tablas -->
-    <!-- <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-        <i class="fas fa-table"></i> Tablas
-      </a>
-      <div class="dropdown-menu dropdown-menu-right">
-        <?php
-        foreach ($this->usuariosperfil as $row) {
-          $usuariosperfil = new Usuariosperfil();
-          $usuariosperfil = $row;
-          if ($usuariosperfil->principal == "Tablas") { ?>
-            <a class="dropdown-item" href="<?php echo constant('URL') . $usuariosperfil->menu; ?>/verPaginacion/1">
-              <i class="fas fa-angle-right mr-2"></i><?php echo $usuariosperfil->menu; ?>
-            </a>
-          <?php }
-        }
-        ?>
-      </div>
-    </li> -->
 
     <!-- Usuario -->
     <li class="nav-item">
-      <a class="nav-link" href="#">
+      <a class="nav-link" href="#" data-tooltip="tooltip" title="<?= $_SESSION["usuario"]; ?>">
         <i class="fas fa-user-circle"></i> 
-        <?php echo $_SESSION["usuario"]; ?> : <?php echo strtoupper($permiso); ?>
+        <small class="badge badge-light mr-1"><?= strtoupper($permiso); ?></small>
+            
       </a>
     </li>
+    
 
     <!-- Logout -->
     <li class="nav-item">
@@ -114,40 +195,4 @@ $asignacion = $this->asignacion;
   </ul>
 </nav>
 
-<!-- jQuery (debe ir primero) -->
-<!-- <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> -->
-
-<!-- Bootstrap 4.6.2 -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script> -->
-
-<!-- AdminLTE 3.2.0 -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/js/adminlte.min.js"></script> -->
-
-<!-- SweetAlert2 (opcional si usas alertas) -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
-<script>
-  var rol = <?php echo json_encode($permiso); ?>;
-  var usuarioID = <?php echo json_encode($asignacion); ?>;
-</script>
-
-<!-- jQuery 3.6.4 -->
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-<!-- Bootstrap 4.6.2 -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- AdminLTE 3.2.0 -->
-<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/js/adminlte.min.js"></script>
-
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<!-- Variables JS desde PHP -->
-<script>
-  var rol = <?php echo json_encode($permiso); ?>;
-  var usuarioID = <?php echo json_encode($asignacion); ?>;
-</script>
-<!-- LOLITO -->
-</body>
-
-</html>
+<body class="sidebar-mini layout-navbar-fixed sidebar-collapse sidebar-closed">

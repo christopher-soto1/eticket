@@ -773,7 +773,7 @@ class CorreoModel extends Model{
     }
     
     /* NUEVA FUNCION IMPLEMENTADA 30/01/2026 */
-    public function obtenerYGuardarCorreos() {
+    public function obtenerYGuardarCorreos($esRespuesta = 0) {
         ini_set('max_execution_time', 3000);
         ini_set('memory_limit', '512M');
 
@@ -789,6 +789,8 @@ class CorreoModel extends Model{
         $totalProcesados = 0;
         $carpetas = ['INBOX', 'INBOX.Sent'];
 
+        $limite = ($esRespuesta == 1) ? 20 : 150;
+
         foreach ($carpetas as $carpeta) {
             $mbox = imap_open($imap_base . $carpeta, $username, $password) or die("No se pudo conectar a $carpeta: " . imap_last_error());
             
@@ -798,7 +800,7 @@ class CorreoModel extends Model{
 
             if ($total_mensajes > 0) {
                 // Definimos un margen de 500 para seguridad total en producción
-                $rango_inicio = max(1, $total_mensajes - 500); 
+                $rango_inicio = max(1, $total_mensajes - $limite); 
                 // Obtenemos solo el resumen de los últimos 500
                 $emails_overview = imap_fetch_overview($mbox, "$rango_inicio:$total_mensajes", 0);
                 // Invertimos para procesar el más reciente primero
@@ -1631,7 +1633,7 @@ class CorreoModel extends Model{
                         <div style='background-color: #f9f9f9; border-left: 4px solid #2980b9; padding: 15px; margin: 20px 0;'>
                             <p style='margin: 5px 0;'><strong>Ticket ID:</strong> #$uid</p>
                             <p style='margin: 5px 0;'><strong>Asunto:</strong> $asunto</p>
-                            <p style='margin: 5px 0;'><strong>Prioridad:</strong> <span style='color: #e74c3c; font-weight: bold;'>Alta</span></p>
+                            <!-- <p style='margin: 5px 0;'><strong>Prioridad:</strong> <span style='color: #e74c3c; font-weight: bold;'>Alta</span></p> -->
                             <p style='margin: 5px 0;'><strong>Fecha:</strong> $fecha_envio</p>
                         </div>
 
@@ -1907,11 +1909,11 @@ class CorreoModel extends Model{
 
             if (in_array($desarrolladorAsignado, $programacion)) {
                 # ---------- COMENTADO MIENTRAS CATA ESTA DE VACACIONES ----------
-                #$mail->addAddress('catalina.henriquez@iopa.cl', 'Catalina Henriquez');
-                #$nombreDestinatario = 'Catalina Henriquez';
+                $mail->addAddress('catalina.henriquez@iopa.cl', 'Catalina Henriquez');
+                $nombreDestinatario = 'Catalina Henriquez';
                 # ---------- COMENTADO MIENTRAS CATA ESTA DE VACACIONES ----------
-                $mail->addAddress('christopher.soto@iopa.cl', 'Christopher Soto');
-                $nombreDestinatario = 'Christopher Soto';
+                #$mail->addAddress('christopher.soto@iopa.cl', 'Christopher Soto');
+                #$nombreDestinatario = 'Christopher Soto';
             } 
             elseif (in_array($desarrolladorAsignado, $soporteTI)) {
                 $mail->addAddress('luis.plaza@iopa.cl', 'Luis Plaza');
@@ -1977,7 +1979,7 @@ class CorreoModel extends Model{
                     <p>Estimado(a) <strong>$nombreDestinatario</strong>,</p>
                     <p>Se informa que el ticket ha sido marcado como <strong>realizado</strong>. A continuación, se detallan los comentarios y la información del requerimiento:</p>
                     
-                    <div style='background-color: #f9f9f9; border-left: 4px solid #27ae60; padding: 15px; margin: 20px 0;'>
+                    <div style='background-color: #f9f9f9; border-left: 4px solid #6f42c1; padding: 15px; margin: 20px 0;'>
                         <p style='margin: 5px 0;'><strong>ID Ticket:</strong> #" . htmlspecialchars($uid_trim) . "</p>
                         <p style='margin: 5px 0;'><strong>Asunto:</strong> " . htmlspecialchars($asunto) . "</p>
                         <p style='margin: 5px 0;'><strong>Fecha de creación:</strong> " . htmlspecialchars($fecha_envio) . "</p>
@@ -2435,6 +2437,77 @@ class CorreoModel extends Model{
         $apellido = isset($fragmentos[1]) ? ucfirst(strtolower($fragmentos[1])) : '';
         
         return trim("$nombre $apellido");
+    }
+
+    public function correoExiste($correo) {
+        // Buscar en tabla usuarios
+        $query = $this->db->connect()->prepare("SELECT * FROM usuarios WHERE email = :correo LIMIT 1");
+        $query->execute(['correo' => $correo]);
+        $resultadoUsuarios = $query->fetch(PDO::FETCH_OBJ);
+        
+        // Si existe en usuarios, retornar true
+        if ($resultadoUsuarios) {
+            return true;
+        }
+        
+        // Buscar en tabla usuariosperfil
+        $query = $this->db->connect()->prepare("SELECT * FROM usuariosperfil WHERE idusuario = :correo LIMIT 1");
+        $query->execute(['correo' => $correo]);
+        $resultadoPerfil = $query->fetch(PDO::FETCH_OBJ);
+        
+        // Si existe en usuariosperfil, retornar true
+        if ($resultadoPerfil) {
+            return true;
+        }
+        
+        // No existe en ninguna tabla
+        return false;
+    }
+    
+    // Agregar nuevo usuario
+    public function agregarUsuario($datos) {
+        try {
+            $pdo = $this->db->connect();
+            
+            // Iniciar transacción
+            $pdo->beginTransaction();
+            
+            // 1. INSERTAR EN TABLA USUARIOS
+            $query = $pdo->prepare("INSERT INTO usuarios (email, pass, foto) VALUES (:email, :pass, NULL)");
+            $query->execute([
+                'email' => $datos['correo'],
+                'pass' => $datos['contrasena']
+            ]);
+            
+            // 2. INSERTAR EN TABLA USUARIOSPERFIL (4 registros)
+            $menus = [
+                ['menu' => 'tablas', 'principal' => ''],
+                ['menu' => 'usuarios', 'principal' => 'Tablas'],
+                ['menu' => 'medicos', 'principal' => 'Tablas'],
+                ['menu' => 'correo', 'principal' => 'Tablas']
+            ];
+            
+            $query = $pdo->prepare("INSERT INTO usuariosperfil (idusuario, menu, habilitado, principal, permiso, area) 
+                                   VALUES (:idusuario, :menu, 'S', :principal, 'admin', :area)");
+            
+            foreach ($menus as $item) {
+                $query->execute([
+                    'idusuario' => $datos['correo'],
+                    'menu' => $item['menu'],
+                    'principal' => $item['principal'],
+                    'area' => $datos['area']
+                ]);
+            }
+            
+            // Confirmar transacción
+            $pdo->commit();
+            return true;
+            
+        } catch (Exception $e) {
+            // Revertir cambios si hay error
+            $pdo->rollBack();
+            return false;
+        }
     }
 
     

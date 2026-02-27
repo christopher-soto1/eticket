@@ -1,100 +1,10 @@
-<?php
-//ini_set('display_errors', 1);
-//error_reporting(E_ALL);
-ini_set('max_execution_time', 4000);  // 300 segundos = 5 minutos
-ini_set('memory_limit', '512M');
-//error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
-
-session_start();
-
-$timeout = 8 * 60 * 60; // 4 horas en segundos
-
-if (!isset($_SESSION['usuario'])) {
-    session_unset();
-    session_destroy();
-    header("Location: " . constant('URL') . "login");
-    exit();
-}
-
-if (isset($_SESSION['LAST_ACTIVITY']) && 
-    (time() - $_SESSION['LAST_ACTIVITY'] > $timeout)) {
-
-    session_unset();
-    session_destroy();
-    header("Location: " . constant('URL') . "login");
-    exit();
-}
-
-// actualizar actividad
-$_SESSION['LAST_ACTIVITY'] = time();
 
 
-?>
-<!DOCTYPE html>
-<html>
+<?php require 'views/header.php' ?>
 
-<head>
-  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <link rel="icon" type="image/png" href="<?php echo constant('URL'); ?>public/uploads/logo-eticket.png">
-  <title>E-Tickets</title>
-  <?php
-  include_once 'models/usuariosperfil.php';
-  $correoModel = new CorreoModel();
-  foreach ($this->usuariosperfil as $row) {
-    $usuariosperfil = new Usuariosperfil();
-    $usuariosperfil = $row;
-    $idusuario = $usuariosperfil->id_usuario;
-    $menu = $usuariosperfil->menu;
-    $habilitado = $usuariosperfil->habilitado;
-    $principal = $usuariosperfil->principal;
-    //$permiso = $usuariosperfil->permiso;
-  }
-  // Accede al primer elemento del array (aunque todos los elementos contienen el mismo valor de idusuario)
-  $usuariosperfil0 = $this->usuariosperfil[0];
-  $idusuario0 = $usuariosperfil0->idusuario;
-  $menu = $usuariosperfil0->menu;
-  $habilitado = $usuariosperfil0->habilitado;
-  $principal = $usuariosperfil0->principal;
-  $permiso = $usuariosperfil0->permiso;
 
-  $_SESSION['permiso'] = $permiso;
-  $_SESSION['idusuario'] = $idusuario0;
-
-  $permiso = $this->permiso;
-  $asignacion = $this->asignacion;
-  ?>
-
-  <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-  <!-- Moment.js (requerido por daterangepicker) -->
-  <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-
-  <!-- Daterangepicker -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-  <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js"></script>
-
-  <style>
-    .main-sidebar {
-      left: 0 !important;
-    }
-
-    .content-wrapper {
-      margin-left: 0 !important;
-      margin-top: -35 !important;
-
-    }
-  </style>
-</head>
-
-<body class="sidebar-mini layout-navbar-fixed sidebar-collapse sidebar-closed">
   <div class="wrapper">
 
-    <?php require 'views/header.php' ?>
     <?php
     $correoModel = new CorreoModel();
     //CONTADORES ADMIN
@@ -214,7 +124,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
         /* ESTILOS SIDEBAR */
         /* Fondo general y textos */
         .main-sidebar {
-          background: linear-gradient(180deg, #0056b3 0%, #007bff 100%);
+          background: linear-gradient(180deg, #f4f6f9 0%, #f4f6f9 100%);
           color: white;
           font-family: 'Segoe UI', sans-serif;
         }
@@ -226,7 +136,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
           font-size: 1.1rem;
           font-weight: bold;
           margin-bottom: 15px;
-          color: #f8f9fa;
+          color: #000000;
         }
 
         /* Inputs y selects */
@@ -243,13 +153,13 @@ $_SESSION['LAST_ACTIVITY'] = time();
         .filtro-input label,
         .form-group label {
           font-size: 0.85rem;
-          color: #e2e6ea;
+          color: #000000;
         }
 
         /* Íconos */
         .filtro-icono {
           /* color: #cce5ff; */
-          color: #ffffff;
+          color: #000000;
           font-size: 1rem;
         }
 
@@ -277,7 +187,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
 
         /* Hover efecto sidebar */
         .main-sidebar:hover .filtro-icono {
-          color: #ffffff;
+          color: #000000;
         }
 
         /* Transiciones suaves */
@@ -289,7 +199,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
         }
 
         .content-wrapper {
-          margin-top: -45px !important;
+          margin-top: 0px !important;
           /* ahora sí se aplicará */
         }
 
@@ -335,100 +245,119 @@ $_SESSION['LAST_ACTIVITY'] = time();
           margin-right: 5px !important;
           font-size: 0.9rem !important;
         }
+        /* Efecto de elevación al pasar el mouse */
+        .card {
+            /* Mantenemos la transición en 0.4s con una curva profesional */
+            /* El cubic-bezier es lo que hace que parezca "orgánico" */
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                        box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
+            
+            /* Esto ayuda a que el navegador use la tarjeta de video para la animación */
+            will-change: transform;
+        }
+        .card:hover {
+            /* Bajamos a -8px para que no sea tan agresivo el salto */
+            transform: translateY(-4px) !important;
+            
+            /* Sombra más elegante: más difusa (30px) y menos oscura (0.12) */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12) !important;
+        }
       </style>
 
 
 
       <!-- TITULO -->
       <br>
-      <div style="text-align: center; margin-top: 30px;">
+      <!-- <div style="text-align: center; margin-top: 30px;">
         <h2
           style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 34px; color: #2c3e50; font-weight: 600; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); letter-spacing: 1px;">
           E-Tickets
         </h2>
-      </div>
+      </div> -->
 
 
       <!-- CONTADORES -->
       <?php if ($permiso == 'admin') { ?>
-        <section class="content">
-          <div class="container-fluid">
-            <!-- Small boxes (Stat box) -->
-            <div class="row justify-content-center">
 
-              <!-- SIN ASIGNAR -->
-              <div class="col-sm-2 col-6">
-                <div class="small-box bg-info">
-                  <div class="inner">
-                    <h3><?php echo $noAsignados; ?></h3>
+      <style>
+          .glass-counter {
+              border-radius: 15px;
+              transition: all 0.3s ease;
+              border: none;
+              overflow: hidden;
+              box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          }
+          .glass-counter:hover {
+              transform: translateY(-5px);
+              box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+          }
+          .card-icon-bg {
+              position: absolute;
+              right: -10px;
+              bottom: -10px;
+              font-size: 4rem;
+              opacity: 0.2;
+              color: #fff;
+              transform: rotate(-15deg);
+          }
+      </style>
+        <section class="content mt-3">
+            <div class="container-fluid">
+                <div class="row justify-content-center">
 
-                    <p>Sin asignar</p>
-                  </div>
-                  <div class="icon">
-                    <i class="ion ion-stats-bars" style="font-size: 50px; top: 10px;"></i>
-                  </div>
-                  <!-- <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a> -->
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
+                        <div class="card glass-counter h-100" 
+                              style="background: linear-gradient(135deg, #17a2b8 0%, #117a8b 100%);">
+                            <div class="card-body p-3 text-white">
+                                <h6 class="text-uppercase opacity-7 font-weight-bold small">Sin Asignar</h6>
+                                <h2 class="font-weight-bold mb-0"><?php echo $noAsignados; ?></h2>
+                                <i class="fas fa-user-slash card-icon-bg"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
+                        <div class="card glass-counter h-100" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);">
+                            <div class="card-body p-3 text-white">
+                                <h6 class="text-uppercase opacity-7 font-weight-bold small">Asignados</h6>
+                                <h2 class="font-weight-bold mb-0"><?php echo $asignados; ?></h2>
+                                <i class="fas fa-user-check card-icon-bg"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
+                        <div class="card glass-counter h-100" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);">
+                            <div class="card-body p-3 text-white">
+                                <h6 class="text-uppercase opacity-7 font-weight-bold small">En Progreso</h6>
+                                <h2 class="font-weight-bold mb-0"><?php echo $enProgresoAdmin; ?></h2>
+                                <i class="fas fa-spinner fa-spin card-icon-bg" style="opacity: 0.1;"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
+                        <div class="card glass-counter h-100" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+                            <div class="card-body p-3 text-white">
+                                <h6 class="text-uppercase opacity-7 font-weight-bold small">Realizados</h6>
+                                <h2 class="font-weight-bold mb-0"><?php echo $realizados; ?></h2>
+                                <i class="fas fa-clipboard-check card-icon-bg"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
+                        <div class="card glass-counter h-100" style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);">
+                            <div class="card-body p-3 text-white">
+                                <h6 class="text-uppercase opacity-7 font-weight-bold small">Finalizados</h6>
+                                <h2 class="font-weight-bold mb-0"><?php echo $finalizados; ?></h2>
+                                <i class="fas fa-check-double card-icon-bg"></i>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-              </div>
-
-              <!-- ASIGNADOS A USUARIOS -->
-              <div class="col-sm-2 col-6">
-                <div class="small-box bg-primary">
-                  <div class="inner" style="max-height: 112px;"> <!-- mantiene los contadores del mismo tamaño -->
-                    <h3><?php echo $asignados; ?></h3>
-
-                    <p>Asignados a usuarios</p>
-                  </div>
-                  <div class="icon">
-                    <i class="ion ion-person-add" style="font-size: 50px; top: 10px;"></i>
-                  </div>
-                </div>
-              </div>
-
-              <!-- EN PROGRESO -->
-              <div class="col-sm-2 col-6">
-                <div class="small-box bg-warning">
-                  <div class="inner">
-                    <h3 style="color: white;"><?php echo $enProgresoAdmin; ?></h3>
-
-                    <p style="color: white;">En progreso</p>
-                  </div>
-                  <div class="icon">
-                    <i class="ion ion-stats-bars" style="font-size: 50px; top: 10px;"></i>
-                  </div>
-                  <!-- <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a> -->
-                </div>
-              </div>
-
-              <!-- REALIZADOS -->
-              <div class="col-sm-2 col-6">
-                <div class="small-box bg-purple">
-                  <div class="inner">
-                    <h3><?php echo $realizados; ?></h3>
-                    <p>Realizados</p>
-                  </div>
-                  <div class="icon">
-                    <i class="ion ion-eye" style="font-size: 50px; top: 10px;"></i>
-                  </div>
-                </div>
-              </div>
-
-              <!-- FINALIZADOS -->
-              <div class="col-sm-2 col-6">
-                <div class="small-box bg-success">
-                  <div class="inner">
-                    <h3><?php echo $finalizados; ?></h3>
-
-                    <p>Finalizados</p>
-                  </div>
-                  <div class="icon">
-                    <i class="ion ion-pie-graph" style="font-size: 50px; top: 10px;"></i>
-                  </div>
-                </div>
-              </div>
-
             </div>
-          </div>
         </section>
       <?php } else { ?>
         <section class="content">
@@ -494,43 +423,53 @@ $_SESSION['LAST_ACTIVITY'] = time();
       <?php } ?>
 
       <!-- Main Sidebar Container -->
-      <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color: #007bff; color: white;">
+      <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color: #ffffff; color: white;">
         <!-- Sidebar -->
         <div class="sidebar px-2">
           <!-- Filtros -->
-          <div style="mt-5" class="">
+          <!-- <div style="mt-5" class="">
             <i class="fas fa-chart-bar sidebar-etickets-icon" style="margin-left: 20px; margin-top: 20px;"></i>
-            <label class="sidebar-etickets-label" style="margin-top: 20px; text-align: center;">Sistema de filtros<br>
-              E-Tickets</label>
-          </div>
+            <label class="sidebar-etickets-label" style="margin-top: 20px; text-align: center;">Sistema de filtros<br>E-Tickets</label>
+          </div> -->
 
           
 
-          <hr style="border: none; border-top: 1px solid white;">
+          <!-- <hr style="border: none; border-top: 1px solid black;" class="filtro-boton"> -->
+          <br class="filtro-icono">
+
+          <!-- 
+          filtro-icono = se visualiza con el side bard cerrado, se oculta con el side bard abierto
+          filtro-input = se visualiza con el side bard abierto, se oculta con el side bard cerrado 
+          filtro-boton = se visualiza con el side bard abierto, se oculta con el side bard cerrado 
+          -->
 
 
           <div class="mt-2">
             <!-- FECHA DE INICIO -->
-            <div class="form-group d-flex align-items-center filtro-item">
               <i class="fas fa-calendar-alt me-2 filtro-icono"
                 style="display: none; margin-left: 20px;margin-bottom: 20px;"></i>
-              <div class="filtro-input w-100">
-                <label for="fecha_inicio"><b>Fecha de Inicio</b></label>
-                <input type="date" class="form-control form-control-sm mb-2" id="fecha_inicio" name="fecha_inicio">
-              </div>
+            <div class="form-group filtro-item">
+                <label class="filtro-label filtro-input" for="fecha_inicio">Fecha de Inicio</label>
+                <div class="input-group">
+                    <input type="date" 
+                          class="form-control form-control-sm mb-2 filtro-input" 
+                          id="fecha_inicio" 
+                          name="fecha_inicio">
+                </div>
             </div>
 
             <!-- Fecha de Fin -->
-            <div class="form-group filtro-fecha-fin">
-              <label class="filtro-input" for="fecha_fin">Fecha de Fin</label>
-              <i class="fas fa-calendar-alt filtro-icono" title="Fecha de Fin"
+             <i class="fas fa-calendar-alt filtro-icono" title="Fecha de Fin"
                 style="display: none;margin-left: 20px;margin-bottom: 20px;"></i>
-              <input type="date" class="form-control form-control-sm mb-2 filtro-input" id="fecha_fin" name="fecha_fin">
+            <div class="form-group filtro-item">
+                <label class="filtro-label filtro-input" for="fecha_fin">Fecha de Fin</label>
+                <input type="date" 
+                      class="form-control form-control-sm mb-2 filtro-input" 
+                      id="fecha_fin" 
+                      name="fecha_fin">
             </div>
 
             <!-- Usuario Asignado -->
-            <?php if ($permiso == 'admin') { ?>
-              <!-- Usuario Asignado -->
               <div class="form-group filtro-usuario-asignado">
                 <label class="filtro-input" for="usuario_asignado">Usuario Asignado</label>
                 <i class="fas fa-user filtro-icono" title="Usuario Asignado"
@@ -545,7 +484,6 @@ $_SESSION['LAST_ACTIVITY'] = time();
                   <?php endforeach; ?>
                 </select>
               </div>
-            <?php } ?>
 
             <!-- Estado -->
             <div class="form-group filtro-estado">
@@ -625,72 +563,66 @@ $_SESSION['LAST_ACTIVITY'] = time();
             </div>
 
             <!-- Botones -->
-            <div class="d-flex justify-content-between filtro-boton">
-              <button class="btn btn-primary btn-sm w-50 me-1" onclick="filtrarCards();">Filtrar</button>
-              <button style="margin-left: 5px;" class="btn btn-secondary btn-sm w-50" id="limpiar_filtros"><i class="fas fa-eraser"></i></button>
-              <button style="margin-left: 5px; background-color: #007bff !important; border-color: #007bff !important; color: white;" class="btn btn-primary btn-sm w-50" id="reload"><i class="fas fa-home"></i></button>
-            </div>
+            <div class="d-flex align-items-center filtro-boton">
+              <button class="btn btn-primary btn-sm flex-grow-1 shadow-sm" onclick="filtrarCards();">
+                <i class="fas fa-filter mr-1"></i> Filtrar
+              </button>
 
-            <hr style="border: none; border-top: 1px solid white;">
+              <button class="btn btn-secondary btn-sm ml-2" id="limpiar_filtros">
+                <i class="fas fa-eraser"></i>
+              </button>
+
+              <button class="btn btn-sm ml-2" id="reload"
+                      style="background-color: #007bff; border-color: #007bff; color: white;">
+                  <i class="fas fa-home"></i>
+              </button>
+            </div>
+            <!-- <hr style="border: none; border-top: 1px solid white;"> -->
 
             <div class="form-group d-flex align-items-center filtro-item">
               <i class="fas fa-sync-alt me-2 filtro-icono" style="display: none; margin-left: 20px;"></i>
             </div>
 
+            <br>
+            <hr style="border: none; border-top: 1px solid black;" class="filtro-boton">
+
             <div class="d-flex justify-content-between mb-2 filtro-boton">
-              <button id="btnSincronizar" class="btn btn-light btn-sm w-100 me-1">Sincronizar E-Tickets</button>
+              <button id="btnSincronizar" class="btn btn-warning btn-sm w-100 shadow-sm">
+                <i class="fas fa-sync-alt mr-2"></i> Sincronizar E-Tickets
+              </button>
             </div>
 
-            <hr style="border: none; border-top: 1px solid white;">
+            <!-- <hr style="border: none; border-top: 1px solid white;"> -->
 
             <div class="form-group d-flex align-items-center filtro-item">
               <i class="fas fa-chart-line me-2 filtro-icono" style="display: none; margin-left: 20px;"></i>
             </div>
 
             <div class="d-flex justify-content-between mb-2 filtro-boton">
-              <button id="btnEstadisticas" class="btn btn-light open-estadisticas btn-sm w-100 me-1" data-toggle="modal"
-                data-target="#modalEstadisticas">
-                Estadísticas
+              <button id="btnEstadisticas" 
+                      class="btn btn-info btn-sm w-100 shadow-sm open-estadisticas" 
+                      data-toggle="modal" 
+                      data-target="#modalEstadisticas"
+                <i class="fas fa-chart-pie mr-2"></i> Ver Estadísticas
               </button>
             </div>
-
-           <?php 
-            $usuarios_permitidos = [
-                'christopher.soto@iopa.cl',
-                'nstuardo@gmail.com',
-                'n2@n2.cl',
-                'dimas.delmoral@iopa.cl',
-                'daniel.navarrete@iopa.cl',
-                'marcos.huenchunir@iopa.cl',
-                'luis.farias@iopa.cl',
-                'catalina.henriquez@iopa.cl'
-              ];
-              
-           if (isset($_SESSION['usuario']) && in_array($_SESSION['usuario'], $usuarios_permitidos)) {?>
-            <hr style="border: none; border-top: 1px solid white;">
-
-            <div class="d-flex justify-content-between mb-2 filtro-boton">
-              <a href="<?php echo constant('URL'); ?>proyectos/verTabla" class="btn btn-light btn-sm w-100 me-1" style="color: black;">
-                Proyectos
-              </a>
-            </div>
-            <?php }?>
 
             <?php
               
            if (isset($_SESSION['usuario']) && $_SESSION['usuario'] == 'christopher.soto@iopa.cl') {?>
-            <hr style="border: none; border-top: 1px solid white;">
+            <!-- <hr style="border: none; border-top: 1px solid white;"> -->
 
             <div class="d-flex justify-content-between mb-2 filtro-boton">
-              <a href="<?php echo constant('URL'); ?>usuarios/verPaginacion/1" class="btn btn-light btn-sm w-100 me-1" style="color: black;">
-                Agregar Usuarios
-              </a>
+              <button type="button" 
+                      class="btn btn-success btn-sm w-100 shadow-sm" 
+                      data-toggle="modal" 
+                      data-target="#modalAgregarUsuario"
+                      style="color: white;">
+                <i class="fas fa-user-plus mr-2"></i> Agregar Usuarios
+              </button>
             </div>
             <?php }?>
-
-
-
-<div id="respuestaEnvio" class="mt-3 text-info"></div>
+            <hr style="border: none; border-top: 1px solid black;" class="filtro-boton">
 
           </div>
 
@@ -872,7 +804,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
 
       
 
-      <!-- MODAL DINAMICO DETALLE -->
+      <!-- MODAL DETALLE -->
       <div class="modal fade" id="modalDetalle" tabindex="-1" role="dialog" aria-labelledby="modalDetalleLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document"> <!-- modal-lg para variar tamaño -->
@@ -890,7 +822,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
         </div>
       </div>
 
-      <!-- MODAL DINAMICO CONTENIDO -->
+      <!-- MODAL CONTENIDO -->
       <div class="modal fade" id="modalContenido" tabindex="-1" role="dialog" aria-labelledby="modalContenidoLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
@@ -1051,6 +983,80 @@ $_SESSION['LAST_ACTIVITY'] = time();
         </div>
       </div>
 
+      <!-- MODAL AGREGAR USUARIO -->
+      <div class="modal fade" id="modalAgregarUsuario" tabindex="-1" role="dialog" aria-labelledby="modalAgregarUsuarioLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            
+            <!-- Header del Modal -->
+            <div class="modal-header bg-success text-white">
+              <h5 class="modal-title" id="modalAgregarUsuarioLabel">
+                <i class="fas fa-user-plus mr-2"></i> Agregar Nuevo Usuario
+              </h5>
+              <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
+              </button>
+            </div>
+            
+            <!-- Body del Modal -->
+            <div class="modal-body">
+              <form id="formAgregarUsuario" method="POST" action="<?php echo constant('URL'); ?>usuarios/agregarUsuario">
+                
+                <!-- Correo -->
+                <div class="form-group">
+                  <label for="correo">
+                    <i class="fas fa-envelope mr-1"></i> Correo Electrónico
+                  </label>
+                  <input type="email" 
+                        class="form-control" 
+                        id="correo" 
+                        name="correo" 
+                        placeholder="ejemplo@correo.com" 
+                        required>
+                </div>
+                
+                <!-- Contraseña -->
+                <div class="form-group">
+                  <label for="contrasena">
+                    <i class="fas fa-lock mr-1"></i> Contraseña
+                  </label>
+                  <input type="password" 
+                        class="form-control" 
+                        id="contrasena" 
+                        name="contrasena" 
+                        placeholder="Mínimo 6 caracteres" 
+                        minlength="6"
+                        required>
+                </div>
+                
+                <!-- Área -->
+                <div class="form-group">
+                  <label for="area">
+                    <i class="fas fa-briefcase mr-1"></i> Área
+                  </label>
+                  <select class="form-control" id="area" name="area" required>
+                    <option value="">Seleccione un área</option>
+                    <option value="Soporte TI">Soporte TI</option>
+                    <option value="Programación">Programación</option>
+                  </select>
+                </div>
+                
+              </form>
+            </div>
+            
+            <!-- Footer del Modal -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                <i class="fas fa-times mr-1"></i> Cancelar
+              </button>
+              <button type="submit" form="formAgregarUsuario" class="btn btn-success">
+                <i class="fas fa-save mr-1"></i> Guardar Usuario
+              </button>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
 
 
       <script>
@@ -1064,10 +1070,10 @@ $_SESSION['LAST_ACTIVITY'] = time();
         }
 
         $(document).ready(function () {
-          const correos = <?php echo json_encode($this->correo); ?>;
-          const usuarios = <?php echo json_encode($this->asignaciones); ?>;
-          //var estadisticas = <?php echo json_encode($this->estadisticas); ?>;
-          //var estadisticasEnProgreso = <?php echo json_encode($this->estadisticasEnProgreso); ?>;
+          var correos = <?php echo json_encode($this->correo); ?>;
+          var usuarios = <?php echo json_encode($this->asignaciones); ?>;
+          var estadisticas = <?php echo json_encode($this->estadisticas); ?>;
+          var estadisticasEnProgreso = <?php echo json_encode($this->estadisticasEnProgreso); ?>;
           //console.log(usuarios);
 
           // ----------------- TIEMPO DE PARA DESCONEXION DE LA SESION ACTUAL -----------------
@@ -1256,7 +1262,6 @@ $_SESSION['LAST_ACTIVITY'] = time();
                     `;
 
                   html += `
-                    <!-- AREA SI EXISTEN RESPUESTAS PREVIAS -->
                     <div id="textareaResponderConHilo" style="display: none;">
                                           <div class="form-group">
                       <label class="form-label" style="color: black;">Respuesta:</label>
@@ -1349,30 +1354,6 @@ $_SESSION['LAST_ACTIVITY'] = time();
 
                 // ---------------  TEXT AREA RESPUESTA AL USUARIO ---------------
 
-                // Inicializamos el editor de una vez (pero estará oculto con su contenedor)
-                $('#editorRespuestaUsuario').trumbowyg({
-                  lang: 'es',
-                  fixedFullWidth: true,
-                  autogrow: true, // Se expande solo al escribir
-                  minimalLinks: true,
-                  defaultLinkTarget: '_blank',
-                  btns: [
-                      ['viewHTML'],
-                      ['undo', 'redo'], // Historial
-                      ['formatting'],
-                      ['strong', 'em', 'del'], // Negrita, cursiva, tachado
-                      ['link'],
-                      ['insertImage'], // Si quieres permitir URLs de imagen
-                      ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
-                      ['unorderedList', 'orderedList'],
-                      ['horizontalRule'],
-                      ['removeformat'],
-                      ['fullscreen']
-                  ],
-                  // Elimina basura de Word al pegar
-                  removeformatPasted: true 
-              });
-
                 $('#btnResponderUsuarioFinal').on('click', function (e) {
                     e.preventDefault(); // Evita cualquier comportamiento extraño del botón
                     
@@ -1384,9 +1365,6 @@ $_SESSION['LAST_ACTIVITY'] = time();
                         $('#textareaResponderSinHilo').toggle();
                         $('#textareaResponderConHilo').hide();
                     }
-
-                    // Refrescar el editor por si estaba oculto
-                    $('#editorRespuestaUsuario').trumbowyg('execCmd', {cmd: 'enable'});
                 });
 
                 // ---------------  FIN TEXT RESPUESTA AL USUARIO ---------------
@@ -1854,6 +1832,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
               hiloDescendente.forEach((correo, index) => {
                 const respuestaNumero = hiloDescendente.length - index;
                 html += `
+                  <br>
                   <div style="margin-bottom: 40px; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background-color: #f9f9f9;">
                     <h5 style="margin-bottom: 10px; color: #555;">
                       Respuesta Nro. #${respuestaNumero}
@@ -1967,7 +1946,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
               Swal.fire({
                 icon: 'success',
                 title: 'Respuesta enviada',
-                text: 'La respuesta fue enviada correctamente, Sincroniza los E-Tickets para ver tu respuesta en el hilo.',
+                  text: 'La respuesta fue enviada correctamente, a continuación se sincronizarán los E-Tickets para que puedas ver tu respuesta en el hilo.',
                 confirmButtonText: 'OK'
               }).then((result) => {
                     $('#textareaResponderSinHilo textarea, #textareaResponderConHilo textarea').val('');
@@ -2063,7 +2042,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
             })
               .then(response => response.json())
               .then(data => {
-                console.log("Respuesta del backend:", data);
+                //console.log("Respuesta del backend:", data);
                 if (data.success) {
                   Swal.fire({
                     title: '¡Éxito!',
@@ -2277,7 +2256,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
             })
               .then(response => response.text())
               .then(data => {
-                console.log("Respuesta:", data);
+                //console.log("Respuesta:", data);
 
                 if (data.includes("Estado actualizado")) {
                   let mensaje;
@@ -2337,7 +2316,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
             })
               .then(response => response.text())
               .then(data => {
-                console.log("Respuesta:", data);
+                //console.log("Respuesta:", data);
 
                 if (data.includes("Estado actualizado")) {
                   Swal.fire({
@@ -2520,10 +2499,11 @@ $_SESSION['LAST_ACTIVITY'] = time();
           $('#fecha_fin').val('');
           $('#usuario_asignado').val('0');
           $('#estado').val('0');
-          $('#dias_creacion').val('0');
           $('#correo_origen').val('');
-          $('#asunto').val('');
           $('#id_ticket').val('');
+          $('#asunto').val('');
+          $('#multirespuesta').val('0');
+          $('#dias_creacion').val('0'); 
           //location.reload();
         });
         // ----- BORRAR FILTROS -----
@@ -2706,7 +2686,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
                   correo_origen: correo_origen
                 },
                 success: function (response) {
-                  console.log("Respuesta del servidor:", response);
+                  //console.log("Respuesta del servidor:", response);
                   Swal.fire({
                     icon: 'success',
                     title: 'Correo marcado como spam',
@@ -2782,7 +2762,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
                   ejecutar_envio_estatico: true
                 },
                 success: function (response) {
-                  console.log(response);
+                  //console.log(response);
 
                   if (response.toLowerCase().includes('correo enviado correctamente')) {
                     Swal.fire({
@@ -2790,7 +2770,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
                       title: '¡Respuesta enviada!',
                       text: response
                     }).then(() => {
-                      console.log("REALIZADO");
+                      //console.log("REALIZADO");
                     });
                   } else {
                     Swal.fire({
@@ -2815,6 +2795,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
 
         function ejecutarSincronizacion() {
             var pagina = <?php echo $pagina_actual; ?>;
+            var correosRespuesta = 1;
 
             Swal.fire({
                 title: 'Sincronizando correos...',
@@ -2828,6 +2809,9 @@ $_SESSION['LAST_ACTIVITY'] = time();
             $.ajax({
                 url: '<?= constant("URL") ?>correo/obtenerCorreos',
                 method: 'POST',
+                data: { 
+                    esRespuesta: correosRespuesta // Enviamos la variable aquí
+                },
                 dataType: 'json',
                 success: function (response) {
                     Swal.fire({
@@ -2848,18 +2832,104 @@ $_SESSION['LAST_ACTIVITY'] = time();
             });
         }
 
+        // GUARDAR NUEVO USUARIO
+        $(document).on('submit', '#formAgregarUsuario', function(e) {
+          e.preventDefault(); // Prevenir envío tradicional del formulario
+          
+          const correo = $('#correo').val().trim();
+          const contrasena = $('#contrasena').val().trim();
+          const area = $('#area').val();
+
+          // Validaciones
+          if (!correo || !contrasena || !area) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Campos incompletos',
+              text: 'Todos los campos son obligatorios',
+              confirmButtonColor: '#3085d6'
+            });
+            return;
+          }
+
+          // Validar email
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(correo)) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Email inválido',
+              text: 'Por favor ingresa un correo electrónico válido',
+              confirmButtonColor: '#3085d6'
+            });
+            return;
+          }
+
+          // Validar contraseña
+          if (contrasena.length < 6) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Contraseña corta',
+              text: 'La contraseña debe tener al menos 6 caracteres',
+              confirmButtonColor: '#3085d6'
+            });
+            return;
+          }
+
+          // Enviar datos al controlador
+          $.ajax({
+            url: '<?php echo constant('URL'); ?>correo/agregarUsuario',
+            type: 'POST',
+            data: {
+              correo: correo,
+              contrasena: contrasena,
+              area: area
+            },
+            dataType: 'json',
+            beforeSend: function() {
+              // Opcional: Mostrar loading
+              Swal.fire({
+                title: 'Guardando...',
+                text: 'Por favor espera',
+                allowOutsideClick: false,
+                didOpen: () => {
+                  Swal.showLoading();
+                }
+              });
+            },
+            success: function(response) {
+              if (response.success) {
+                Swal.fire({
+                  icon: 'success',
+                  title: '¡Éxito!',
+                  text: 'Usuario creado correctamente',
+                  confirmButtonColor: '#28a745'
+                }).then(() => {
+                  $('#modalAgregarUsuario').modal('hide');
+                  location.reload(); // Recargar para ver el nuevo usuario
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: response.mensaje || 'No se pudo crear el usuario',
+                  confirmButtonColor: '#dc3545'
+                });
+              }
+            },
+            error: function(xhr, status, error) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error del servidor',
+                text: 'Ocurrió un error al procesar la solicitud',
+                confirmButtonColor: '#dc3545'
+              });
+              console.error('Error:', error);
+              console.error('Respuesta:', xhr.responseText);
+            }
+          });
+        });
       </script>
 
     </div> <!-- content-wrapper -->
 
-    <?php require 'views/footer.php' ?>
-
   </div> <!-- wrapper -->
-
-  <!-- PARA ENVIAR CORREOS EN FORMATO HTML -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/ui/trumbowyg.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.27.3/trumbowyg.min.js"></script>
-
-</body>
-
-</html>
+<?php require 'views/footer.php'; ?>

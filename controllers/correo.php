@@ -284,7 +284,8 @@ class Correo extends Controller{
     /* IMAP */
     public function obtenerCorreos() {
         $correoModel = new CorreoModel();
-        $correosProcesados = $correoModel->obtenerYGuardarCorreos();
+        $esRespuesta = isset($_POST['esRespuesta']) ? $_POST['esRespuesta'] : 0;
+        $correosProcesados = $correoModel->obtenerYGuardarCorreos($esRespuesta);
     
         // Devolver una respuesta JSON
         echo json_encode([
@@ -517,6 +518,95 @@ class Correo extends Controller{
 
         
         //echo json_encode($exito);
+    }
+
+    public function agregarUsuario() {
+        header('Content-Type: application/json');
+        
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            
+            // Obtener y limpiar datos
+            $correo = trim($_POST['correo']);
+            $contrasena = trim($_POST['contrasena']);
+            $area = trim($_POST['area']);
+            
+            // Validaciones
+            if (empty($correo) || empty($contrasena) || empty($area)) {
+                echo json_encode([
+                    'success' => false,
+                    'mensaje' => 'Todos los campos son obligatorios'
+                ]);
+                exit();
+            }
+            
+            // Validar email
+            if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+                echo json_encode([
+                    'success' => false,
+                    'mensaje' => 'Correo electrónico no válido'
+                ]);
+                exit();
+            }
+            
+            // Validar longitud contraseña
+            if (strlen($contrasena) < 6) {
+                echo json_encode([
+                    'success' => false,
+                    'mensaje' => 'La contraseña debe tener al menos 6 caracteres'
+                ]);
+                exit();
+            }
+            
+            // Validar área
+            $areas_validas = ['Soporte TI', 'Programación'];
+            if (!in_array($area, $areas_validas)) {
+                echo json_encode([
+                    'success' => false,
+                    'mensaje' => 'Área no válida'
+                ]);
+                exit();
+            }
+            
+            // Verificar si el correo ya existe
+            if ($this->model->correoExiste($correo)) {
+                echo json_encode([
+                    'success' => false,
+                    'mensaje' => 'Este correo ya está registrado en el sistema'
+                ]);
+                exit();
+            }
+            
+            // Encriptar contraseña con MD5 (como en tu sistema)
+            $contrasenaHash = md5($contrasena);
+            
+            // Preparar datos
+            $datos = [
+                'correo' => $correo,
+                'contrasena' => $contrasenaHash,
+                'area' => $area
+            ];
+            
+            // Insertar en BD
+            if ($this->model->agregarUsuario($datos)) {
+                echo json_encode([
+                    'success' => true,
+                    'mensaje' => 'Usuario creado exitosamente'
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'mensaje' => 'Error al crear el usuario en la base de datos'
+                ]);
+            }
+            
+        } else {
+            echo json_encode([
+                'success' => false,
+                'mensaje' => 'Método no permitido'
+            ]);
+        }
+        
+        exit();
     }
 
 
