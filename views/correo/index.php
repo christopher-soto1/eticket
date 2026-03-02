@@ -609,7 +609,7 @@
 
             <?php
               
-           if (isset($_SESSION['usuario']) && $_SESSION['usuario'] == 'christopher.soto@iopa.cl') {?>
+           if (isset($_SESSION['usuario']) &&  in_array($_SESSION['usuario'], ['christopher.soto@iopa.cl','catalina.henriquez@iopa.cl'])) {?>
             <!-- <hr style="border: none; border-top: 1px solid white;"> -->
 
             <div class="d-flex justify-content-between mb-2 filtro-boton">
