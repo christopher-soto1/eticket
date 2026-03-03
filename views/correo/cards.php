@@ -6,11 +6,90 @@ $asignacion = $this->asignacion;
 <script>
   var rol = <?php echo json_encode($permiso); ?>;
   var usuarioID = <?php echo json_encode($asignacion); ?>;
+  var correos = <?php echo json_encode($this->correo); ?>;
 
   //PARAR MOSTRAR PERMISOS DEL USUARIO
   //console.log("Rol:", rol);
   //console.log("ID usuario:", usuarioID);
 </script>
+
+<!-- PAGINADOR SUPERIOR -->
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+
+              <!-- Ir a la primera página -->
+              <?php if ($this->paginaactual > 1): ?>
+                <li class="page-item">
+                  <a class="page-link text-info btn-paginacion" href="#" data-pagina="1" title="Primera página">
+                    <i class="fas fa-angle-double-left"></i>
+                  </a>
+                </li>
+              <?php endif; ?>
+
+              <!-- Botón Anterior -->
+              <li class="page-item <?php echo $this->paginaactual <= 1 ? 'disabled' : ''; ?>">
+                <a class="page-link text-info btn-paginacion" href="#"
+                  data-pagina="<?php echo $this->paginaactual - 1; ?>">
+                  <i class="fas fa-angle-left"></i>
+                </a>
+              </li>
+
+              <?php
+              $total_paginas = $this->paginas;
+              $pagina_actual = $this->paginaactual;
+              $visible = 5;
+
+              $mitad = floor($visible / 2);
+              $start = max(1, $pagina_actual - $mitad);
+              $end = min($start + $visible - 1, $total_paginas);
+
+              if ($end - $start + 1 < $visible) {
+                $start = max(1, $end - $visible + 1);
+              }
+
+              for ($i = $start; $i <= $end; $i++):
+                ?>
+                <li class="page-item <?php echo $pagina_actual == $i ? 'active' : ''; ?>">
+                  <a class="page-link btn-paginacion" href="#" data-pagina="<?php echo $i; ?>">
+                    <?php echo $i; ?>
+                  </a>
+                </li>
+              <?php endfor; ?>
+
+              <!-- Botón Siguiente -->
+              <li class="page-item <?php echo $pagina_actual >= $total_paginas ? 'disabled' : ''; ?>">
+                <a class="page-link text-info btn-paginacion" href="#" data-pagina="<?php echo $pagina_actual + 1; ?>">
+                  <i class="fas fa-angle-right"></i>
+                </a>
+              </li>
+
+              <!-- Ir a la última página -->
+              <?php if ($pagina_actual < $total_paginas): ?>
+                <li class="page-item">
+                  <a class="page-link text-info btn-paginacion" href="#" data-pagina="<?php echo $total_paginas; ?>"
+                    title="Última página">
+                    <i class="fas fa-angle-double-right"></i>
+                  </a>
+                </li>
+              <?php endif; ?>
+
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <?php
+      $registros_mostrados = count($this->correo); // lo que estás mostrando en esta página
+      $total = $this->total_registros;
+
+      $inicio = ($this->paginaactual - 1) * $this->registros_por_pagina + 1;
+      $fin = $inicio + $registros_mostrados - 1;
+      ?>
+      <div class="text-center text-muted mt-2">
+        Mostrando <?php echo $registros_mostrados; ?> registro<?php echo $registros_mostrados == 1 ? '' : 's'; ?> de <?php echo $total; ?>
+      </div>
 
 <section class="content">
   <div class="container-fluid">
@@ -218,5 +297,72 @@ $asignacion = $this->asignacion;
     </div>
   </div>
 </section>
+
+<!-- PAGINADOR INFERIOR -->
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+
+              <!-- Ir a la primera página -->
+              <?php if ($this->paginaactual > 1): ?>
+                <li class="page-item">
+                  <a class="page-link text-info btn-paginacion" href="#" data-pagina="1" title="Primera página">
+                    <i class="fas fa-angle-double-left"></i>
+                  </a>
+                </li>
+              <?php endif; ?>
+
+              <!-- Botón Anterior -->
+              <li class="page-item <?php echo $this->paginaactual <= 1 ? 'disabled' : ''; ?>">
+                <a class="page-link text-info btn-paginacion" href="#"
+                  data-pagina="<?php echo $this->paginaactual - 1; ?>">
+                  <i class="fas fa-angle-left"></i>
+                </a>
+              </li>
+
+              <?php
+              $total_paginas = $this->paginas;
+              $pagina_actual = $this->paginaactual;
+              $visible = 5;
+
+              $mitad = floor($visible / 2);
+              $start = max(1, $pagina_actual - $mitad);
+              $end = min($start + $visible - 1, $total_paginas);
+
+              if ($end - $start + 1 < $visible) {
+                $start = max(1, $end - $visible + 1);
+              }
+
+              for ($i = $start; $i <= $end; $i++):
+                ?>
+                <li class="page-item <?php echo $pagina_actual == $i ? 'active' : ''; ?>">
+                  <a class="page-link btn-paginacion" href="#" data-pagina="<?php echo $i; ?>">
+                    <?php echo $i; ?>
+                  </a>
+                </li>
+              <?php endfor; ?>
+
+              <!-- Botón Siguiente -->
+              <li class="page-item <?php echo $pagina_actual >= $total_paginas ? 'disabled' : ''; ?>">
+                <a class="page-link text-info btn-paginacion" href="#" data-pagina="<?php echo $pagina_actual + 1; ?>">
+                  <i class="fas fa-angle-right"></i>
+                </a>
+              </li>
+
+              <!-- Ir a la última página -->
+              <?php if ($pagina_actual < $total_paginas): ?>
+                <li class="page-item">
+                  <a class="page-link text-info btn-paginacion" href="#" data-pagina="<?php echo $total_paginas; ?>"
+                    title="Última página">
+                    <i class="fas fa-angle-double-right"></i>
+                  </a>
+                </li>
+              <?php endif; ?>
+
+            </ul>
+          </nav>
+        </div>
+      </div>
 
 <!-- FIN DE TODO EL CONTENIDO -->

@@ -642,83 +642,7 @@
 
 
       <br>
-      <!-- PAGINADOR SUPERIOR -->
-      <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8">
-          <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-
-              <!-- Ir a la primera página -->
-              <?php if ($this->paginaactual > 1): ?>
-                <li class="page-item">
-                  <a class="page-link text-info btn-paginacion" href="#" data-pagina="1" title="Primera página">
-                    <i class="fas fa-angle-double-left"></i>
-                  </a>
-                </li>
-              <?php endif; ?>
-
-              <!-- Botón Anterior -->
-              <li class="page-item <?php echo $this->paginaactual <= 1 ? 'disabled' : ''; ?>">
-                <a class="page-link text-info btn-paginacion" href="#"
-                  data-pagina="<?php echo $this->paginaactual - 1; ?>">
-                  <i class="fas fa-angle-left"></i>
-                </a>
-              </li>
-
-              <?php
-              $total_paginas = $this->paginas;
-              $pagina_actual = $this->paginaactual;
-              $visible = 5;
-
-              $mitad = floor($visible / 2);
-              $start = max(1, $pagina_actual - $mitad);
-              $end = min($start + $visible - 1, $total_paginas);
-
-              if ($end - $start + 1 < $visible) {
-                $start = max(1, $end - $visible + 1);
-              }
-
-              for ($i = $start; $i <= $end; $i++):
-                ?>
-                <li class="page-item <?php echo $pagina_actual == $i ? 'active' : ''; ?>">
-                  <a class="page-link btn-paginacion" href="#" data-pagina="<?php echo $i; ?>">
-                    <?php echo $i; ?>
-                  </a>
-                </li>
-              <?php endfor; ?>
-
-              <!-- Botón Siguiente -->
-              <li class="page-item <?php echo $pagina_actual >= $total_paginas ? 'disabled' : ''; ?>">
-                <a class="page-link text-info btn-paginacion" href="#" data-pagina="<?php echo $pagina_actual + 1; ?>">
-                  <i class="fas fa-angle-right"></i>
-                </a>
-              </li>
-
-              <!-- Ir a la última página -->
-              <?php if ($pagina_actual < $total_paginas): ?>
-                <li class="page-item">
-                  <a class="page-link text-info btn-paginacion" href="#" data-pagina="<?php echo $total_paginas; ?>"
-                    title="Última página">
-                    <i class="fas fa-angle-double-right"></i>
-                  </a>
-                </li>
-              <?php endif; ?>
-
-            </ul>
-          </nav>
-        </div>
-      </div>
-
-      <?php
-      $registros_mostrados = count($this->correo); // lo que estás mostrando en esta página
-      $total = $this->total_registros;
-
-      $inicio = ($this->paginaactual - 1) * $this->registros_por_pagina + 1;
-      $fin = $inicio + $registros_mostrados - 1;
-      ?>
-      <div class="text-center text-muted mt-2">
-        Mostrando <?php echo $registros_mostrados; ?> registro<?php echo $registros_mostrados == 1 ? '' : 's'; ?> de <?php echo $total; ?>
-      </div>
+      
 
 
       <!-- CARDS -->
@@ -735,72 +659,7 @@
       </div>
 
       <br>
-      <!-- PAGINADOR INFERIOR -->
-      <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8">
-          <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-
-              <!-- Ir a la primera página -->
-              <?php if ($this->paginaactual > 1): ?>
-                <li class="page-item">
-                  <a class="page-link text-info btn-paginacion" href="#" data-pagina="1" title="Primera página">
-                    <i class="fas fa-angle-double-left"></i>
-                  </a>
-                </li>
-              <?php endif; ?>
-
-              <!-- Botón Anterior -->
-              <li class="page-item <?php echo $this->paginaactual <= 1 ? 'disabled' : ''; ?>">
-                <a class="page-link text-info btn-paginacion" href="#"
-                  data-pagina="<?php echo $this->paginaactual - 1; ?>">
-                  <i class="fas fa-angle-left"></i>
-                </a>
-              </li>
-
-              <?php
-              $total_paginas = $this->paginas;
-              $pagina_actual = $this->paginaactual;
-              $visible = 5;
-
-              $mitad = floor($visible / 2);
-              $start = max(1, $pagina_actual - $mitad);
-              $end = min($start + $visible - 1, $total_paginas);
-
-              if ($end - $start + 1 < $visible) {
-                $start = max(1, $end - $visible + 1);
-              }
-
-              for ($i = $start; $i <= $end; $i++):
-                ?>
-                <li class="page-item <?php echo $pagina_actual == $i ? 'active' : ''; ?>">
-                  <a class="page-link btn-paginacion" href="#" data-pagina="<?php echo $i; ?>">
-                    <?php echo $i; ?>
-                  </a>
-                </li>
-              <?php endfor; ?>
-
-              <!-- Botón Siguiente -->
-              <li class="page-item <?php echo $pagina_actual >= $total_paginas ? 'disabled' : ''; ?>">
-                <a class="page-link text-info btn-paginacion" href="#" data-pagina="<?php echo $pagina_actual + 1; ?>">
-                  <i class="fas fa-angle-right"></i>
-                </a>
-              </li>
-
-              <!-- Ir a la última página -->
-              <?php if ($pagina_actual < $total_paginas): ?>
-                <li class="page-item">
-                  <a class="page-link text-info btn-paginacion" href="#" data-pagina="<?php echo $total_paginas; ?>"
-                    title="Última página">
-                    <i class="fas fa-angle-double-right"></i>
-                  </a>
-                </li>
-              <?php endif; ?>
-
-            </ul>
-          </nav>
-        </div>
-      </div>
+      
 
       
 
@@ -1070,7 +929,7 @@
         }
 
         $(document).ready(function () {
-          var correos = <?php echo json_encode($this->correo); ?>;
+          //var correos = <?php echo json_encode($this->correo); ?>;
           var usuarios = <?php echo json_encode($this->asignaciones); ?>;
           var estadisticas = <?php echo json_encode($this->estadisticas); ?>;
           var estadisticasEnProgreso = <?php echo json_encode($this->estadisticasEnProgreso); ?>;
@@ -1108,7 +967,7 @@
 
 
           // CONTENIDO
-          $('.open-contenido-modal').on('click', function () {
+          $(document).off('click', '.open-contenido-modal').on('click', '.open-contenido-modal', function () {
             const uid = $(this).data('id');
             //const correos = <?php echo json_encode($this->correo); ?>;
             const correo = correos.find(c => c.uid == uid);
@@ -1373,7 +1232,7 @@
           });
 
           // DETALLE
-          $('.open-detalle-modal').on('click', function () {
+          $(document).off('click', '.open-detalle-modal').on('click', '.open-detalle-modal', function () {
             const uid = $(this).data('id');
             //const correos = <?php echo json_encode($this->correo); ?>;
             const correo = correos.find(c => c.uid == uid);
@@ -1395,7 +1254,7 @@
           });
 
           // ASIGNACION
-          $('.open-asignacion-modal').on('click', function () {
+          $(document).off('click', '.open-asignacion-modal').on('click', '.open-asignacion-modal', function () {
             const uid = $(this).data('id');
             //const correos = <?php echo json_encode($this->correo); ?>;
             const fecha_envio = $(this).data('fecha');
@@ -1447,7 +1306,7 @@
           });
 
           // ESTADO
-          $('.open-editar-modal').on('click', function () {
+          $(document).off('click', '.open-editar-modal').on('click', '.open-editar-modal', function () {
             const uid = $(this).data('id');
             //const correos = <?php echo json_encode($this->correo); ?>;
             const correo = correos.find(c => c.uid == uid);
@@ -1559,7 +1418,7 @@
           });
 
           // CAMBIAR ESTADO (para usuarios sin privilegios)
-          $('.open-cambiar-modal').on('click', function () {
+          $(document).off('click', '.open-cambiar-modal').on('click', '.open-cambiar-modal', function () {
             const uid = $(this).data('id');
             const correo = correos.find(c => c.uid == uid);
 
@@ -1589,7 +1448,7 @@
           });
 
           // ESTADISTICAS
-          $('.open-estadisticas').on('click', function () {
+          $(document).off('click', '.open-estadisticas').on('click', '.open-estadisticas', function () {
             var estadisticas = <?php echo json_encode($this->estadisticas); ?>;
             var estadisticasEnProgreso = <?php echo json_encode($this->estadisticasEnProgreso); ?>;
             if (estadisticas.length === 0) {
@@ -1675,59 +1534,8 @@
             $('#modalEstadisticasBody').html(tabla);
           });
 
-          // HISTORIAL DEPRECADA
-          /* $('.open-historial').on('click', function () {
-            var historial = <?php echo json_encode($this->historial); ?>;
-            //console.log(historial);
-            const uid = $(this).data('id');
-            const registros = historial.filter(c => c.uid == uid);
-
-            if (registros.length > 0) {
-              $('#modalHistorialLabel').text('Historial de Ticket #' + uid);
-
-              let contenido = `
-                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                  <table class="table table-bordered table-sm table-hover">
-                    <thead class="thead-light">
-                      <tr>
-                        <th>#</th>
-                        <th>Usuario</th>
-                        <th>Acción</th>
-                        <th>Detalle</th>
-                        <th>Fecha</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-              `;
-
-              registros.forEach((registro, index) => {
-                contenido += `
-                      <tr>
-                        <td>${index + 1}</td>
-                        <td>${registro.usuario}</td>
-                        <td>${registro.accion}</td>
-                        <td>${registro.detalle}</td>
-                        <td>${registro.fecha}</td>
-                      </tr>
-                    `;
-                          });
-
-                          contenido += `
-                      </tbody>
-                    </table>
-                  </div>
-                `;
-
-              $('#modalHistorialBody').html(contenido);
-            } else {
-              $('#modalHistorialLabel').text('Historial de Ticket #' + uid);
-              $('#modalHistorialBody').html('<p>No se encontraron registros en el historial.</p>');
-            }
-
-          }); */
-
           //HISTORIAL NEW 19-02-2026
-          $('.open-historial').on('click', function () {
+          $(document).off('click', '.open-historial').on('click', '.open-historial', function () {
               const uid = $(this).data('id');
 
               $('#modalHistorialLabel').text('Historial de Ticket #' + uid);
@@ -1780,9 +1588,8 @@
               });
           });
 
-
           // HILO
-          $('.open-hilo').on('click', function () {
+          $(document).off('click', '.open-hilo').on('click', '.open-hilo', function () {
             const correoRespuesta = <?php echo json_encode($this->correoRespuesta); ?>;
             const uid = $(this).data('uid'); // uid del correo principal
             const message_id = $(this).data('message-id'); // message_id del correo principal
@@ -2266,14 +2073,19 @@
                   } else {
                     mensaje = data; // mensaje que viene del servidor
                   }
-
+                  
+                  $('#modalEditar').modal('hide');
+                  /* $('body').removeClass('modal-open'); */
+                  $('.modal-backdrop').remove();
                   Swal.fire({
                     title: '¡Éxito!',
                     html: mensaje, // Muestra el mensaje completo que venga del servidor
                     icon: 'success',
                     confirmButtonText: 'Cerrar'
                   }).then(() => {
+                    
                     filtrarCards(pagina);
+                    
                   });
                 } else {
                   Swal.fire({
@@ -2423,9 +2235,11 @@
               asunto: asunto
             },
             success: function (html) {
-              document.open();
-              document.write(html); //rompe el flujo de eventos, manejar
-              document.close();
+              //document.open();
+              //document.write(html); //rompe el flujo de eventos, manejar
+              //document.close();
+              $("#container-full").html(html);
+              $('[data-tooltip="tooltip"]').tooltip({ trigger: 'hover' });
               setTimeout(() => {
                 if (fechaInicio) $('input[name="fecha_inicio"]').val(fechaInicio);
                 if (fechaFin) $('input[name="fecha_fin"]').val(fechaFin);
@@ -2437,7 +2251,6 @@
                 if (multirespuesta) { $('select[name="multirespuesta"]').val(multirespuesta); }
                 if (dias_creacion) { $('select[name="dias_creacion"]').val(dias_creacion); }
               }, 100);
-              //$("#container-full").html(html); 
             },
             error: function (xhr, status, error) {
               console.error("Error al filtrar:", error);
@@ -2810,15 +2623,16 @@
                 url: '<?= constant("URL") ?>correo/obtenerCorreos',
                 method: 'POST',
                 data: { 
-                    esRespuesta: correosRespuesta // Enviamos la variable aquí
+                    esRespuesta: correosRespuesta // Variable para sincronizar menos correos de la carga habitual
                 },
                 dataType: 'json',
                 success: function (response) {
                     Swal.fire({
                         icon: 'success',
                         title: '¡Sincronización completa!',
-                        html: `Se sincronizaron <strong>${response.procesados} correo(s)</strong> correctamente.`,
+                        html: `Se sincronizaron <strong>${response.procesados} correo(s)</strong> correctamente. <b>Para ver tu respuesta recarga la página</b>.`,
                     }).then(() => {
+                        //location.reload();
                         filtrarCards(pagina);
                     });
                 },

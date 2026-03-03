@@ -131,7 +131,8 @@ class Correo extends Controller{
             $this->view->paginaactual = $id;
             $this->view->registros_por_pagina = $autorizacionporpagina;
             $this->view->total_registros = $totalRegistros['total'];
-            $this->view->render('correo/index');
+            /* $this->view->render('correo/index'); */
+            $this->view->render('correo/cards'); // ← solo devuelve las cards
 
         } else {
             $this->view->permiso = $_SESSION['permiso']; //le mandamos los permisos al renderizar la pagina por defecto

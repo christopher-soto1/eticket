@@ -789,7 +789,7 @@ class CorreoModel extends Model{
         $totalProcesados = 0;
         $carpetas = ['INBOX', 'INBOX.Sent'];
 
-        $limite = ($esRespuesta == 1) ? 20 : 150;
+        $limite = ($esRespuesta == 1) ? 25 : 150;
 
         foreach ($carpetas as $carpeta) {
             $mbox = imap_open($imap_base . $carpeta, $username, $password) or die("No se pudo conectar a $carpeta: " . imap_last_error());
@@ -870,8 +870,7 @@ class CorreoModel extends Model{
                             continue;
                         }
 
-                        if (stripos($asunto, 'de Ticket') !== false || 
-                            stripos($asunto, 'Vacaciones' ) !== false) {
+                        if (stripos($asunto, 'de Ticket') !== false) {
                             continue;
                         }
 
