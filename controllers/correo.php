@@ -610,6 +610,45 @@ class Correo extends Controller{
         exit();
     }
 
+    public function obtenerTicketsPorEstado() {
+        header('Content-Type: application/json');
+        
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            
+            $estadoID = isset($_POST['estadoId']) ? intval($_POST['estadoId']) : null;
+
+            if ($estadoID === null) {
+                echo json_encode([
+                    'success' => false,
+                    'mensaje' => 'ID de estado no proporcionado'
+                ]);
+                exit();
+            }
+
+            // Llamada al modelo
+            $tickets = $this->model->getTicketsFiltrados($estadoID);
+
+            if ($tickets !== false) {
+                echo json_encode([
+                    'success' => true,
+                    'data' => $tickets
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'mensaje' => 'Error al consultar la base de datos'
+                ]);
+            }
+            
+        } else {
+            echo json_encode([
+                'success' => false,
+                'mensaje' => 'Método no permitido'
+            ]);
+        }
+        exit();
+    }
+
 
 
 }

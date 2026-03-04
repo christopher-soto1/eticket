@@ -1,6 +1,14 @@
 <?php
 $permiso = $this->permiso;
 $asignacion = $this->asignacion;
+
+$correoModel = new CorreoModel();
+//CONTADORES ADMIN
+$noAsignados = $correoModel->getTicketsNoAsignados();
+$asignados = $correoModel->getTicketsAsignados();
+$finalizados = $correoModel->getTicketsFinalizados();
+$enProgresoAdmin = $correoModel->getTicketsEnProgreso();
+$realizados = $correoModel->getTicketsRealizados();
 ?>
 <!-- CARDS -->
 <script>
@@ -9,10 +17,104 @@ $asignacion = $this->asignacion;
   var correos = <?php echo json_encode($this->correo); ?>;
   var correoRespuesta = <?php echo json_encode($this->correoRespuesta); ?>;
 
+  
+
   //PARAR MOSTRAR PERMISOS DEL USUARIO
   //console.log("Rol:", rol);
   //console.log("ID usuario:", usuarioID);
 </script>
+
+<!-- CONTADORES -->
+
+      <style>
+          .glass-counter {
+              border-radius: 15px;
+              transition: all 0.3s ease;
+              border: none;
+              overflow: hidden;
+              box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          }
+          .glass-counter:hover {
+              transform: translateY(-5px);
+              box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+          }
+          .card-icon-bg {
+              position: absolute;
+              right: -10px;
+              bottom: -10px;
+              font-size: 4rem;
+              opacity: 0.2;
+              color: #fff;
+              transform: rotate(-15deg);
+          }
+      </style>
+      <section class="content mt-3">
+            <div class="container-fluid">
+                <div class="row justify-content-center">
+
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
+                        <div class="card glass-counter h-100 btn-detalle" 
+                            style="background: linear-gradient(135deg, #17a2b8 0%, #117a8b 100%); cursor: pointer;"
+                            data-toggle="modal" 
+                            data-target="#modalGeneral" 
+                            data-tipo="sin_asignar" 
+                            data-titulo="Tickets Sin Asignar" 
+                            data-color="bg-info">
+                            <div class="card-body p-3 text-white">
+                                <h6 class="text-uppercase opacity-7 font-weight-bold small">Sin Asignar</h6>
+                                <h2 class="font-weight-bold mb-0"><?php echo $noAsignados; ?></h2>
+                                <i class="fas fa-user-slash card-icon-bg"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
+                        <div class="card glass-counter h-100 btn-detalle" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); cursor: pointer;" 
+                            data-toggle="modal" data-target="#modalGeneral" data-tipo="asignados" data-titulo="Tickets Asignados" data-color="bg-primary">
+                            <div class="card-body p-3 text-white">
+                                <h6 class="text-uppercase opacity-7 font-weight-bold small">Asignados</h6>
+                                <h2 class="font-weight-bold mb-0"><?php echo $asignados; ?></h2>
+                                <i class="fas fa-user-check card-icon-bg"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
+                        <div class="card glass-counter h-100 btn-detalle" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); cursor: pointer;" 
+                            data-toggle="modal" data-target="#modalGeneral" data-tipo="progreso" data-titulo="Tickets en Progreso" data-color="bg-warning">
+                            <div class="card-body p-3 text-white">
+                                <h6 class="text-uppercase opacity-7 font-weight-bold small">En Progreso</h6>
+                                <h2 class="font-weight-bold mb-0"><?php echo $enProgresoAdmin; ?></h2>
+                                <i class="fas fa-spinner fa-spin card-icon-bg" style="opacity: 0.1;"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
+                        <div class="card glass-counter h-100 btn-detalle" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%); cursor: pointer;" 
+                            data-toggle="modal" data-target="#modalGeneral" data-tipo="realizados" data-titulo="Tickets Realizados" data-color="bg-purple" style="background-color: #6f42c1 !important;">
+                            <div class="card-body p-3 text-white">
+                                <h6 class="text-uppercase opacity-7 font-weight-bold small">Realizados</h6>
+                                <h2 class="font-weight-bold mb-0"><?php echo $realizados; ?></h2>
+                                <i class="fas fa-clipboard-check card-icon-bg"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
+                        <div class="card glass-counter h-100 btn-detalle" style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%); cursor: pointer;" 
+                            data-toggle="modal" data-target="#modalGeneral" data-tipo="finalizados" data-titulo="Tickets Finalizados" data-color="bg-success">
+                            <div class="card-body p-3 text-white">
+                                <h6 class="text-uppercase opacity-7 font-weight-bold small">Finalizados</h6>
+                                <h2 class="font-weight-bold mb-0"><?php echo $finalizados; ?></h2>
+                                <i class="fas fa-check-double card-icon-bg"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+      </section>
 
 <!-- PAGINADOR SUPERIOR -->
       <div class="row justify-content-center">

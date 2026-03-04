@@ -1364,7 +1364,7 @@ class CorreoModel extends Model{
     {
         try {
     
-            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 2 and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 2 and multirespuesta!=1 and deleted_at is null");
             
             while ($row = $query->fetch()) {
                 $asignados = $row['uid'];
@@ -1379,7 +1379,7 @@ class CorreoModel extends Model{
     {
         try {
     
-            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 4 and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 4 and multirespuesta!=1 and deleted_at is null");
             
             while ($row = $query->fetch()) {
                 $finalizado = $row['uid'];
@@ -1394,7 +1394,7 @@ class CorreoModel extends Model{
     {
         try {
     
-            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 3 and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 3 and multirespuesta!=1 and deleted_at is null");
             
             while ($row = $query->fetch()) {
                 $finalizado = $row['uid'];
@@ -1409,7 +1409,7 @@ class CorreoModel extends Model{
     {
         try {
     
-            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 6 and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 6 and multirespuesta!=1 and deleted_at is null");
             
             while ($row = $query->fetch()) {
                 $realizados = $row['uid'];
@@ -2512,6 +2512,33 @@ class CorreoModel extends Model{
         } catch (Exception $e) {
             // Revertir cambios si hay error
             $pdo->rollBack();
+            return false;
+        }
+    }
+
+    public function getTicketsFiltrados($estadoID) {
+        try {
+            $query = "SELECT 
+                        uid as uid, 
+                        correo_origen as usuario_solicitante,
+                        asunto as asunto,
+                        fecha_envio as fecha_envio,
+                        asignado as asignado,
+                        respuesta_correo as comentario_finalizacion,
+                        comentario_desarrollador as comentario_desarrollador,
+                        estado as estado
+                    FROM correo
+                    WHERE estado = :estadoID
+                    AND multirespuesta = 0
+                    AND deleted_at is null
+                    order by fecha_envio DESC";
+
+            $stmt = $this->db->connect()->prepare($query);
+            $stmt->execute(['estadoID' => $estadoID]);
+
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            error_log("Error en getTicketsFiltrados: " . $e->getMessage());
             return false;
         }
     }

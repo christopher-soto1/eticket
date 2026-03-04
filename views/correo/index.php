@@ -264,177 +264,14 @@
         }
       </style>
 
-
-
-      <!-- TITULO -->
       <br>
-      <!-- <div style="text-align: center; margin-top: 30px;">
-        <h2
-          style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 34px; color: #2c3e50; font-weight: 600; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); letter-spacing: 1px;">
-          E-Tickets
-        </h2>
-      </div> -->
 
-
-      <!-- CONTADORES -->
-      <?php if ($permiso == 'admin') { ?>
-
-      <style>
-          .glass-counter {
-              border-radius: 15px;
-              transition: all 0.3s ease;
-              border: none;
-              overflow: hidden;
-              box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-          }
-          .glass-counter:hover {
-              transform: translateY(-5px);
-              box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-          }
-          .card-icon-bg {
-              position: absolute;
-              right: -10px;
-              bottom: -10px;
-              font-size: 4rem;
-              opacity: 0.2;
-              color: #fff;
-              transform: rotate(-15deg);
-          }
-      </style>
-        <section class="content mt-3">
-            <div class="container-fluid">
-                <div class="row justify-content-center">
-
-                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
-                        <div class="card glass-counter h-100" 
-                              style="background: linear-gradient(135deg, #17a2b8 0%, #117a8b 100%);">
-                            <div class="card-body p-3 text-white">
-                                <h6 class="text-uppercase opacity-7 font-weight-bold small">Sin Asignar</h6>
-                                <h2 class="font-weight-bold mb-0"><?php echo $noAsignados; ?></h2>
-                                <i class="fas fa-user-slash card-icon-bg"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
-                        <div class="card glass-counter h-100" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);">
-                            <div class="card-body p-3 text-white">
-                                <h6 class="text-uppercase opacity-7 font-weight-bold small">Asignados</h6>
-                                <h2 class="font-weight-bold mb-0"><?php echo $asignados; ?></h2>
-                                <i class="fas fa-user-check card-icon-bg"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
-                        <div class="card glass-counter h-100" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);">
-                            <div class="card-body p-3 text-white">
-                                <h6 class="text-uppercase opacity-7 font-weight-bold small">En Progreso</h6>
-                                <h2 class="font-weight-bold mb-0"><?php echo $enProgresoAdmin; ?></h2>
-                                <i class="fas fa-spinner fa-spin card-icon-bg" style="opacity: 0.1;"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
-                        <div class="card glass-counter h-100" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
-                            <div class="card-body p-3 text-white">
-                                <h6 class="text-uppercase opacity-7 font-weight-bold small">Realizados</h6>
-                                <h2 class="font-weight-bold mb-0"><?php echo $realizados; ?></h2>
-                                <i class="fas fa-clipboard-check card-icon-bg"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
-                        <div class="card glass-counter h-100" style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);">
-                            <div class="card-body p-3 text-white">
-                                <h6 class="text-uppercase opacity-7 font-weight-bold small">Finalizados</h6>
-                                <h2 class="font-weight-bold mb-0"><?php echo $finalizados; ?></h2>
-                                <i class="fas fa-check-double card-icon-bg"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-      <?php } else { ?>
-        <section class="content">
-          <div class="container-fluid">
-            <!-- Small boxes (Stat box) -->
-            <div class="row justify-content-center">
-
-              <!-- ASIGNADOS -->
-              <div class="col-sm-2 col-6">
-                <div class="small-box bg-info">
-                  <div class="inner">
-                    <h3><?php echo $asignadosUsuario; ?></h3>
-                    <p>Asignados</p>
-                  </div>
-                  <div class="icon">
-                    <i class="ion ion-stats-bars" style="font-size: 50px; top: 10px;"></i>
-                  </div>
-                </div>
-              </div>
-
-              <!-- EN PROGRESO -->
-              <div class="col-sm-2 col-6">
-                <div class="small-box bg-warning">
-                  <div class="inner">
-                    <h3 style="color: white;"><?php echo $enProgresoUsuario; ?></h3>
-                    <p style="color: white;">En progreso</p>
-                  </div>
-                  <div class="icon">
-                    <i class="ion ion-person-add" style="font-size: 50px; top: 10px;"></i>
-                  </div>
-                </div>
-              </div>
-
-              <!-- REALIZADOS -->
-              <div class="col-sm-2 col-6">
-                <div class="small-box bg-purple">
-                  <div class="inner">
-                    <h3><?php echo $realizadoUsuario; ?></h3>
-                    <p>Realizados</p>
-                  </div>
-                  <div class="icon">
-                    <i class="ion ion-eye" style="font-size: 50px; top: 10px;"></i>
-                  </div>
-                </div>
-              </div>
-
-              <!-- FINALIZADOS -->
-              <div class="col-sm-2 col-6">
-                <div class="small-box bg-success">
-                  <div class="inner">
-                    <h3><?php echo $finalizadosUsuario; ?></h3>
-                    <p>Finalizados</p>
-                  </div>
-                  <div class="icon">
-                    <i class="ion ion-pie-graph" style="font-size: 50px; top: 10px;"></i>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </section>
-      <?php } ?>
+      
 
       <!-- Main Sidebar Container -->
       <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color: #ffffff; color: white;">
         <!-- Sidebar -->
         <div class="sidebar px-2">
-          <!-- Filtros -->
-          <!-- <div style="mt-5" class="">
-            <i class="fas fa-chart-bar sidebar-etickets-icon" style="margin-left: 20px; margin-top: 20px;"></i>
-            <label class="sidebar-etickets-label" style="margin-top: 20px; text-align: center;">Sistema de filtros<br>E-Tickets</label>
-          </div> -->
-
-          
-
-          <!-- <hr style="border: none; border-top: 1px solid black;" class="filtro-boton"> -->
           <br class="filtro-icono">
 
           <!-- 
@@ -648,10 +485,7 @@
       <!-- CARDS -->
       <div id="container-full">
         <?php
-        $correos = $this->correo;
         //var_dump($correos);
-        $estadisticas = $this->estadisticas;
-        $historial = $this->historial;
 
 
         include 'views/correo/cards.php';
@@ -916,6 +750,29 @@
         </div>
       </div>
 
+      <div class="modal fade" id="modalGeneral" tabindex="-1" role="dialog" aria-labelledby="modalGeneralLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-white" id="modalHeaderColor">
+                    <h5 class="modal-title" id="modalGeneralLabel">Cargando...</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalGeneralBody">
+                    <div class="text-center p-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Cargando...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+      </div>
+
 
 
       <script>
@@ -941,6 +798,152 @@
           //let tiempoPopup = 25 * 1000; // popup antes //debugg
           //console.log("La sesión se cerrará en:", (tiempoTotal / (1000 * 60 * 60)).toFixed(2), "horas");
           // ----------------- TIEMPO DE PARA DESCONEXION DE LA SESION ACTUAL -----------------
+
+          $(document).off('click', '.btn-detalle').on('click', '.btn-detalle', function() {
+              // 1. Obtener datos de la card clickeada
+              var tipo = $(this).data('tipo');
+              var titulo = $(this).data('titulo');
+              var colorClase = $(this).data('color'); // Ejemplo: bg-primary, bg-success
+              var estado;
+
+              console.log("Tipo: ",tipo);
+              console.log("titulo: ",titulo);
+              console.log("colorClase: ",colorClase);
+
+              const mapaEstados = {
+                  'sin_asignar': 1,
+                  'asignados':   2,
+                  'progreso':    4,
+                  'realizados':  6,
+                  'finalizados': 3
+              };
+
+              var estadoId = mapaEstados[tipo] || 0;
+              console.log("Enviando estado ID:", estadoId);
+
+              // 2. Resetear y aplicar color al header
+              // Limpiamos clases de fondo previas para que no se mezclen
+              $('#modalHeaderColor').removeClass('bg-primary bg-warning bg-success bg-info bg-purple');
+              
+              // Si es el color morado y no tienes la clase en CSS, la aplicamos manual
+              if(colorClase === 'bg-purple') {
+                  $('#modalHeaderColor').css('background-color', '#6f42c1');
+              } else {
+                  $('#modalHeaderColor').css('background-color', ''); // Limpia el estilo manual
+                  $('#modalHeaderColor').addClass(colorClase);
+              }
+
+              // 3. Cambiar el título
+              $('#modalGeneralLabel').text(titulo);
+
+              // 4. Limpiar el cuerpo del modal y poner el spinner
+              $('#modalGeneralBody').html('<div class="text-center p-4"><div class="spinner-border text-secondary" role="status"></div></div>');
+
+              // 5. Llamada AJAX
+              $.ajax({
+                  url: '<?= constant('URL'); ?>correo/obtenerTicketsPorEstado', // Cambia esto por tu archivo real
+                  type: 'POST',
+                  data: { estadoId: estadoId },
+                  success: function(response) {
+                      if (response.success) {
+                          var tickets = response.data;
+                          var est = estadoId; // El ID del estado actual
+                          var html = '';
+
+                          if (tickets.length === 0) {
+                              html = '<div class="alert alert-info">No hay registros para este estado.</div>';
+                          } else {
+                              html = '<div class="table-responsive">' +
+                                    '<table class="table table-hover table-sm">' +
+                                    '<thead class="thead-light"><tr>' +
+                                    '<th style="width: 50px;">#</th>' +
+                                    '<th>UID</th>' +
+                                    '<th>Solicitante</th>' +
+                                    '<th>Asunto</th>';
+
+                              // --- Lógica de Encabezados Dinámicos ---
+                              if (est != 1) html += '<th>Asignado</th>';
+                              /* if (est == 6 || est == 3) html += '<th>Coment. Desarrollador</th>';
+                              if (est == 3) html += '<th>Respuesta Final</th>'; */
+                              
+                              html += '<th>Fecha</th>';
+
+                              html += '<th>Acciones</th></tr></thead><tbody>';
+
+                              // --- Lógica de Filas ---
+                              tickets.forEach(function(t, i) {
+                                  var estiloColumna = 'style="word-break: break-all; min-width: 150px; max-width: 250px; font-size: 0.9rem;"';
+                                  var numeroRegistro = i + 1;
+                                  html += '<tr>' +
+                                          '<td class="font-weight-bold text-muted">' + numeroRegistro + '</td>' +
+                                          '<td>' + t.uid + '</td>' +
+                                          // Columna Solicitante con break
+                                          '<td ' + estiloColumna + '>' + 
+                                              (t.usuario_solicitante ? t.usuario_solicitante.trim() : '-') + 
+                                          '</td>' +
+                                          // Columna Asunto con break (le damos un poco más de ancho máximo)
+                                          '<td style="word-break: break-word; min-width: 200px; max-width: 300px; font-size: 0.9rem;">' + 
+                                              (t.asunto ? t.asunto.trim() : '-') + 
+                                          '</td>';
+
+                                  if (est != 1) {
+                                      html += '<td>' + (t.asignado ? t.asignado : '<span class="badge badge-secondary">Sin asignar</span>') + '</td>';
+                                  }
+                                  
+                                  /* if (est == 6 || est == 3) {
+                                      html += '<td style="word-break: break-word;">' + (t.comentario_desarrollador ? t.comentario_desarrollador : '-') + '</td>';
+                                  }
+
+                                  if (est == 3) {
+                                      html += '<td style="word-break: break-word;">' + (t.comentario_finalizacion ? t.comentario_finalizacion : '-') + '</td>';
+                                  } */
+
+                                  html += '<td>' + t.fecha_envio + '</td>';
+
+                                  // --- Columna de Acciones ---
+
+                                  html += '<td>' +
+                                      '<button class="btn btn-primary btn-sm btn-ir-al-ticket shadow-sm" ' +
+                                      'data-uid="' + t.uid + '">' +
+                                          '<i class="fas fa-search mr-1"></i> Ir' +
+                                      '</button>' +
+                                  '</td></tr>';
+                              });
+
+                              html += '</tbody></table></div>';
+                          }
+                          $('#modalGeneralBody').html(html);
+                      }
+                  },
+                  error: function() {
+                      $('#modalGeneralBody').html('<div class="alert alert-danger">Error al cargar los datos.</div>');
+                  }
+              });
+          });
+
+          $(document).on('click', '.btn-ir-al-ticket', function() {
+              var uid = $(this).data('uid');
+
+              // 1. Cerramos el modal
+              $('#modalGeneral').modal('hide');
+
+              // 2. Limpiamos los otros inputs de filtro para que no interfieran (Opcional pero recomendado)
+              $('#fecha_inicio, #fecha_fin, #correo_origen, #asunto').val('');
+              $('#estado, #usuario_asignado, #dias_creacion').val('0');
+
+              // 3. Inyectamos el UID en el input de id_ticket
+              // Nota: Asegúrate de que el id sea "id_ticket" como en tu función
+              $('#id_ticket').val(uid);
+
+              // 4. Ejecutamos tu función de filtrado existente
+              filtrarCards(1); 
+              
+              // 5. Scroll suave hacia arriba para ver el resultado
+              $('html, body').animate({ scrollTop: 0 }, 'slow');
+          });
+
+          
+
 
           // mostrar popup
           setTimeout(() => {
