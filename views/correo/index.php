@@ -929,7 +929,6 @@
         }
 
         $(document).ready(function () {
-          //var correos = <?php echo json_encode($this->correo); ?>;
           var usuarios = <?php echo json_encode($this->asignaciones); ?>;
           var estadisticas = <?php echo json_encode($this->estadisticas); ?>;
           var estadisticasEnProgreso = <?php echo json_encode($this->estadisticasEnProgreso); ?>;
@@ -969,11 +968,9 @@
           // CONTENIDO
           $(document).off('click', '.open-contenido-modal').on('click', '.open-contenido-modal', function () {
             const uid = $(this).data('id');
-            //const correos = <?php echo json_encode($this->correo); ?>;
             const correo = correos.find(c => c.uid == uid);
 
             // HILO EN CADENA
-            const correoRespuesta = <?php echo json_encode($this->correoRespuesta); ?>;
             const message_id = $(this).data('message-id'); // message_id del correo principal
 
             // ------------ DEBUG ------------
@@ -1234,7 +1231,6 @@
           // DETALLE
           $(document).off('click', '.open-detalle-modal').on('click', '.open-detalle-modal', function () {
             const uid = $(this).data('id');
-            //const correos = <?php echo json_encode($this->correo); ?>;
             const correo = correos.find(c => c.uid == uid);
 
             if (correo) {
@@ -1256,7 +1252,6 @@
           // ASIGNACION
           $(document).off('click', '.open-asignacion-modal').on('click', '.open-asignacion-modal', function () {
             const uid = $(this).data('id');
-            //const correos = <?php echo json_encode($this->correo); ?>;
             const fecha_envio = $(this).data('fecha');
             const asunto = $(this).data('asunto');
             const correo = correos.find(c => c.uid == uid);
@@ -1308,7 +1303,6 @@
           // ESTADO
           $(document).off('click', '.open-editar-modal').on('click', '.open-editar-modal', function () {
             const uid = $(this).data('id');
-            //const correos = <?php echo json_encode($this->correo); ?>;
             const correo = correos.find(c => c.uid == uid);
             const asignado = $(this).data('asignado');
             const estado_actual = $(this).data('estado-actual');
@@ -1449,8 +1443,6 @@
 
           // ESTADISTICAS
           $(document).off('click', '.open-estadisticas').on('click', '.open-estadisticas', function () {
-            var estadisticas = <?php echo json_encode($this->estadisticas); ?>;
-            var estadisticasEnProgreso = <?php echo json_encode($this->estadisticasEnProgreso); ?>;
             if (estadisticas.length === 0) {
               $('#modalEstadisticasBody').html('<p class="text-muted">No hay estadísticas disponibles.</p>');
               return;
@@ -1590,7 +1582,6 @@
 
           // HILO
           $(document).off('click', '.open-hilo').on('click', '.open-hilo', function () {
-            const correoRespuesta = <?php echo json_encode($this->correoRespuesta); ?>;
             const uid = $(this).data('uid'); // uid del correo principal
             const message_id = $(this).data('message-id'); // message_id del correo principal
 
@@ -2109,63 +2100,6 @@
         });
         // -----  ESTADO (ADMIN) -----
 
-
-        // ----- GUARDAR ESTADO DE TICKET (NO ADMIN) -----
-        document.querySelector('.guardar-cambio-estado').addEventListener('click', function () {
-          const uid = document.getElementById('cambiarUid').value;
-          const select = document.getElementById(`selectEstadoCambiar-${uid}`);
-          const nuevoEstado = select ? select.value : null;
-          var rol = <?php echo json_encode($permiso); ?>;
-          var pagina = <?php echo $pagina_actual; ?>;
-
-          if (uid && nuevoEstado) {
-            fetch(`<?= constant('URL'); ?>correo/cambiarEstado`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-              },
-              body: `uid=${uid}&estado=${nuevoEstado}&rol=${rol}`
-            })
-              .then(response => response.text())
-              .then(data => {
-                //console.log("Respuesta:", data);
-
-                if (data.includes("Estado actualizado")) {
-                  Swal.fire({
-                    title: '¡Éxito!',
-                    text: data,
-                    icon: 'success',
-                    confirmButtonText: 'Cerrar'
-                  }).then(() => {
-                    $('#modalCambiarEstado').modal('hide');
-                    //location.reload();
-                    filtrarCards(pagina);
-                  });
-                } else {
-                  Swal.fire({
-                    title: 'Error en estado',
-                    text: 'Hubo un problema al actualizar el estado del ticket.',
-                    icon: 'error',
-                    confirmButtonText: 'Cerrar'
-                  });
-                }
-              })
-              .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                  title: 'Error',
-                  text: 'Hubo un problema de conexión, no se pudo guardar el estado del ticket, por favor intente nuevamente.',
-                  icon: 'error',
-                  confirmButtonText: 'Cerrar'
-                });
-              });
-          }
-        });
-        // ----- GUARDAR ESTADO DE TICKET (NO ADMIN) -----
-
-
-
-
         // ----- FUNCION DE FILTRADO -----
         function filtrarCards(pagina = 1) {
           //EXTRACION DE DATOS
@@ -2630,7 +2564,7 @@
                     Swal.fire({
                         icon: 'success',
                         title: '¡Sincronización completa!',
-                        html: `Se sincronizaron <strong>${response.procesados} correo(s)</strong> correctamente. <b>Para ver tu respuesta recarga la página</b>.`,
+                        html: `Se sincronizaron <strong>${response.procesados} correo(s)</strong> correctamente.`,
                     }).then(() => {
                         //location.reload();
                         filtrarCards(pagina);

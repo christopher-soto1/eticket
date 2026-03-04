@@ -7,6 +7,7 @@ $asignacion = $this->asignacion;
   var rol = <?php echo json_encode($permiso); ?>;
   var usuarioID = <?php echo json_encode($asignacion); ?>;
   var correos = <?php echo json_encode($this->correo); ?>;
+  var correoRespuesta = <?php echo json_encode($this->correoRespuesta); ?>;
 
   //PARAR MOSTRAR PERMISOS DEL USUARIO
   //console.log("Rol:", rol);

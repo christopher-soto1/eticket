@@ -2383,9 +2383,16 @@ class CorreoModel extends Model{
 
                 $soporte_correo = 'soporte@iopa.cl';
 
-                // Si soporte es el único destinatario, no guardar
                 if (count($todos_destinatarios_limpios) === 1 && strtolower($todos_destinatarios_limpios[0]) === strtolower($soporte_correo)) {
-                    return true; // solo enviar, no guardar en Sent
+                    // Es autorespuesta, guardar en Sent igualmente para que se sincronice
+                    $imapPath = '{mail.iopa.cl:993/imap/ssl}INBOX.Sent';
+                    $imapStream = imap_open($imapPath, $namecorreo, $pwcorreo);
+                    if ($imapStream) {
+                        $mime = $mail->getSentMIMEMessage();
+                        imap_append($imapStream, $imapPath, $mime);
+                        imap_close($imapStream);
+                    }
+                    return true;
                 }
 
                 // Si hay uno o más destinatarios y uno de ellos es soporte, quitarlo antes de guardar en Sent
