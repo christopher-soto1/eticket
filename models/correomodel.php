@@ -1364,7 +1364,7 @@ class CorreoModel extends Model{
     {
         try {
     
-            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 2 and multirespuesta!=1 and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 2 and deleted_at is null");
             
             while ($row = $query->fetch()) {
                 $asignados = $row['uid'];
@@ -1379,7 +1379,7 @@ class CorreoModel extends Model{
     {
         try {
     
-            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 4 and multirespuesta!=1 and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 4 and deleted_at is null");
             
             while ($row = $query->fetch()) {
                 $finalizado = $row['uid'];
@@ -1394,7 +1394,7 @@ class CorreoModel extends Model{
     {
         try {
     
-            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 3 and multirespuesta!=1 and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 3 and deleted_at is null");
             
             while ($row = $query->fetch()) {
                 $finalizado = $row['uid'];
@@ -1409,7 +1409,7 @@ class CorreoModel extends Model{
     {
         try {
     
-            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 6 and multirespuesta!=1 and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 6 and deleted_at is null");
             
             while ($row = $query->fetch()) {
                 $realizados = $row['uid'];
@@ -1486,7 +1486,7 @@ class CorreoModel extends Model{
 
     /* -------------------- OBTENER LISTADO DE USUARIOS PERMITIDOS -------------------- */
     public function getAsignacion() {
-        $query = $this->db->connect()->prepare("SELECT idusuario FROM usuariosperfil u WHERE habilitado = 'S' AND menu = 'Correo' GROUP BY u.idusuario;");
+        $query = $this->db->connect()->prepare("SELECT idusuario FROM usuariosperfil u WHERE habilitado = 'S' AND menu = 'Correo' GROUP BY u.idusuario order by area;");
         $query->execute();
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
@@ -2516,9 +2516,38 @@ class CorreoModel extends Model{
         }
     }
 
+    public function eliminarUsuario($id_usuario) {
+        try {
+            $pdo = $this->db->connect();
+
+            // Iniciar transacción
+            $pdo->beginTransaction();
+
+            // 1. Eliminar de usuariosperfil
+            $query = $pdo->prepare("DELETE FROM usuariosperfil WHERE idusuario = :idusuario");
+            $query->execute([
+                'idusuario' => $id_usuario
+            ]);
+
+            // 2. Eliminar de usuarios
+            $query = $pdo->prepare("DELETE FROM usuarios WHERE email = :email");
+            $query->execute([
+                'email' => $id_usuario
+            ]);
+
+            // Confirmar
+            $pdo->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            return false;
+        }
+    }
     public function getTicketsFiltrados($estadoID) {
         try {
-            $query = "SELECT 
+            if($estadoID == 1){
+                $query = "SELECT 
                         uid as uid, 
                         correo_origen as usuario_solicitante,
                         asunto as asunto,
@@ -2532,6 +2561,22 @@ class CorreoModel extends Model{
                     AND multirespuesta = 0
                     AND deleted_at is null
                     order by fecha_envio DESC";
+            }
+            else{
+                $query = "SELECT 
+                        uid as uid, 
+                        correo_origen as usuario_solicitante,
+                        asunto as asunto,
+                        fecha_envio as fecha_envio,
+                        asignado as asignado,
+                        respuesta_correo as comentario_finalizacion,
+                        comentario_desarrollador as comentario_desarrollador,
+                        estado as estado
+                    FROM correo
+                    WHERE estado = :estadoID
+                    AND deleted_at is null
+                    order by fecha_envio DESC";
+            }
 
             $stmt = $this->db->connect()->prepare($query);
             $stmt->execute(['estadoID' => $estadoID]);

@@ -455,9 +455,20 @@
                       data-toggle="modal" 
                       data-target="#modalAgregarUsuario"
                       style="color: white;">
-                <i class="fas fa-user-plus mr-2"></i> Agregar Usuarios
+                <i class="fas fa-user-plus mr-2"></i> Agregar Usuario
               </button>
             </div>
+
+            <div class="d-flex justify-content-between mb-2 filtro-boton">
+              <button type="button" 
+                      class="btn btn-danger btn-sm w-100 shadow-sm" 
+                      data-toggle="modal" 
+                      data-target="#modalEliminarUsuario"
+                      style="color: white;">
+                <i class="fas fa-user-minus mr-2"></i> Eliminar Usuario
+              </button>
+            </div>
+
             <?php }?>
             <hr style="border: none; border-top: 1px solid black;" class="filtro-boton">
 
@@ -749,6 +760,64 @@
           </div>
         </div>
       </div>
+
+      <!-- MODAL ELIMINAR USUARIO -->
+      <div class="modal fade" id="modalEliminarUsuario" tabindex="-1" role="dialog" aria-labelledby="modalEliminarUsuarioLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            
+            <!-- Header -->
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title" id="modalEliminarUsuarioLabel">
+                <i class="fas fa-user-minus mr-2"></i> Eliminar Usuario
+              </h5>
+              <button type="button" class="close text-white" data-dismiss="modal"></button>
+            </div>
+            
+            <!-- Body -->
+            <div class="modal-body">
+              <form id="formEliminarUsuario" method="POST" action="<?php echo constant('URL'); ?>usuarios/eliminarUsuario">
+                
+                <!-- Select de usuarios -->
+                <div class="form-group">
+                  <label for="usuarioEliminar">
+                    <i class="fas fa-user mr-1"></i> Usuario
+                  </label>
+                  <select class="form-control" id="usuarioEliminar" name="id_usuario" required>
+                    <option value="">Seleccionar usuario</option>
+                    
+                    <?php foreach ($this->usuariosAsignables as $usuario): ?>
+                      <option value="<?php echo $usuario->idusuario; ?>">
+                        <?php echo $usuario->idusuario; ?>
+                      </option>
+                    <?php endforeach; ?>
+
+                  </select>
+                </div>
+
+                <!-- Advertencia -->
+                <div class="alert alert-warning text-center">
+                  <i class="fas fa-exclamation-triangle mr-1"></i>
+                  Esta acción eliminará el usuario seleccionado y no se puede deshacer.
+                </div>
+
+              </form>
+            </div>
+            
+            <!-- Footer -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                <i class="fas fa-times mr-1"></i> Cancelar
+              </button>
+              <button type="submit" form="formEliminarUsuario" class="btn btn-danger">
+                <i class="fas fa-trash mr-1"></i> Eliminar
+              </button>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
 
       <div class="modal fade" id="modalGeneral" tabindex="-1" role="dialog" aria-labelledby="modalGeneralLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
@@ -2678,6 +2747,93 @@
             }
           });
         });
+
+        $(document).on('submit', '#formEliminarUsuario', function(e) {
+          e.preventDefault();
+
+          const id_usuario = $('#usuarioEliminar').val();
+
+          // Validación
+          if (!id_usuario) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Seleccione un usuario',
+              text: 'Debes seleccionar un usuario a eliminar',
+              confirmButtonColor: '#3085d6'
+            });
+            return;
+          }
+
+          // Confirmación
+          Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Esta acción eliminará el usuario definitivamente',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+          }).then((result) => {
+            if (result.isConfirmed) {
+
+              $.ajax({
+                url: '<?php echo constant('URL'); ?>correo/eliminarUsuario',
+                type: 'POST',
+                data: {
+                  id_usuario: id_usuario
+                },
+                dataType: 'json',
+                beforeSend: function() {
+                  Swal.fire({
+                    title: 'Eliminando...',
+                    text: 'Por favor espera',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                      Swal.showLoading();
+                    }
+                  });
+                },
+                success: function(response) {
+                  if (response.success) {
+                    Swal.fire({
+                      icon: 'success',
+                      title: 'Eliminado',
+                      text: 'Usuario eliminado correctamente',
+                      confirmButtonColor: '#28a745'
+                    }).then(() => {
+                      $('#modalEliminarUsuario').modal('hide');
+                      location.reload();
+                    });
+                  } else {
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'Error',
+                      text: response.mensaje || 'No se pudo eliminar el usuario',
+                      confirmButtonColor: '#dc3545'
+                    });
+                  }
+                },
+                error: function(xhr, status, error) {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error del servidor',
+                    text: 'Ocurrió un error al procesar la solicitud',
+                    confirmButtonColor: '#dc3545'
+                  });
+                  console.error('Error:', error);
+                  console.error('Respuesta:', xhr.responseText);
+                }
+              });
+
+            }
+          });
+        });
+
+
+
+
+
       </script>
 
     </div> <!-- content-wrapper -->

@@ -610,6 +610,44 @@ class Correo extends Controller{
         exit();
     }
 
+    public function eliminarUsuario() {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            $id_usuario = trim($_POST['id_usuario']);
+
+            if (empty($id_usuario)) {
+                echo json_encode([
+                    'success' => false,
+                    'mensaje' => 'Usuario no válido'
+                ]);
+                exit();
+            }
+
+            // Ejecutar eliminación
+            if ($this->model->eliminarUsuario($id_usuario)) {
+                echo json_encode([
+                    'success' => true,
+                    'mensaje' => 'Usuario eliminado correctamente'
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'mensaje' => 'Error al eliminar el usuario'
+                ]);
+            }
+
+        } else {
+            echo json_encode([
+                'success' => false,
+                'mensaje' => 'Método no permitido'
+            ]);
+        }
+
+        exit();
+    }
+
     public function obtenerTicketsPorEstado() {
         header('Content-Type: application/json');
         
