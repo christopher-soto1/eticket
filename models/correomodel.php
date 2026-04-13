@@ -25,6 +25,7 @@ class CorreoModel extends Model{
                 $item->habilitado = $row['habilitado'];
                 $item->principal = $row['principal'];
                 $item->permiso = $row['permiso'];
+                $item->area = $row['area'];
                 array_push($items, $item);
             }
             return $items;

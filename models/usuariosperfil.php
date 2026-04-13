@@ -7,5 +7,6 @@ class Usuariosperfil
  public $habilitado;
  public $principal;
  public $permisos;
+ public $area;
 }
 ?>

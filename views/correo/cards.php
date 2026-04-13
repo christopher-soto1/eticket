@@ -386,9 +386,10 @@ $realizados = $correoModel->getTicketsRealizados();
 
         </div>
       </section>
-<br>
+      
+      <br>
 <!-- PAGINADOR SUPERIOR -->
-      <div class="row justify-content-center">
+      <div class="d-flex justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
           <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
@@ -454,7 +455,7 @@ $realizados = $correoModel->getTicketsRealizados();
         </div>
       </div>
 <!-- PAGINADOR SUPERIOR -->
-
+ 
       <?php
       $registros_mostrados = count($this->correo); // lo que estás mostrando en esta página
       $total = $this->total_registros;
@@ -695,7 +696,7 @@ $realizados = $correoModel->getTicketsRealizados();
 </section>
 
 <!-- PAGINADOR INFERIOR -->
-      <div class="row justify-content-center">
+      <div class="d-flex justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
           <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
