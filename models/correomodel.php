@@ -1670,7 +1670,7 @@ class CorreoModel extends Model{
             $mail->send();
 
             // --- LLAMADA A LA SEGUNDA FUNCIÓN ANTES DEL RETURN ---
-            if ($notificar == 1){
+            if ($notificar == 1 && $idusuario!=='soporte@iopa.cl'){
                 $this->enviarCorreoAsignacionUsuarioSolicitante($uid, $asunto);
             }
             
