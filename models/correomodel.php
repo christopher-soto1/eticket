@@ -21,6 +21,7 @@ class CorreoModel extends Model{
                 $item = new Usuariosperfil();
                 $item->id = $row['id'];
                 $item->idusuario = $row['idusuario'];
+                $item->usuario_rebsol = $row['usuario_rebsol'];
                 $item->menu = $row['menu'];
                 $item->habilitado = $row['habilitado'];
                 $item->principal = $row['principal'];
@@ -71,7 +72,6 @@ class CorreoModel extends Model{
 
     /* ------ OBTIENE REGISTROS PARA EL PAGINADOR ------ */
     public function getregistros(
-        $s, 
         $permiso, 
         $idusuario, 
         $fecha_inicio = null, 
@@ -90,59 +90,59 @@ class CorreoModel extends Model{
 
             $debug = " / INICIO - ";
 
-            if ($s == null) {
+
                 if ($permiso != 'admin') {
                     // 🔒 NO ADMIN
-                    $sql = "SELECT * FROM correo WHERE asignado = '$idusuario'";
-
-                    if(empty($estado) && empty($fecha_inicio) && empty($fecha_fin) && empty($correo_origen) && empty($dias_creacion) && empty($id_ticket) && empty($multirespuesta) && empty($asunto)) {
-                        $sql .= " AND estado in (2,4) and multirespuesta != 1";
-                        $debug .= ".1";
-                    } else {
-                        if (!empty($fecha_inicio)) {
-                            $sql .= " AND fecha_envio >= '$inicio'";
-                            $debug.=".3";
+                    $sql = "SELECT * FROM correo where 1 AND correo_origen = '$idusuario'";
+                    if(empty($usuario_asignado) && empty($estado) && empty($fecha_inicio) && empty($fecha_fin) && empty($correo_origen) && empty($dias_creacion) && empty($id_ticket) && empty($multirespuesta) && empty($asunto)) {
+                        $sql .= " AND estado = 1 and multirespuesta != 1";
+                    }
+                    else{
+                        if(!empty($usuario_asignado)) {
+                            $sql .= " AND asignado = '$usuario_asignado'";
+                            $debug.= ".6";
                         }
-                        
                         if(!empty($multirespuesta)) {
                             if($multirespuesta == 2){
                                 $sql .= " AND multirespuesta = 0";
-                                $debug.= ".multi230";
+                                $debug.= ".multi0r";
                             }
                             else{
                                 $sql .= " AND multirespuesta = $multirespuesta";
-                                $debug.= ".multi231";
+                                $debug.= ".multi1r";
                             }
                         }
-
-                        if (!empty($fecha_fin)) {
-                            $sql .= " AND fecha_envio <= '$fin'";
-                            $debug.=".4";
+                        if (!empty($fecha_inicio)) {
+                            $sql .= " AND fecha_envio >= '$inicio'";
+                            $debug.= ".8";
                         }
         
+                        if (!empty($fecha_fin)) {
+                            $sql .= " AND fecha_envio <= '$fin'";
+                            $debug.=".9";
+                        }
                         if (!empty($estado)) {
-                            $debug.=".estadopagina";
+                            $debug.=".estado";
                             if($estado == 5) {
                                 $sql .= " AND estado = $estado AND deleted_at is not null";
-                                $debug.=".estado5pagina";
+                                $debug.=".estado5";
                             }
                             else{
                                 $sql .= " AND estado = $estado";
-                                $debug.=".estadoNormalpagina";
+                                $debug.=".estadoNormal";
                             }
                         }
-                        if (!empty($correo_origen)) {
+                        /* if (!empty($correo_origen)) {
                             $sql .= " AND correo_origen like '%$correo_origen%'";
-                            $debug.=".44";
-                        }
-
+                            $debug.=".14";
+                        } */
                         if (!empty($asunto)) {
                             $sql .= " AND asunto like '%$asunto%'";
-                            $debug.=".4asunto4";
+                            $debug.=".4asunto99";
                         }
                         if (!empty($id_ticket)) {
                             $sql .= " AND uid like '%$id_ticket%'";
-                            $debug.=".999999idticket";
+                            $debug.=".99aadminidticket";
                         }
                         if (!empty($dias_creacion)) {
                             if($dias_creacion == "hoy"){
@@ -290,12 +290,6 @@ class CorreoModel extends Model{
                 
                 return ['total' => $totalRegistros, 'registros' => $resultados]; // Devuelve tanto el total de registros como los datos
     
-            } else {
-                // Si $s no es nulo, solo buscamos el conteo de un registro específico
-                $query = $this->db->connect()->query("SELECT count(*) as son FROM correo WHERE estado != 0 and deleted_at is null and id=" . $s);
-                $cuantos = $query->fetch(PDO::FETCH_ASSOC)['son'];
-                return $cuantos;
-            }
         } catch (PDOException $e) {
             return [];
         }
@@ -336,9 +330,9 @@ class CorreoModel extends Model{
                             IFNULL(TIMESTAMPDIFF(DAY, updated_at, NOW()), 0) AS dias_desde_actualizacion,
                             IFNULL(TIMESTAMPDIFF(hour , updated_at, NOW()), 0) AS horas_desde_actualizacion,
                             IFNULL(TIMESTAMPDIFF(minute , updated_at, NOW()), 0) AS minutos_desde_actualizacion
-                            FROM correo WHERE asignado = '$idusuario'";
+                            FROM correo WHERE correo_origen = '$idusuario'";
                     if(empty($estado) && empty($fecha_inicio) && empty($fecha_fin) && empty($correo_origen) && empty($dias_creacion) && empty($id_ticket) && empty($multirespuesta) && empty($asunto)) {
-                        $sql .= " AND estado in (2,4) and multirespuesta != 1";
+                        $sql .= " AND estado in (1) and multirespuesta != 1";
                         $debug.=".1";
                     }
                     else{
@@ -1425,12 +1419,24 @@ class CorreoModel extends Model{
 
     
     /* -------------------- COTANDORES USUARIOS -------------------- */
+    public function getTicketsNoAsignadosUsuario($idusuario)
+    {
+        try {
+            //$sql = "SELECT COUNT(uid) FROM correo WHERE estado = 2 AND asignado = $idusuario";
+            #echo $sql;
+            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 1 AND correo_origen = '$idusuario' AND multirespuesta != 1 and deleted_at is null");
+            $row = $query->fetch();
+            return $row['total']; // ✅
+        } catch (PDOException $e) {
+            return 0;
+        }
+    }
     public function getTicketsAsignadosUsuario($idusuario)
     {
         try {
             //$sql = "SELECT COUNT(uid) FROM correo WHERE estado = 2 AND asignado = $idusuario";
             #echo $sql;
-            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 2 AND asignado = '$idusuario' and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 2 AND correo_origen = '$idusuario' and deleted_at is null");
             $row = $query->fetch();
             return $row['total']; // ✅
         } catch (PDOException $e) {
@@ -1443,7 +1449,7 @@ class CorreoModel extends Model{
         try {
             //$sql = "SELECT COUNT(uid) FROM correo WHERE estado = 4 AND asignado = $idusuario";
             #echo $sql;
-            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 4 AND asignado = '$idusuario' and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 4 AND correo_origen = '$idusuario' and deleted_at is null");
             $row = $query->fetch();
             
             return $row['total'];
@@ -1457,7 +1463,7 @@ class CorreoModel extends Model{
         try {
             //$sql = "SELECT COUNT(uid) FROM correo WHERE estado = 4 AND asignado = $idusuario";
             #echo $sql;
-            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 6 AND asignado = '$idusuario' and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 6 AND correo_origen = '$idusuario' and deleted_at is null");
             $row = $query->fetch();
             
             return $row['total'];
@@ -1471,7 +1477,7 @@ class CorreoModel extends Model{
         try {
             //$sql = "SELECT COUNT(uid) FROM correo WHERE estado = 3 AND asignado = $idusuario";
             #echo $sql;
-            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 3 AND asignado = '$idusuario' and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 3 AND correo_origen = '$idusuario' and deleted_at is null");
             #echo $query;
             $row = $query->fetch();
             
@@ -2545,50 +2551,64 @@ class CorreoModel extends Model{
             return false;
         }
     }
-    public function getTicketsFiltrados($estadoID) {
+    public function getTicketsFiltrados($estadoID, $permiso, $usuario) {
         try {
-            if($estadoID == 1){
-                $query = "SELECT 
-                        uid as uid, 
-                        correo_origen as usuario_solicitante,
-                        asunto as asunto,
-                        fecha_envio as fecha_envio,
-                        asignado as asignado,
-                        respuesta_correo as comentario_finalizacion,
-                        comentario_desarrollador as comentario_desarrollador,
-                        estado as estado
-                    FROM correo
-                    WHERE estado = :estadoID
-                    AND multirespuesta = 0
-                    AND deleted_at is null
-                    order by fecha_envio DESC";
+            $usuariotrim = trim($usuario);
+            $permisotrim = trim($permiso);
+            
+            // BASE de la query
+            $query = "SELECT 
+                    uid as uid, 
+                    correo_origen as usuario_solicitante,
+                    asunto as asunto,
+                    fecha_envio as fecha_envio,
+                    asignado as asignado,
+                    respuesta_correo as comentario_finalizacion,
+                    comentario_desarrollador as comentario_desarrollador,
+                    estado as estado
+                FROM correo
+                WHERE estado = :estadoID
+                AND deleted_at IS NULL";
+            
+            // Parámetros
+            $params = [':estadoID' => $estadoID];
+            
+            // Si es admin, mostrar multirespuesta = 0 solo si estado es 1
+            if ($permisotrim === 'admin') {
+                if ($estadoID == 1) {
+                    $query .= " AND multirespuesta = 0";
+                }
+            } else {
+                // Si NO es admin, filtrar por usuario Y multirespuesta = 0 si estado es 1
+                $query .= " AND correo_origen = :usuario";
+                $params[':usuario'] = $usuariotrim;
+                
+                if ($estadoID == 1) {
+                    $query .= " AND multirespuesta = 0";
+                }
             }
-            else{
-                $query = "SELECT 
-                        uid as uid, 
-                        correo_origen as usuario_solicitante,
-                        asunto as asunto,
-                        fecha_envio as fecha_envio,
-                        asignado as asignado,
-                        respuesta_correo as comentario_finalizacion,
-                        comentario_desarrollador as comentario_desarrollador,
-                        estado as estado
-                    FROM correo
-                    WHERE estado = :estadoID
-                    AND deleted_at is null
-                    order by fecha_envio DESC";
-            }
-
+            
+            $query .= " ORDER BY fecha_envio DESC";
+            
             $stmt = $this->db->connect()->prepare($query);
-            $stmt->execute(['estadoID' => $estadoID]);
-
-            return $stmt->fetchAll(PDO::FETCH_OBJ);
+            $result = $stmt->execute($params);
+            
+            if (!$result) {
+                throw new Exception("Error ejecutando query: " . json_encode($stmt->errorInfo()));
+            }
+            
+            $data = $stmt->fetchAll(PDO::FETCH_OBJ);
+            
+            return $data;
+            
         } catch (PDOException $e) {
-            error_log("Error en getTicketsFiltrados: " . $e->getMessage());
-            return false;
+            error_log("PDOException en getTicketsFiltrados: " . $e->getMessage());
+            throw new Exception("PDOException: " . $e->getMessage());
+        } catch (Exception $e) {
+            error_log("Exception en getTicketsFiltrados: " . $e->getMessage());
+            throw new Exception("Exception: " . $e->getMessage());
         }
     }
-
     
 }
 ?>

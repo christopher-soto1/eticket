@@ -15,6 +15,7 @@
     $realizados = $correoModel->getTicketsRealizados();
 
     //CONTADORES USUARIO
+    $noAsignadosUsuario = $correoModel->getTicketsNoAsignadosUsuario($idusuario0);
     $asignadosUsuario = $correoModel->getTicketsAsignadosUsuario($idusuario0);
     $enProgresoUsuario = $correoModel->getTicketsEnProgresoUsuario($idusuario0);
     $realizadoUsuario = $correoModel->getTicketsRealizadoUsuario($idusuario0);
@@ -307,6 +308,7 @@
             </div>
 
             <!-- Usuario Asignado -->
+            <?php if ($permiso == 'admin') { ?> 
               <div class="form-group filtro-usuario-asignado">
                 <label class="filtro-input" for="usuario_asignado">Usuario Asignado</label>
                 <i class="fas fa-user filtro-icono" title="Usuario Asignado"
@@ -321,6 +323,7 @@
                   <?php endforeach; ?>
                 </select>
               </div>
+            <?php } ?>
 
             <!-- Estado -->
             <div class="form-group filtro-estado">
@@ -330,9 +333,7 @@
               <select style="height: 35px;" class="form-control form-control-sm mb-2 filtro-input" id="estado"
                 name="estado">
                 <option value="0">Seleccionar estado</option>
-                <?php if ($permiso == 'admin') { ?>
-                  <option value="1">Sin asignar</option>
-                <?php } ?>
+                <option value="1">Sin asignar</option>
                 <option value="2">Asignado</option>
                 <option value="4">En progreso</option>
                 <option value="6">Realizado</option>
@@ -344,13 +345,15 @@
             </div>
 
             <!-- Correo de origen -->
-            <div class="form-group filtro-correo-origen">
-              <label class="filtro-input" for="correo_origen">Correo de origen</label>
-              <i class="fas fa-envelope filtro-icono" title="Correo de origen"
-                style="display: none;margin-left: 20px;margin-bottom: 20px;"></i>
-              <input type="text" placeholder="gonzalez o gonzalez@iopa.cl"
-                class="form-control form-control-sm mb-2 filtro-input" id="correo_origen" name="correo_origen">
-            </div>
+            <?php if ($permiso == 'admin') { ?>
+              <div class="form-group filtro-correo-origen">
+                <label class="filtro-input" for="correo_origen">Correo de origen</label>
+                <i class="fas fa-envelope filtro-icono" title="Correo de origen"
+                  style="display: none;margin-left: 20px;margin-bottom: 20px;"></i>
+                <input type="text" placeholder="gonzalez o gonzalez@iopa.cl"
+                  class="form-control form-control-sm mb-2 filtro-input" id="correo_origen" name="correo_origen">
+              </div>
+            <?php } ?>
 
             <!-- Buscar por ID -->
             <div class="form-group filtro-id-ticket">
@@ -370,6 +373,7 @@
             </div>
                 
             <!-- Multirespuesta -->
+            <?php if ($permiso == 'admin') { ?>
             <div class="form-group filtro-multirespuesta">
               <label class="filtro-input" for="multirespuesta">Tipo de correo</label>
               <i class="fas fa-random filtro-icono" title="Multirespuesta"
@@ -381,6 +385,7 @@
                 <option value="2">Principal</option>
               </select>
             </div>
+            <?php } ?>
 
             <!-- Días desde la creación -->
             <div class="form-group filtro-dias-creacion">
@@ -415,7 +420,7 @@
               </button>
             </div>
             <!-- <hr style="border: none; border-top: 1px solid white;"> -->
-
+          <?php if ($permiso == 'admin') { ?> 
             <div class="form-group d-flex align-items-center filtro-item">
               <i class="fas fa-sync-alt me-2 filtro-icono" style="display: none; margin-left: 20px;"></i>
             </div>
@@ -423,11 +428,13 @@
             <br>
             <hr style="border: none; border-top: 1px solid black;" class="filtro-boton">
 
-            <div class="d-flex justify-content-between mb-2 filtro-boton">
-              <button id="btnSincronizar" class="btn btn-warning btn-sm w-100 shadow-sm">
-                <i class="fas fa-sync-alt mr-2"></i> Sincronizar E-Tickets
-              </button>
-            </div>
+            
+              <div class="d-flex justify-content-between mb-2 filtro-boton">
+                <button id="btnSincronizar" class="btn btn-warning btn-sm w-100 shadow-sm">
+                  <i class="fas fa-sync-alt mr-2"></i> Sincronizar E-Tickets
+                </button>
+              </div>
+            
 
             <!-- <hr style="border: none; border-top: 1px solid white;"> -->
 
@@ -449,7 +456,7 @@
            if (isset($_SESSION['usuario']) &&  in_array($_SESSION['usuario'], ['christopher.soto@iopa.cl','catalina.henriquez@iopa.cl'])) {?>
             <!-- <hr style="border: none; border-top: 1px solid white;"> -->
 
-            <div class="d-flex justify-content-between mb-2 filtro-boton">
+            <!-- <div class="d-flex justify-content-between mb-2 filtro-boton">
               <button type="button" 
                       class="btn btn-success btn-sm w-100 shadow-sm" 
                       data-toggle="modal" 
@@ -457,7 +464,7 @@
                       style="color: white;">
                 <i class="fas fa-user-plus mr-2"></i> Agregar Usuario
               </button>
-            </div>
+            </div> -->
 
             <div class="d-flex justify-content-between mb-2 filtro-boton">
               <button type="button" 
@@ -473,6 +480,7 @@
             <hr style="border: none; border-top: 1px solid black;" class="filtro-boton">
 
           </div>
+        <?php } ?>
 
           <!-- /.sidebar-menu -->
         </div>
@@ -818,7 +826,7 @@
         </div>
       </div>
 
-
+      <!-- MODAL CONTADORES ADMIN Y USUARIOS -->
       <div class="modal fade" id="modalGeneral" tabindex="-1" role="dialog" aria-labelledby="modalGeneralLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
@@ -871,13 +879,19 @@
           $(document).off('click', '.btn-detalle').on('click', '.btn-detalle', function() {
               // 1. Obtener datos de la card clickeada
               var tipo = $(this).data('tipo');
+              var permiso = $(this).data('permiso');
+              var usuario = $(this).data('usuario');
               var titulo = $(this).data('titulo');
               var colorClase = $(this).data('color'); // Ejemplo: bg-primary, bg-success
               var estado;
 
-              console.log("Tipo: ",tipo);
-              console.log("titulo: ",titulo);
-              console.log("colorClase: ",colorClase);
+              console.log("=== VALORES OBTENIDOS ===");
+              console.log("permiso valor:", permiso);
+              console.log("permiso typeof:", typeof permiso);
+              console.log("permiso length:", permiso.length);
+              console.log("permiso charCodeAt:", permiso.charCodeAt(0)); // Ver si hay caracteres raros
+              console.log("permiso === 'admin':", permiso === 'admin');
+              console.log("permiso.trim() === 'admin':", permiso.trim() === 'admin');
 
               const mapaEstados = {
                   'sin_asignar': 1,
@@ -910,14 +924,15 @@
 
               // 5. Llamada AJAX
               $.ajax({
-                  url: '<?= constant('URL'); ?>correo/obtenerTicketsPorEstado', // Cambia esto por tu archivo real
+                  url: '<?= constant('URL'); ?>correo/obtenerTicketsPorEstado',
                   type: 'POST',
-                  data: { estadoId: estadoId },
+                  data: { estadoId: estadoId, permiso: permiso, usuario: usuario },
                   success: function(response) {
                       if (response.success) {
                           var tickets = response.data;
                           var est = estadoId; // El ID del estado actual
                           var html = '';
+                          var perm = permiso;
 
                           if (tickets.length === 0) {
                               html = '<div class="alert alert-info">No hay registros para este estado.</div>';
@@ -931,11 +946,11 @@
                                     '<th>Asunto</th>';
 
                               // --- Lógica de Encabezados Dinámicos ---
-                              if (est != 1) html += '<th>Asignado</th>';
+                              if (est != 1 && perm === 'admin') html += '<th>Asignado</th>';
                               /* if (est == 6 || est == 3) html += '<th>Coment. Desarrollador</th>';
                               if (est == 3) html += '<th>Respuesta Final</th>'; */
                               
-                              html += '<th>Fecha</th>';
+                              html += '<th>Fecha Creación</th>';
 
                               html += '<th>Acciones</th></tr></thead><tbody>';
 
@@ -955,7 +970,7 @@
                                               (t.asunto ? t.asunto.trim() : '-') + 
                                           '</td>';
 
-                                  if (est != 1) {
+                                  if (est != 1 && perm === 'admin') {
                                       html += '<td>' + (t.asignado ? t.asignado : '<span class="badge badge-secondary">Sin asignar</span>') + '</td>';
                                   }
                                   
@@ -982,7 +997,9 @@
                               html += '</tbody></table></div>';
                           }
                           $('#modalGeneralBody').html(html);
-                      }
+                      }else {
+        console.error("Error:", response);
+    }
                   },
                   error: function() {
                       $('#modalGeneralBody').html('<div class="alert alert-danger">Error al cargar los datos.</div>');
@@ -1132,12 +1149,13 @@
                 `;
 
                 if (hiloDescendente.length === 0) {
+                  if(permiso=='admin'){
                     html += `
                     <div class="mt-4 p-3 border rounded bg-light shadow-sm" style="border-left: 5px solid #0d6efd;">
                       <h6 class="text-primary mb-3">Respuesta al usuario</h6>
                       <button id="btnResponderUsuarioFinal" class="btn btn-sm btn-outline-primary mb-3">Redactar respuesta</button>
                     `;
-                  
+                  }
 
                   html += `
                     <!-- AREA SI NO HAY RESPUESTAS (PRIMERA RESPUESTA) -->
@@ -1182,12 +1200,13 @@
 
                 }
                 else{
-                  
+                  if(permiso=='admin'){
                     html += `
                     <div class="mt-4 p-3 border rounded bg-light shadow-sm" style="border-left: 5px solid #0d6efd;">
                       <h6 class="text-primary mb-3">Respuesta al usuario</h6>
                       <button id="btnResponderUsuarioFinal" class="btn btn-sm btn-outline-primary mb-3">Redactar respuesta</button>
                     `;
+                  }
 
                   html += `
                     <div id="textareaResponderConHilo" style="display: none;">
@@ -1304,20 +1323,30 @@
           $(document).off('click', '.open-detalle-modal').on('click', '.open-detalle-modal', function () {
             const uid = $(this).data('id');
             const correo = correos.find(c => c.uid == uid);
+            //const permiso = permiso;
+            
 
             if (correo) {
               $('#modalDetalleLabel').text('Detalles de Ticket #' + correo.uid);
-              $('#modalDetalleBody').html(`
+              
+              let html = `
                 <h5><strong>Estado:</strong> ${correo.estado == 1 ? 'No asignado' : (correo.estado == 2 ? 'Asignado' : 'Finalizado')}</h5>
                 <h5><strong>Origen:</strong> ${correo.correo_origen}</h5>
                 <h5><strong>Destino:</strong> <span style="word-break: break-all;">${correo.correo_destino ? correo.correo_destino : 'No posee'}</span></h5>
                 <h5><strong>Asunto:</strong> <span style="word-break: break-all;">${correo.asunto ? correo.asunto : 'No posee'}</span></h5>
                 <h5><strong>Fecha:</strong> ${correo.fecha_envio}</h5>
-                <hr class="detalle">
-                <h5><strong>Identificador único:</strong> <span style="word-break: break-all;">${correo.message_id ? correo.message_id : 'No posee'}</span></h5>
-                <h5><strong>Correo respuesta:</strong> ${correo.multirespuesta == 1 ? 'Sí' : 'No'}</h5>
-                <h5><strong>En respuesta a:</strong> <span style="word-break: break-all;">${correo.in_reply_to ? correo.in_reply_to : 'No aplica'}</span></h5>
-              `);
+              `;
+              
+              if (permiso === 'admin') {
+                html += `
+                  <hr class="detalle">
+                  <h5><strong>Identificador único:</strong> <span style="word-break: break-all;">${correo.message_id ? correo.message_id : 'No posee'}</span></h5>
+                  <h5><strong>Correo respuesta:</strong> ${correo.multirespuesta == 1 ? 'Sí' : 'No'}</h5>
+                  <h5><strong>En respuesta a:</strong> <span style="word-break: break-all;">${correo.in_reply_to ? correo.in_reply_to : 'No aplica'}</span></h5>
+                `;
+              }
+              
+              $('#modalDetalleBody').html(html);
             }
           });
 

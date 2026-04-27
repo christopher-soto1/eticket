@@ -78,11 +78,11 @@
       <div class="space-y-8">
 
         <!-- FORM FUNCIONAL -->
-        <form action="<?php echo constant('URL'); ?>login/verificar" method="POST" class="space-y-5">
+        <form id="formLogin" class="space-y-5">
 
           <!-- EMAIL -->
           <div class="space-y-1.5">
-            <label class="text-[13px] font-medium text-slate-500 ml-1">Usuario</label>
+            <label class="text-[13px] font-medium text-slate-500 ml-1">Usuario <small>(Rebsol Los Leones)</small></label>
 
             <div
               class="relative group input-focus-effect border border-slate-200 rounded-lg transition-all bg-muted-gray">
@@ -90,7 +90,7 @@
                 <span class="material-symbols-outlined text-[20px]">person</span>
               </div>
 
-              <input type="email" id="username" name="email" required
+              <input type="text" id="username" name="user" 
                 class="w-full bg-transparent border-none text-slate-800 rounded-lg pl-11 pr-4 py-3 focus:ring-0 transition-all placeholder:text-slate-300 text-sm"
                 placeholder="Tu nombre de usuario">
             </div>
@@ -108,7 +108,7 @@
                 <span class="material-symbols-outlined text-[20px]">lock</span>
               </div>
 
-              <input type="password" id="password" name="pass" required
+              <input type="password" id="password" name="pass" 
                 class="w-full bg-transparent border-none text-slate-800 rounded-lg pl-11 pr-4 py-3 focus:ring-0 transition-all placeholder:text-slate-300 text-sm"
                 placeholder="••••••••">
             </div>
@@ -116,7 +116,7 @@
 
           <!-- OPTIONS -->
           <div class="flex items-center justify-between px-1">
-            <label class="flex items-center space-x-2 cursor-pointer group">
+            <!-- <label class="flex items-center space-x-2 cursor-pointer group">
               <input class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20 bg-white transition-all"
                 type="checkbox" />
               <span class="text-[13px] text-slate-400 group-hover:text-slate-600 transition-colors">Recordarme</span>
@@ -124,7 +124,7 @@
 
             <a class="text-[13px] font-medium text-primary hover:underline transition-all" href="#">
               ¿Olvidaste la clave?
-            </a>
+            </a> -->
           </div>
 
           <!-- BUTTON -->
@@ -136,9 +136,9 @@
         </form>
 
         <div class="pt-4 text-center border-t border-slate-50">
-          <p class="text-sm text-slate-400">
+          <!-- <p class="text-sm text-slate-400">
             ¿No tienes acceso? <a class="text-primary font-medium hover:underline" href="#">Solicitar cuenta</a>
-          </p>
+          </p> -->
         </div>
 
       </div>
@@ -179,8 +179,222 @@
         });
       };
     </script>
-    <?php unset($_SESSION['login_error']); endif; ?>
+  <?php unset($_SESSION['login_error']); endif; ?>
 
+
+  <script>
+    document.getElementById('formLogin').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const email = document.querySelector('input[name="user"]').value;
+      const pass = document.querySelector('input[name="pass"]').value;
+      //console.log('Enviando:', { usuario: email, pass: pass });
+
+      fetch('<?php echo constant("URL"); ?>login/loginAjax', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          usuario: email,
+          pass: pass
+        })
+      })
+      .then(res => {
+        console.log('Status:', res.status); // 👈 Y AQUÍ
+        return res.json();
+      })
+        .then(data => {
+          console.log('Response:', data);
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: '¡Bienvenido!',
+              text: 'Iniciando sesión...',
+              confirmButtonColor: '#137fec',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.href = '<?php echo constant("URL"); ?>correo/verPaginacion/1';
+            });
+          } else if (data.requiere_registro) {
+            // 🔥 POPUP 1: preguntar si quiere registrarse
+            Swal.fire({
+              icon: 'info',
+              title: 'Usuario no registrado',
+              text: 'Tienes acceso a Rebsol pero no a E-Tickets. ¿Deseas registrarte?',
+              showCancelButton: true,
+              confirmButtonText: 'Registrarse',
+              cancelButtonText: 'Cancelar'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                mostrarFormularioRegistro(data.usuario);
+              }
+            });
+
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: '¡Error!',
+              text: data.message,
+              confirmButtonColor: '#137fec'
+            });
+          }
+        })
+        .catch(() => {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error de conexión',
+            confirmButtonColor: '#137fec'
+          });
+        });
+    });
+
+    function mostrarFormularioRegistro(usuario) {
+      Swal.fire({
+        title: 'Registro',
+        html: `
+          <input type="email" id="correo1" class="swal2-input" placeholder="nombre.apellido@iopa.cl">
+          <input type="email" id="correo2" class="swal2-input" placeholder="Confirmar correo">
+        `,
+        confirmButtonText: 'Continuar',
+        focusConfirm: false,
+        preConfirm: () => {
+          const c1 = document.getElementById('correo1').value;
+          const c2 = document.getElementById('correo2').value;
+
+          // Vacios
+          if (!c1 || !c2) {
+            Swal.showValidationMessage('Debes completar ambos campos');
+            return false;
+          }
+
+          // Coincidencia
+          if (c1 !== c2) {
+            Swal.showValidationMessage('Los correos no coinciden');
+            return false;
+          }
+
+          // Validacion de dominio
+          if (!c1.endsWith('@iopa.cl') || !c2.endsWith('@iopa.cl')) {
+            /* Swal.fire({
+              icon: 'error',
+              title: 'Correo inválido',
+              text: 'Debe ser un correo corporativo (@iopa.cl)'
+            }); */
+            Swal.showValidationMessage('Debe ser un correo corporativo (@iopa.cl)');
+            return false;
+          }
+          
+          // Validacion para que el correo incluya punto
+          const parte1 = c1.split('@')[0];
+          const parte2 = c2.split('@')[0];
+
+          if (!parte1.includes('.') || !parte2.includes('.')) {
+            Swal.showValidationMessage('El correo debe tener formato nombre.apellido');
+            return false;
+          }
+
+          return { correo: c1 };
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          confirmarRegistro(usuario, result.value.correo);
+        }
+      });
+    }
+    function confirmarRegistro(usuario, correo) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Confirmación',
+        text: `¿Estás seguro que el correo ${correo} es correcto?`,
+        showCancelButton: true,
+        confirmButtonText: 'Sí, registrarse',
+        cancelButtonText: 'Volver'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          validarCorreo(usuario, correo);
+        }
+      });
+    }
+    function validarCorreo(usuario, correo) {
+      fetch('<?php echo constant("URL"); ?>login/validarCorreo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          usuario: usuario,
+          correo: correo
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+
+        if (!data.success) {
+          // 🔴 YA EXISTE → bloquear
+          Swal.fire({
+            icon: 'error',
+            title: 'Correo ya registrado',
+            text: data.message
+          });
+          return;
+        }
+
+        // ✅ SI NO EXISTE → recién preguntar confirmación
+        Swal.fire({
+          icon: 'warning',
+          title: 'Confirmación',
+          text: `¿Estás seguro que el correo ${correo} es correcto?`,
+          showCancelButton: true,
+          confirmButtonText: 'Sí, registrarse',
+          cancelButtonText: 'Volver'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            registrarUsuario(usuario, correo);
+          }
+        });
+
+      })
+      .catch(() => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al validar correo'
+        });
+      });
+    }
+    function registrarUsuario(usuario, correo) {
+      fetch('<?php echo constant("URL"); ?>login/registrarUsuario', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          usuario: usuario,
+          correo: correo
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Registrado',
+            text: 'Tu cuenta fue creada correctamente'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.message
+          });
+        }
+      });
+    }
+  </script>
 </body>
 
 </html>

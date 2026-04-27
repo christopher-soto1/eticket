@@ -16,7 +16,7 @@ class LoginModel extends Model
           return false;
        }
     }
-      public function getmenu($idu){
+      /* public function getmenu($idu){
         $items = [];
         include_once 'models/usuariosperfil.php';
         try{
@@ -34,6 +34,6 @@ class LoginModel extends Model
        }catch(PDOException $e){
            return [];
        }
-   } 
+   } */
 }
 ?>

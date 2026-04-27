@@ -59,7 +59,6 @@ class Correo extends Controller{
         $autorizacionporpagina = 10;
     
         $totalRegistros = $this->model->getregistros(
-            null,
             $_SESSION['permiso'],
             $_SESSION['asignado'],
             $fecha_inicio,
@@ -654,35 +653,38 @@ class Correo extends Controller{
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             $estadoID = isset($_POST['estadoId']) ? intval($_POST['estadoId']) : null;
-
-            if ($estadoID === null) {
-                echo json_encode([
-                    'success' => false,
-                    'mensaje' => 'ID de estado no proporcionado'
-                ]);
+            $permiso = isset($_POST['permiso']) ? trim($_POST['permiso']) : null;
+            $usuario = isset($_POST['usuario']) ? trim($_POST['usuario']) : null;
+            
+            if ($estadoID === null || $permiso === null || $usuario === null) {
+                echo json_encode(['success' => false, 'debug' => ['estadoID' => $estadoID, 'permiso' => $permiso, 'usuario' => $usuario]]);
                 exit();
             }
-
-            // Llamada al modelo
-            $tickets = $this->model->getTicketsFiltrados($estadoID);
-
-            if ($tickets !== false) {
+            
+            try {
+                $tickets = $this->model->getTicketsFiltrados($estadoID, $permiso, $usuario);
+                
                 echo json_encode([
                     'success' => true,
-                    'data' => $tickets
+                    'data' => $tickets/* , */
+                    /* 'debug' => [
+                        'permiso_recibido' => $permiso,
+                        'es_admin' => ($permiso === 'admin'),
+                        'tickets_count' => count($tickets)
+                    ] */
                 ]);
-            } else {
+                
+            } catch (Exception $e) {
                 echo json_encode([
                     'success' => false,
-                    'mensaje' => 'Error al consultar la base de datos'
+                    'mensaje' => 'Error en modelo',
+                    'error' => $e->getMessage(),
+                    'debug' => ['permiso' => $permiso]
                 ]);
             }
             
         } else {
-            echo json_encode([
-                'success' => false,
-                'mensaje' => 'Método no permitido'
-            ]);
+            echo json_encode(['success' => false, 'mensaje' => 'Método no permitido']);
         }
         exit();
     }

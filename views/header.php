@@ -29,6 +29,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
   // Solo necesitas el primer elemento
   $usuariosperfil0    = $this->usuariosperfil[0];
   $idusuario0         = $usuariosperfil0->idusuario;
+  $usuario_rebsol     = $usuariosperfil0->usuario_rebsol;
   $menu               = $usuariosperfil0->menu;
   $habilitado         = $usuariosperfil0->habilitado;
   $principal          = $usuariosperfil0->principal;
@@ -50,7 +51,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
   ];
 
   // Avatar: iniciales desde el email
-  $usuario_email = $_SESSION['usuario'] ?? '';
+  $usuario_email = $idusuario0 ?? '';
   $partes        = explode('.', explode('@', $usuario_email)[0]);
   $iniciales     = strtoupper(substr($partes[0] ?? 'U', 0, 1) . substr($partes[1] ?? '', 0, 1));
   ?>
@@ -292,7 +293,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
         <i class="fas fa-ticket-alt" style="font-size:11px; margin-right:4px;"></i> Tickets
       </a>
 
-      <?php if (isset($_SESSION['usuario']) && in_array($_SESSION['usuario'], $usuarios_permitidos)): ?>
+      <?php if (isset($_SESSION['usuario']) && in_array($_SESSION['usuario'], $usuarios_permitidos) && $_SESSION['permiso'] == 'admin'): ?>
         <a href="<?= constant('URL'); ?>proyectos/verTabla" data-tooltip="tooltip" title="Ir a proyectos IOPA">
           <i class="fas fa-tasks" style="font-size:11px; margin-right:4px;"></i> Proyectos
         </a>
@@ -337,11 +338,12 @@ $_SESSION['LAST_ACTIVITY'] = time();
     <div class="sh-user-info mr-2 d-none d-md-block">
       <span class="sh-user-name">
         <?php
-        $nombre = explode('@', $usuario_email)[0]; // christopher.soto
-        $nombre = str_replace('.', ' ', $nombre);  // christopher soto
-        $nombre = ucwords($nombre);               // Christopher Soto
-        echo $nombre;
+        $nombre = explode('@', $usuario_email)[0];  // christopher.soto
+        $nombre = str_replace('.', ' ', $nombre);   // christopher soto
+        $nombre = ucwords($nombre);                 // Christopher Soto
+        echo $nombre.' ('.$usuario_rebsol.')';
         ?>
+
       </span>
       <!-- <span class="sh-user-role"><?= $usuario_email; ?></span> -->
       <span class="sh-user-role"><?= $area; ?></span>

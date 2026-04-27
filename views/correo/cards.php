@@ -9,6 +9,14 @@ $asignados = $correoModel->getTicketsAsignados();
 $finalizados = $correoModel->getTicketsFinalizados();
 $enProgresoAdmin = $correoModel->getTicketsEnProgreso();
 $realizados = $correoModel->getTicketsRealizados();
+
+//CONTADORES USUARIO
+$noAsignadosUsuario = $correoModel->getTicketsNoAsignadosUsuario($asignacion);
+$asignadosUsuario = $correoModel->getTicketsAsignadosUsuario($asignacion);
+$enProgresoUsuario = $correoModel->getTicketsEnProgresoUsuario($asignacion);
+$realizadoUsuario = $correoModel->getTicketsRealizadoUsuario($asignacion);
+$finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
+
 ?>
 <!-- CARDS -->
 <script>
@@ -20,8 +28,8 @@ $realizados = $correoModel->getTicketsRealizados();
   
 
   //PARAR MOSTRAR PERMISOS DEL USUARIO
-  //console.log("Rol:", rol);
-  //console.log("ID usuario:", usuarioID);
+  console.log("Rol:", rol);
+  console.log("ID usuario:", usuarioID);
 </script>
 
 <!-- CONTADORES -->
@@ -331,55 +339,65 @@ $realizados = $correoModel->getTicketsRealizados();
               data-toggle="modal"
               data-target="#modalGeneral"
               data-tipo="sin_asignar"
+              data-permiso=<?=$permiso?>
+              data-usuario=<?=$asignacion?>
               data-titulo="Tickets Sin Asignar"
               data-color="bg-info">
               <div class="stat-dot" style="background:#17a2b8;"></div>
               <span class="stat-label">Sin Asignar</span>
-              <span class="stat-count"><?php echo $noAsignados; ?></span>
+              <span class="stat-count"><?= ($permiso == 'admin') ? $noAsignados : $noAsignadosUsuario; ?></span>
             </div>
 
             <div class="stat-chip btn-detalle"
               data-toggle="modal"
               data-target="#modalGeneral"
               data-tipo="asignados"
+              data-permiso=<?=$permiso?>
+              data-usuario=<?=$asignacion?>
               data-titulo="Tickets Asignados"
               data-color="bg-primary">
               <div class="stat-dot" style="background:#007bff;"></div>
               <span class="stat-label">Asignados</span>
-              <span class="stat-count"><?php echo $asignados; ?></span>
+              <span class="stat-count"><?= ($permiso == 'admin') ? $asignados : $asignadosUsuario; ?></span>
             </div>
 
             <div class="stat-chip btn-detalle"
               data-toggle="modal"
               data-target="#modalGeneral"
               data-tipo="progreso"
+              data-permiso=<?=$permiso?>
+              data-usuario=<?=$asignacion?>
               data-titulo="Tickets en Progreso"
               data-color="bg-warning">
               <div class="stat-dot" style="background:#ffc107;"></div>
               <span class="stat-label">En Progreso</span>
-              <span class="stat-count"><?php echo $enProgresoAdmin; ?></span>
+              <span class="stat-count"><?= ($permiso == 'admin') ? $enProgresoAdmin : $enProgresoUsuario; ?></span>
             </div>
 
             <div class="stat-chip btn-detalle"
               data-toggle="modal"
               data-target="#modalGeneral"
               data-tipo="realizados"
+              data-permiso=<?=$permiso?>
+              data-usuario=<?=$asignacion?>
               data-titulo="Tickets Realizados"
               data-color="bg-purple">
               <div class="stat-dot" style="background:#6f42c1;"></div>
               <span class="stat-label">Realizados</span>
-              <span class="stat-count"><?php echo $realizados; ?></span>
+              <span class="stat-count"><?= ($permiso == 'admin') ? $realizados : $realizadoUsuario; ?></span>
             </div>
 
             <div class="stat-chip btn-detalle"
               data-toggle="modal"
               data-target="#modalGeneral"
               data-tipo="finalizados"
+              data-permiso=<?=$permiso?>
+              data-usuario=<?=$asignacion?>
               data-titulo="Tickets Finalizados"
               data-color="bg-success">
               <div class="stat-dot" style="background:#28a745;"></div>
               <span class="stat-label">Finalizados</span>
-              <span class="stat-count"><?php echo $finalizados; ?></span>
+              <span class="stat-count"><?= ($permiso == 'admin') ? $finalizados : $finalizadosUsuario; ?></span>
             </div>
 
           </div>
@@ -622,14 +640,14 @@ $realizados = $correoModel->getTicketsRealizados();
                     <?php endif; ?>
 
                     <?php if (strtolower($permiso) != 'admin'): ?>
-                      <button class="btn-ticket-outline open-cambiar-modal"
+                      <!-- <button class="btn-ticket-outline open-cambiar-modal"
                         data-id="<?php echo $correo->uid; ?>"
                         data-toggle="modal"
                         data-target="#modalCambiarEstado"
                         data-tooltip="tooltip"
                         title="Actualizar estado del ticket asignado">
                         <i class="fas fa-sync-alt" style="font-size:11px;"></i> Actualizar
-                      </button>
+                      </button> -->
                     <?php endif; ?>
 
                     <?php if (strtolower($permiso) == 'admin'): ?>
