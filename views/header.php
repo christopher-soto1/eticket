@@ -2,17 +2,25 @@
 error_reporting(E_ALL & ~E_WARNING & ~E_DEPRECATED);
 ini_set('max_execution_time', 4000);
 ini_set('memory_limit', '512M');
-
 session_start();
+
+// Configurar duración de sesión
+ini_set('session.gc_maxlifetime', 86400); // 24 horas
+ini_set('session.cookie_lifetime', 0);    // Hasta cerrar navegador
 
 // Redirigir si no hay sesión activa
 if (!isset($_SESSION['usuario'])) {
-    session_unset(); session_destroy();
-    header("Location: " . constant('URL') . "login"); exit();
+    session_unset(); 
+    session_destroy();
+    header("Location: " . constant('URL') . "login"); 
+    exit();
 }
 
-// Actualizar actividad sin límite de tiempo
+// Actualizar actividad
 $_SESSION['LAST_ACTIVITY'] = time();
+
+// Renovar la cookie de sesión
+session_regenerate_id(false);
 ?>
 <!DOCTYPE html>
 <html>
@@ -44,6 +52,7 @@ $_SESSION['LAST_ACTIVITY'] = time();
   $permiso    = $this->permiso;
   $asignacion = $this->asignacion;
 
+  //vista de proyectos
   $usuarios_permitidos = [
     'christopher.soto@iopa.cl', 'nstuardo@gmail.com', 'dimas.delmoral@iopa.cl',
     'daniel.navarrete@iopa.cl', 'marcos.huenchunir@iopa.cl',

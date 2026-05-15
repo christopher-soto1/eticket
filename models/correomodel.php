@@ -582,9 +582,9 @@ class CorreoModel extends Model{
                     COUNT(CASE WHEN c.estado = 6 THEN 1 END) AS realizados,
                     COUNT(CASE WHEN c.estado = 3 THEN 1 END) AS finalizados
                     FROM correo c
-                    JOIN usuarios u ON u.email = c.asignado
+                    JOIN usuariosperfil u ON u.idusuario = c.asignado
                     WHERE c.estado IN (2, 3, 4, 6) and deleted_at is null
-                    GROUP BY c.asignado, u.email
+                    GROUP BY c.asignado, u.idusuario
                     order by finalizados DESC;";
             //Para debuguear
             //echo "<p> estadisticas() </p>";
