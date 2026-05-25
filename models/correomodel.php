@@ -1493,7 +1493,7 @@ class CorreoModel extends Model{
 
     /* -------------------- OBTENER LISTADO DE USUARIOS PERMITIDOS -------------------- */
     public function getAsignacion() {
-        $query = $this->db->connect()->prepare("SELECT idusuario FROM usuariosperfil u WHERE habilitado = 'S' AND menu = 'Correo' GROUP BY u.idusuario order by area;");
+        $query = $this->db->connect()->prepare("SELECT idusuario FROM usuariosperfil u WHERE habilitado = 'S' AND menu = 'Correo' AND permiso = 'admin' GROUP BY u.idusuario order by area;");
         $query->execute();
         return $query->fetchAll(PDO::FETCH_OBJ);
     }

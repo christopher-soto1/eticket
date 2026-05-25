@@ -2449,7 +2449,7 @@
               $.ajax({
                 url: '<?= constant("URL") ?>correo/obtenerCorreos',
                 method: 'POST',
-                dataType: 'json', // 👈 IMPORTANTE
+                dataType: 'json',
                 success: function (response) {
                   console.log("RESPONSE: ", response);
                   Swal.fire({

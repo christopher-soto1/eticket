@@ -201,7 +201,7 @@
         })
       })
       .then(res => {
-        console.log('Status:', res.status); // 👈 Y AQUÍ
+        console.log('Status:', res.status);
         return res.json();
       })
         .then(data => {
@@ -218,7 +218,7 @@
               window.location.href = '<?php echo constant("URL"); ?>correo/verPaginacion/1';
             });
           } else if (data.requiere_registro) {
-            // 🔥 POPUP 1: preguntar si quiere registrarse
+            // preguntar si quiere registrarse
             Swal.fire({
               icon: 'info',
               title: 'Usuario no registrado',
@@ -334,7 +334,7 @@
       .then(data => {
 
         if (!data.success) {
-          // 🔴 YA EXISTE → bloquear
+          // YA EXISTE → bloquear
           Swal.fire({
             icon: 'error',
             title: 'Correo ya registrado',
@@ -343,7 +343,7 @@
           return;
         }
 
-        // ✅ SI NO EXISTE → recién preguntar confirmación
+        // SI NO EXISTE → recién preguntar confirmación
         Swal.fire({
           icon: 'warning',
           title: 'Confirmación',
