@@ -53,6 +53,14 @@ class Correo extends Controller{
         $correoModel = new CorreoModel();
         $usuariosAsignables = $correoModel->getAsignacion();
         $this->view->usuariosAsignables = $usuariosAsignables;
+
+        //Obtener usuarios habilitados para asignacion por jefe de grupo (todos los usuarios registrados en el sistema)
+        $usuariosAsignablesPorGrupo = $correoModel->obtenerAsignacionPorGrupo();
+        $this->view->usuariosAsignablesPorGrupo = $usuariosAsignablesPorGrupo;
+
+        //Obtener usuarios habilitados para asignacion por jefe de grupo para el filtro usuario
+        $usuariosAsignablesPorGrupoParaUsuario = $correoModel->obtenerAsignacionPorGrupoParaUsuario($_SESSION['usuario']);
+        $this->view->usuariosAsignablesPorGrupoParaUsuario = $usuariosAsignablesPorGrupoParaUsuario;
     
         //PAGINADOR
         $id = $param[0];
@@ -78,7 +86,6 @@ class Correo extends Controller{
         $correo = $this->model->getpag(
             $iniciar,
             $autorizacionporpagina,
-            null,
             $_SESSION['permiso'],
             $_SESSION['asignado'],
             $fecha_inicio,
@@ -687,6 +694,113 @@ class Correo extends Controller{
             echo json_encode(['success' => false, 'mensaje' => 'Método no permitido']);
         }
         exit();
+    }
+
+    public function obtenerAsignaciones()
+    {
+        try {
+
+            $usuario = $_POST['usuario'];
+            $permiso = $_POST['permiso'];
+
+            $data = $this->model->obtenerAsignaciones($usuario, $permiso);
+
+            header('Content-Type: application/json');
+
+            echo json_encode($data);
+
+        } catch (Exception $e) {
+
+            http_response_code(500);
+
+            echo json_encode([
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function eliminarAsignacion()
+    {
+        try {
+
+            $principal = trim($_POST['principal'] ?? '');
+            $asociado = trim($_POST['asociado'] ?? '');
+
+            if (empty($principal) || empty($asociado)) {
+
+                echo json_encode([
+                    'success' => false,
+                    'mensaje' => 'Datos incompletos'
+                ]);
+
+                return;
+            }
+
+            $resultado = $this->model->eliminarAsignacion(
+                $principal,
+                $asociado
+            );
+
+            echo json_encode([
+                'success' => $resultado
+            ]);
+
+        } catch (Exception $e) {
+
+            http_response_code(500);
+
+            echo json_encode([
+                'success' => false,
+                'mensaje' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function crearAsignaciones()
+    {
+        try {
+
+            $principal = trim($_POST['principal'] ?? '');
+            $asociados = $_POST['asociados'] ?? [];
+
+            if (empty($principal)) {
+
+                echo json_encode([
+                    'success' => false,
+                    'mensaje' => 'Principal vacío'
+                ]);
+
+                return;
+            }
+
+            if (!is_array($asociados) || count($asociados) === 0) {
+
+                echo json_encode([
+                    'success' => false,
+                    'mensaje' => 'Sin asociados'
+                ]);
+
+                return;
+            }
+
+            $resultado = $this->model->crearAsignaciones(
+                $principal,
+                $asociados
+            );
+
+            echo json_encode([
+                'success' => $resultado
+            ]);
+
+        } catch (Exception $e) {
+
+            http_response_code(500);
+
+            echo json_encode([
+                'success' => false,
+                'mensaje' => $e->getMessage()
+            ]);
+        }
     }
 
 

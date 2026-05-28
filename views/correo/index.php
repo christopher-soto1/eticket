@@ -353,6 +353,31 @@
                 <input type="text" placeholder="gonzalez o gonzalez@iopa.cl"
                   class="form-control form-control-sm mb-2 filtro-input" id="correo_origen" name="correo_origen">
               </div>
+            <?php } else { ?>
+                <div class="form-group filtro-correo-origen">
+                    <label class="filtro-input" for="correo_origen">
+                        Correo de origen
+                    </label>
+
+                    <i class="fas fa-envelope filtro-icono"
+                      title="Correo de origen"
+                      style="display: none; margin-left: 20px; margin-bottom: 20px;">
+                    </i>
+
+                    <select class="form-control form-control-sm mb-2 filtro-input" id="correo_origen" name="correo_origen">
+                        <option value="">
+                            Todos
+                        </option>
+                        <option value="<?php echo $idusuario0; ?>">
+                            <?php echo $idusuario0; ?>
+                        </option>
+                        <?php foreach ($this->usuariosAsignablesPorGrupoParaUsuario as $usuario): ?>
+                            <option value="<?php echo $usuario->usuario_asociado; ?>">
+                                <?php echo $usuario->usuario_asociado; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
             <?php } ?>
 
             <!-- Buscar por ID -->
@@ -419,68 +444,189 @@
                   <i class="fas fa-home"></i>
               </button>
             </div>
-            <!-- <hr style="border: none; border-top: 1px solid white;"> -->
-          <?php if ($permiso == 'admin') { ?> 
-            <div class="form-group d-flex align-items-center filtro-item">
-              <i class="fas fa-sync-alt me-2 filtro-icono" style="display: none; margin-left: 20px;"></i>
-            </div>
 
-            <br>
-            <hr style="border: none; border-top: 1px solid black;" class="filtro-boton">
-
-            
-              <div class="d-flex justify-content-between mb-2 filtro-boton">
-                <button id="btnSincronizar" class="btn btn-warning btn-sm w-100 shadow-sm">
-                  <i class="fas fa-sync-alt mr-2"></i> Sincronizar E-Tickets
-                </button>
+            <!-- SINCRONIZACION GLOBAL / ESTADISTICAS / ELIMINAR USUARIO -->
+            <?php if ($permiso == 'admin') { ?> 
+              <!-- <div class="form-group d-flex align-items-center filtro-item">
+                <i class="fas fa-sync-alt me-2 filtro-icono" style="display: none; margin-left: 20px;"></i>
               </div>
-            
 
-            <!-- <hr style="border: none; border-top: 1px solid white;"> -->
+              <br> -->
+              <hr style="border: none; border-top: 1px solid #d1d1d1;" class="filtro-boton">
 
-            <div class="form-group d-flex align-items-center filtro-item">
-              <i class="fas fa-chart-line me-2 filtro-icono" style="display: none; margin-left: 20px;"></i>
-            </div>
-
-            <div class="d-flex justify-content-between mb-2 filtro-boton">
-              <button id="btnEstadisticas" 
-                      class="btn btn-info btn-sm w-100 shadow-sm open-estadisticas" 
-                      data-toggle="modal" 
-                      data-target="#modalEstadisticas"
-                <i class="fas fa-chart-pie mr-2"></i> Ver Estadísticas
-              </button>
-            </div>
-
-            <?php
               
-           if (isset($_SESSION['usuario']) &&  in_array($_SESSION['usuario'], ['christopher.soto@iopa.cl','catalina.henriquez@iopa.cl'])) {?>
-            <!-- <hr style="border: none; border-top: 1px solid white;"> -->
+                <div class="mb-2 filtro-boton">
 
-            <!-- <div class="d-flex justify-content-between mb-2 filtro-boton">
-              <button type="button" 
-                      class="btn btn-success btn-sm w-100 shadow-sm" 
-                      data-toggle="modal" 
-                      data-target="#modalAgregarUsuario"
-                      style="color: white;">
-                <i class="fas fa-user-plus mr-2"></i> Agregar Usuario
-              </button>
-            </div> -->
+    <button 
+        id="btnSincronizar"
+        class="btn btn-sm w-100"
+        style="
+            background: #d6a23d;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all .2s ease;
+        "
+        onmouseover="
+            this.style.background='#c8932e';
+            this.style.transform='translateY(-1px)';
+            this.style.boxShadow='0 3px 8px rgba(0,0,0,.12)';
+        "
+        onmouseout="
+            this.style.background='#d6a23d';
+            this.style.transform='translateY(0)';
+            this.style.boxShadow='none';
+        "
+    >
+        <i class="fas fa-sync-alt mr-2"></i>
+        Sincronizar E-Tickets
+    </button>
 
-            <div class="d-flex justify-content-between mb-2 filtro-boton">
-              <button type="button" 
-                      class="btn btn-danger btn-sm w-100 shadow-sm" 
-                      data-toggle="modal" 
-                      data-target="#modalEliminarUsuario"
-                      style="color: white;">
-                <i class="fas fa-user-minus mr-2"></i> Eliminar Usuario
-              </button>
+</div>
+              
+
+              <!-- <hr style="border: none; border-top: 1px solid white;"> -->
+
+              <div class="form-group d-flex align-items-center filtro-item">
+                <i class="fas fa-chart-line me-2 filtro-icono" style="display: none; margin-left: 20px;"></i>
+              </div>
+
+              <div class="mb-2 filtro-boton">
+
+    <button 
+        id="btnEstadisticas"
+        class="btn btn-sm w-100 open-estadisticas"
+        data-toggle="modal"
+        data-target="#modalEstadisticas"
+        style="
+            background: #3f8ec4;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all .2s ease;
+        "
+        onmouseover="
+            this.style.background='#3379a8';
+            this.style.transform='translateY(-1px)';
+            this.style.boxShadow='0 3px 8px rgba(0,0,0,.12)';
+        "
+        onmouseout="
+            this.style.background='#3f8ec4';
+            this.style.transform='translateY(0)';
+            this.style.boxShadow='none';
+        "
+    >
+        <i class="fas fa-chart-pie mr-2"></i>
+        Ver Estadísticas
+    </button>
+
+</div>
+
+              <?php
+                
+            if (isset($_SESSION['usuario']) &&  in_array($_SESSION['usuario'], ['christopher.soto@iopa.cl','catalina.henriquez@iopa.cl'])) {?>
+
+              <div class="mb-2 filtro-boton">
+
+    <button 
+        type="button"
+        class="btn btn-sm w-100"
+        data-toggle="modal"
+        data-target="#modalEliminarUsuario"
+        style="
+            background: #c95a5a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all .2s ease;
+        "
+        onmouseover="
+            this.style.background='#b54b4b';
+            this.style.transform='translateY(-1px)';
+            this.style.boxShadow='0 3px 8px rgba(0,0,0,.12)';
+        "
+        onmouseout="
+            this.style.background='#c95a5a';
+            this.style.transform='translateY(0)';
+            this.style.boxShadow='none';
+        "
+    >
+        <i class="fas fa-user-minus mr-2"></i>
+        Eliminar Usuario
+    </button>
+
+</div>
+
+              <?php }?>
+              <hr style="border: none; border-top: 1px solid #d1d1d1;" class="filtro-boton">
+
             </div>
+            <?php } ?>
 
-            <?php }?>
-            <hr style="border: none; border-top: 1px solid black;" class="filtro-boton">
+            <!-- ASIGNACIONES -->
+             <?php if ($permiso !== 'admin') { ?>
+            <hr style="border: none; border-top: 1px solid #d1d1d1;" class="filtro-boton">
+            <?php } ?>
+              <div class="d-flex align-items-center filtro-boton">
 
-          </div>
-        <?php } ?>
+                  <button 
+                      class="btn btn-sm flex-grow-1 open-asignaciones"
+                      data-usuario="<?php echo $idusuario0; ?>"
+                      data-permiso="<?php echo $permiso; ?>"
+                      style="
+                          background: #6f7d95;
+                          color: white;
+                          border: none;
+                          border-radius: 12px;
+                          padding: 9px 14px;
+                          font-size: 13px;
+                          font-weight: 600;
+                          transition: all .2s ease;"
+                      onmouseover="
+                          this.style.background='#5f6d84';
+                          this.style.transform='translateY(-1px)';
+                          this.style.boxShadow='0 3px 8px rgba(0,0,0,.12)';"
+                      onmouseout="
+                          this.style.background='#6f7d95';
+                          this.style.transform='translateY(0)';
+                          this.style.boxShadow='none';">
+                      <i class="fas fa-list-ul mr-1"></i>
+                      Ver asignaciones
+                  </button>
+
+              </div>
+              <?php if ($permiso == 'admin') { ?>
+              <div class="d-flex align-items-center filtro-boton">
+                    <button 
+                        class="btn btn-sm flex-grow-1 shadow-sm open-crear-asignacion"
+                        style="
+                            margin-top: 5px;
+                            background: linear-gradient(135deg, #10b981, #059669);
+                            border: none;
+                            color: white;
+                            border-radius: 12px;
+                            padding: 10px 14px;
+                            font-weight: 600;
+                            transition: all .2s ease;
+                        ">
+                        <i class="fas fa-plus mr-1"></i> 
+                        Crear asignación
+                    </button>
+                </div>
+              <?php } ?>
+            <hr style="border: none; border-top: 1px solid #d1d1d1;" class="filtro-boton">
+            <!-- ASIGNACIONES -->
+
+            
 
           <!-- /.sidebar-menu -->
         </div>
@@ -608,9 +754,9 @@
       <!-- MODAL DINAMICO ESTADÍSTICAS -->
       <div class="modal fade" id="modalEstadisticas" tabindex="-1" aria-labelledby="modalEstadisticasLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
           <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
+            <div class="modal-header text-black">
               <h5 class="modal-title" id="modalEstadisticasLabel">Estadísticas de usuarios</h5>
             </div>
             <div class="modal-body" id="modalEstadisticasBody" style="max-height: 70vh; overflow-y: auto;">
@@ -828,7 +974,7 @@
 
       <!-- MODAL CONTADORES ADMIN Y USUARIOS -->
       <div class="modal fade" id="modalGeneral" tabindex="-1" role="dialog" aria-labelledby="modalGeneralLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header text-white" id="modalHeaderColor">
                     <h5 class="modal-title" id="modalGeneralLabel">Cargando...</h5>
@@ -849,6 +995,106 @@
             </div>
         </div>
       </div>
+
+      <!-- MODAL DE VER ASIGNACIONES -->
+      <div class="modal fade" id="modalAsignaciones" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-l modal-dialog-centered" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header text-dark">
+                    <h5 class="modal-title" id="modalAsignacionesLabel">
+                        Asignaciones
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body" id="modalAsignacionesBody">
+                    Cargando...
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CREAR ASIGNACIONES -->
+    <div class="modal fade" id="modalCrearAsignacion" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-l modal-dialog-centered" role="document">
+
+          <div class="modal-content">
+
+              <div class="modal-header text-dark">
+                  <h5 class="modal-title">
+                      Crear asignación
+                  </h5>
+
+                  <button type="button" class="close text-white" data-dismiss="modal">
+                      <span>&times;</span>
+                  </button>
+              </div>
+
+              <div class="modal-body">
+
+                  <!-- JEFE -->
+                  <div class="form-group">
+                      <label>Usuario principal</label>
+
+                      <select class="form-control select2" id="usuarioPrincipal">
+
+                          <option value="">
+                              Seleccione usuario
+                          </option>
+
+                          <?php foreach ($this->usuariosAsignablesPorGrupo as $usuario): ?>
+
+                                    <option value="<?php echo $usuario->idusuario; ?>">
+                                        <?php echo $usuario->idusuario; ?>
+                                    </option>
+
+                                <?php endforeach; ?>
+
+                      </select>
+                  </div>
+
+                  <!-- ASOCIADOS -->
+                  <div id="contenedorUsuariosAsociados">
+
+                      <div class="form-group fila-asociado">
+                          <label>Usuario asociado</label>
+
+                          <div class="d-flex">
+
+                              <input type="text" class="form-control usuario-asociado" placeholder="correo@iopa.cl">
+                              <button class="btn btn-danger ml-2 eliminar-input" type="button">
+                                  <i class="fas fa-trash"></i>
+                              </button>
+
+                          </div>
+                      </div>
+
+                  </div>
+
+                  <button type="button" class="btn btn-primary btn-sm" id="agregarInputAsociado">
+                      <i class="fas fa-plus"></i>
+                      Agregar usuario
+                  </button>
+
+              </div>
+
+              <div class="modal-footer">
+
+                  <button type="button" class="btn btn-success" id="guardarAsignaciones">
+                      Guardar asignaciones
+                  </button>
+
+              </div>
+
+          </div>
+
+      </div>
+  </div>
 
 
 
@@ -928,6 +1174,7 @@
                   type: 'POST',
                   data: { estadoId: estadoId, permiso: permiso, usuario: usuario },
                   success: function(response) {
+                    console.log("RESPUESTA COMPLETA:", response);
                       if (response.success) {
                           var tickets = response.data;
                           var est = estadoId; // El ID del estado actual
@@ -998,11 +1245,17 @@
                           }
                           $('#modalGeneralBody').html(html);
                       }else {
-        console.error("Error:", response);
-    }
+                      console.error("Error:", response);
+                  }
                   },
                   error: function() {
-                      $('#modalGeneralBody').html('<div class="alert alert-danger">Error al cargar los datos.</div>');
+                      console.error("ERROR BACKEND:", response);
+
+                        $('#modalGeneralBody').html(`
+                            <div class="alert alert-danger">
+                                ${response.error ?? response.mensaje ?? 'Error desconocido'}
+                            </div>
+                        `);
                   }
               });
           });
@@ -1028,8 +1281,377 @@
               $('html, body').animate({ scrollTop: 0 }, 'slow');
           });
 
-          
+          /* ELIMINAR UNA ASIGNACION DE JEFE DE GRUPO */
+          $(document).off('click', '.eliminar-asignacion').on('click', '.eliminar-asignacion', function () {
 
+              const boton = $(this);
+
+              const principal = boton.data('principal');
+              const asociado = boton.data('asociado');
+
+              Swal.fire({
+                  title: '¿Eliminar asignación?',
+                  text: asociado,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonText: 'Sí, eliminar',
+                  cancelButtonText: 'Cancelar',
+                  reverseButtons: true
+              }).then((result) => {
+
+                  if (!result.isConfirmed) {
+                      return;
+                  }
+
+                  $.ajax({
+                      url: '<?php echo constant('URL'); ?>correo/eliminarAsignacion',
+                      method: 'POST',
+                      dataType: 'json',
+                      data: {
+                          principal: principal,
+                          asociado: asociado
+                      },
+
+                      success: function (response) {
+
+                          if (response.success) {
+
+                              boton.closest('li').fadeOut(300, function () {
+                                  $(this).remove();
+                              });
+
+                              Swal.fire({
+                                  icon: 'success',
+                                  title: 'Asignación eliminada',
+                                  timer: 1200,
+                                  showConfirmButton: false
+                              });
+
+                          } else {
+
+                              Swal.fire({
+                                  icon: 'error',
+                                  title: 'No se pudo eliminar'
+                              });
+                          }
+                      },
+
+                      error: function (xhr) {
+
+                          console.log(xhr.responseText);
+
+                          Swal.fire({
+                              icon: 'error',
+                              title: 'Error del servidor'
+                          });
+                      }
+                  });
+              });
+          });
+
+          /* ABRIR MODAL ASIGNACIONES PARA ADMIN Y USUARIO */
+          $(document).off('click', '.open-asignaciones').on('click', '.open-asignaciones', function () {
+
+              const usuario = $(this).data('usuario');
+              const permiso = $(this).data('permiso');
+
+              $('#modalAsignaciones').modal('show');
+
+              if (permiso === 'admin') {
+                  $('#modalAsignacionesLabel').text('Asignaciones Globales');
+              } else {
+                  $('#modalAsignacionesLabel').text('Asignaciones de ' + usuario);
+              }
+
+              $('#modalAsignacionesBody').html(`
+                  <div class="text-center p-3">
+                      <div class="spinner-border text-warning"></div>
+                  </div>
+              `);
+
+              $.ajax({
+                  url: '<?php echo constant('URL'); ?>correo/obtenerAsignaciones',
+                  method: 'POST',
+                  dataType: 'json',
+                  data: {
+                      usuario: usuario,
+                      permiso: permiso
+                  },
+
+                  success: function (response) {
+                      let contenido = '';
+
+                      if (response.length > 0) {
+
+                          // ADMIN
+                          if (permiso === 'admin') {
+
+                              let grupos = {};
+
+                              // Agrupar
+                              response.forEach(fila => {
+
+                                  if (!grupos[fila.usuario_principal]) {
+                                      grupos[fila.usuario_principal] = [];
+                                  }
+
+                                  grupos[fila.usuario_principal].push(fila.usuario_asociado);
+                              });
+
+                              // Render
+                              Object.keys(grupos).forEach(jefe => {
+
+                                  contenido += `
+                                      <div class="card shadow-sm mb-3">
+                                          <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+
+                                              <strong>${jefe}</strong>
+
+                                          </div>
+
+                                          <div class="card-body p-2">
+                                              <ul class="list-group">
+                                  `;
+
+                                  grupos[jefe].forEach(usuario => {
+
+                                      contenido += `
+                                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                                              ${usuario}
+                                              <button 
+                                                  class="btn btn-danger btn-sm eliminar-asignacion"
+                                                  data-principal="${jefe}"
+                                                  data-asociado="${usuario}">
+                                                  <i class="fas fa-trash"></i>
+                                              </button>
+                                          </li>
+                                      `;
+                                  });
+
+                                  contenido += `
+                                              </ul>
+                                          </div>
+                                      </div>
+                                  `;
+                              });
+
+                          } else {
+
+                              // USUARIO NORMAL
+
+                              contenido += `
+                                  <div class="card shadow-sm">
+                                      <div class="card-header bg-warning">
+                                          Usuarios asociados
+                                      </div>
+
+                                      <ul class="list-group list-group-flush">
+                              `;
+
+                              response.forEach(fila => {
+
+                                  contenido += `
+                                      <li class="list-group-item">
+                                          ${fila.usuario_asociado}
+                                      </li>
+                                  `;
+                              });
+
+                              contenido += `
+                                      </ul>
+                                  </div>
+                              `;
+                          }
+
+                      } else {
+
+                          contenido = `
+                              <div class="alert alert-warning">
+                                  No existen asignaciones
+                              </div>
+                          `;
+                      }
+
+                      $('#modalAsignacionesBody').html(contenido);
+                  },
+                  error: function (xhr) {
+
+                      console.log(xhr.responseText);
+
+                      $('#modalAsignacionesBody').html(`
+                          <div class="alert alert-danger">
+                              Error al cargar asignaciones
+                          </div>
+                      `);
+                  }
+              });
+          });
+
+          /* ABRIR MODAL CREAR ASIGNACIONES */
+          $(document).off('click', '.open-crear-asignacion').on('click', '.open-crear-asignacion', function () {
+
+          $('#modalCrearAsignacion').modal('show');
+              // Limpiar principal
+              $('#usuarioPrincipal').val('').trigger('change');
+
+              // Limpiar asociados
+              $('#contenedorUsuariosAsociados').html(`
+              
+                  <div class="form-group fila-asociado">
+                      <label>Usuario asociado</label>
+
+                      <div class="d-flex">
+
+                          <input 
+                              type="text" 
+                              class="form-control usuario-asociado"
+                              placeholder="correo@iopa.cl"
+                          >
+
+                          <button 
+                              class="btn btn-danger ml-2 eliminar-input"
+                              type="button"
+                          >
+                              <i class="fas fa-trash"></i>
+                          </button>
+
+                      </div>
+                  </div>
+
+              `);
+
+              // Inicializar select2
+              $('#usuarioPrincipal').select2({
+                  width: '100%',
+                  dropdownParent: $('#modalCrearAsignacion')
+              });
+
+              // Abrir modal
+              $('#modalCrearAsignacion').modal('show');
+          });
+
+          /* AGREGAR INPUT DINAMICO */
+          $(document).off('click', '#agregarInputAsociado').on('click', '#agregarInputAsociado', function () {
+
+              $('#contenedorUsuariosAsociados').append(`
+
+                  <div class="form-group fila-asociado">
+
+                      <label>Usuario asociado</label>
+
+                      <div class="d-flex">
+
+                          <input 
+    type="text" 
+    class="form-control usuario-asociado"
+    placeholder="correo@iopa.cl"
+>
+
+                          <button 
+                              class="btn btn-danger ml-2 eliminar-input"
+                              type="button"
+                          >
+                              <i class="fas fa-trash"></i>
+                          </button>
+
+                      </div>
+
+                  </div>
+
+              `);
+
+              $('.select2-asociado').select2({
+                  width: '100%',
+                  dropdownParent: $('#modalCrearAsignacion')
+              });
+          });
+
+          /* ELIMINAR INPUT DINAMICO */
+          $(document).off('click', '.eliminar-input').on('click', '.eliminar-input', function () {
+
+              $(this).closest('.fila-asociado').remove();
+          });
+
+          /* GUARDAR ASIGNACIONES */
+          $(document).off('click', '#guardarAsignaciones').on('click', '#guardarAsignaciones', function () {
+
+              const principal = $('#usuarioPrincipal').val();
+
+              let asociados = [];
+
+              $('.usuario-asociado').each(function () {
+
+                  const valor = $(this).val().trim();
+
+                  if (valor !== '') {
+                      asociados.push(valor);
+                  }
+              });
+
+              if (principal === '') {
+
+                  Swal.fire({
+                      icon: 'warning',
+                      title: 'Seleccione usuario principal'
+                  });
+
+                  return;
+              }
+
+              if (asociados.length === 0) {
+
+                  Swal.fire({
+                      icon: 'warning',
+                      title: 'Ingrese al menos un asociado'
+                  });
+
+                  return;
+              }
+
+              $.ajax({
+
+                  url: '<?php echo constant('URL'); ?>correo/crearAsignaciones',
+
+                  method: 'POST',
+
+                  dataType: 'json',
+
+                  data: {
+                      principal: principal,
+                      asociados: asociados
+                  },
+
+                  success: function (response) {
+
+                      if (response.success) {
+
+                          Swal.fire({
+                              icon: 'success',
+                              title: 'Asignaciones creadas'
+                          });
+
+                          $('#modalCrearAsignacion').modal('hide');
+
+                      } else {
+
+                          Swal.fire({
+                              icon: 'error',
+                              title: 'Error creando asignaciones'
+                          });
+                      }
+                  },
+
+                  error: function (xhr) {
+
+                      console.log(xhr.responseText);
+
+                      Swal.fire({
+                          icon: 'error',
+                          title: 'Error servidor'
+                      });
+                  }
+              });
+          });
 
           // mostrar popup
           setTimeout(() => {
@@ -1555,7 +2177,7 @@
                     <p>Detalles generales de tickets: </p>
                     <thead class="thead text-center">
                       <tr>
-                        <th class="bg-primary text-white">Usuario</th>
+                        <th class="text-black">Usuario</th>
                         <th class="bg-primary text-white">Asignado</th>
                         <th class="bg-warning text-white">En progreso</th>
                         <th class="bg-purple text-white" style="background-color: #6f42c1;">Realizado</th>
@@ -2238,7 +2860,7 @@
             asunto: asunto
           };
 
-          //console.log("FUNCION DE FILTRADO:", payload);
+          console.log("FUNCION DE FILTRADO:", payload);
 
           if (fechaInicio && fechaFin && new Date(fechaInicio) > new Date(fechaFin)) {
             Swal.fire({

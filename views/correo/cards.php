@@ -339,8 +339,8 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
               data-toggle="modal"
               data-target="#modalGeneral"
               data-tipo="sin_asignar"
-              data-permiso=<?=$permiso?>
-              data-usuario=<?=$asignacion?>
+              data-permiso="<?=$permiso?>"
+              data-usuario="<?=$asignacion?>"
               data-titulo="Tickets Sin Asignar"
               data-color="bg-info">
               <div class="stat-dot" style="background:#17a2b8;"></div>
@@ -352,8 +352,8 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
               data-toggle="modal"
               data-target="#modalGeneral"
               data-tipo="asignados"
-              data-permiso=<?=$permiso?>
-              data-usuario=<?=$asignacion?>
+              data-permiso="<?=$permiso?>"
+              data-usuario="<?=$asignacion?>"
               data-titulo="Tickets Asignados"
               data-color="bg-primary">
               <div class="stat-dot" style="background:#007bff;"></div>
@@ -365,8 +365,8 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
               data-toggle="modal"
               data-target="#modalGeneral"
               data-tipo="progreso"
-              data-permiso=<?=$permiso?>
-              data-usuario=<?=$asignacion?>
+              data-permiso="<?=$permiso?>"
+              data-usuario="<?=$asignacion?>"
               data-titulo="Tickets en Progreso"
               data-color="bg-warning">
               <div class="stat-dot" style="background:#ffc107;"></div>
@@ -378,8 +378,8 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
               data-toggle="modal"
               data-target="#modalGeneral"
               data-tipo="realizados"
-              data-permiso=<?=$permiso?>
-              data-usuario=<?=$asignacion?>
+              data-permiso="<?=$permiso?>"
+              data-usuario="<?=$asignacion?>"
               data-titulo="Tickets Realizados"
               data-color="bg-purple">
               <div class="stat-dot" style="background:#6f42c1;"></div>
@@ -391,8 +391,8 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
               data-toggle="modal"
               data-target="#modalGeneral"
               data-tipo="finalizados"
-              data-permiso=<?=$permiso?>
-              data-usuario=<?=$asignacion?>
+              data-permiso="<?=$permiso?>"
+              data-usuario="<?=$asignacion?>"
               data-titulo="Tickets Finalizados"
               data-color="bg-success">
               <div class="stat-dot" style="background:#28a745;"></div>

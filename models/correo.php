@@ -18,6 +18,7 @@ class CorreoM
     public $comentario_desarrollador;
     public $references;
     public $cc;
+    public $carpeta;
     public $estado;
     public $created_at;
     public $updated_at;

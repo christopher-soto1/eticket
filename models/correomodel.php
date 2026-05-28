@@ -5,9 +5,11 @@ require 'vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-class CorreoModel extends Model{
+class CorreoModel extends Model
+{
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
     }
 
@@ -30,8 +32,7 @@ class CorreoModel extends Model{
                 array_push($items, $item);
             }
             return $items;
-        } 
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             return [];
         }
     }
@@ -60,30 +61,29 @@ class CorreoModel extends Model{
                 $item->created_at = $row['created_at'];
                 $item->updated_at = $row['updated_at'];
                 $item->deleted_at = $row['deleted_at'];
-                
+
                 array_push($items, $item);
             }
             return $items;
-        } 
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             return [];
         }
     }
 
     /* ------ OBTIENE REGISTROS PARA EL PAGINADOR ------ */
     public function getregistros(
-        $permiso, 
-        $idusuario, 
-        $fecha_inicio = null, 
-        $fecha_fin = null, 
-        $usuario_asignado = null, 
+        $permiso,
+        $idusuario,
+        $fecha_inicio = null,
+        $fecha_fin = null,
+        $usuario_asignado = null,
         $estado = null,
         $correo_origen = null,
         $id_ticket = null,
         $dias_creacion = null,
         $multirespuesta,
-        $asunto = null)
-    {
+        $asunto = null
+    ) {
         try {
             $inicio = "$fecha_inicio 00:00:00";
             $fin = "$fecha_fin 23:59:59";
@@ -91,332 +91,369 @@ class CorreoModel extends Model{
             $debug = " / INICIO - ";
 
 
-                if ($permiso != 'admin') {
-                    // 🔒 NO ADMIN
-                    $sql = "SELECT * FROM correo where 1 AND correo_origen = '$idusuario'";
-                    if(empty($usuario_asignado) && empty($estado) && empty($fecha_inicio) && empty($fecha_fin) && empty($correo_origen) && empty($dias_creacion) && empty($id_ticket) && empty($multirespuesta) && empty($asunto)) {
-                        $sql .= " AND estado = 1 and multirespuesta != 1";
-                    }
-                    else{
-                        if(!empty($usuario_asignado)) {
-                            $sql .= " AND asignado = '$usuario_asignado'";
-                            $debug.= ".6";
-                        }
-                        if(!empty($multirespuesta)) {
-                            if($multirespuesta == 2){
-                                $sql .= " AND multirespuesta = 0";
-                                $debug.= ".multi0r";
-                            }
-                            else{
-                                $sql .= " AND multirespuesta = $multirespuesta";
-                                $debug.= ".multi1r";
-                            }
-                        }
-                        if (!empty($fecha_inicio)) {
-                            $sql .= " AND fecha_envio >= '$inicio'";
-                            $debug.= ".8";
-                        }
-        
-                        if (!empty($fecha_fin)) {
-                            $sql .= " AND fecha_envio <= '$fin'";
-                            $debug.=".9";
-                        }
-                        if (!empty($estado)) {
-                            $debug.=".estado";
-                            if($estado == 5) {
-                                $sql .= " AND estado = $estado AND deleted_at is not null";
-                                $debug.=".estado5";
-                            }
-                            else{
-                                $sql .= " AND estado = $estado";
-                                $debug.=".estadoNormal";
-                            }
-                        }
-                        /* if (!empty($correo_origen)) {
-                            $sql .= " AND correo_origen like '%$correo_origen%'";
-                            $debug.=".14";
-                        } */
-                        if (!empty($asunto)) {
-                            $sql .= " AND asunto like '%$asunto%'";
-                            $debug.=".4asunto99";
-                        }
-                        if (!empty($id_ticket)) {
-                            $sql .= " AND uid like '%$id_ticket%'";
-                            $debug.=".99aadminidticket";
-                        }
-                        if (!empty($dias_creacion)) {
-                            if($dias_creacion == "hoy"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 0 ";
-                                $debug.=".15";
-                            }
-                            if($dias_creacion == "1"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 1 ";
-                                $debug.=".16";
-                            }
-                            if($dias_creacion == "2"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 2 ";
-                                $debug.=".17";
-                            }
-                            if($dias_creacion == "3"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 3 ";
-                                $debug.=".18";
-                            }
-                            if($dias_creacion == "4"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 4 ";
-                                $debug.=".19";
-                            }
-                            if($dias_creacion == "5"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 5 ";
-                                $debug.=".20";
-                            }
-                            if($dias_creacion == "mas_de_5"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) > 5";
-                                $debug.=".21";
-                            }   
+            if ($permiso != 'admin') {
+                //  NO ADMIN
+                #echo "<pre>";
+                #var_dump([
+                #    'usuario_asignado' => empty($usuario_asignado),
+                #    'estado' => empty($estado),
+                #    'fecha_inicio' => empty($fecha_inicio),
+                #    'fecha_fin' => empty($fecha_fin),
+                #    'correo_origen' => empty($correo_origen),
+                #    'dias_creacion' => empty($dias_creacion),
+                #    'id_ticket' => empty($id_ticket),
+                #    'multirespuesta' => empty($multirespuesta),
+                #    'asunto' => empty($asunto)
+                #]);
+                #echo "</pre>";
+                #no modificar la linea de 'SELECT * FROM correo' con salto de linea, se caera la query
+                $sql = "SELECT * FROM correo where 1"; 
+                if (empty($estado) && empty($fecha_inicio) && empty($fecha_fin) && empty($correo_origen) && empty($dias_creacion) && empty($id_ticket) && empty($multirespuesta) && empty($asunto)) {
+                    $sql .= " AND (correo_origen = '$idusuario' OR correo_origen IN (SELECT usuario_asociado
+                                                                                    FROM usuariosperfil_asignaciones
+                                                                                    WHERE usuario_principal = '$idusuario')) AND estado = 1 and multirespuesta != 1";
+                    $debug .= ".1";
+                } else {
+                    if (!empty($multirespuesta)) {
+                        if ($multirespuesta == 2) {
+                            $sql .= " AND multirespuesta = 0";
+                            $debug .= ".3";
+                        } else {
+                            $sql .= " AND multirespuesta = $multirespuesta";
+                            $debug .= ".4";
                         }
                     }
-                    
-                } 
-                else {
-                    // ✅ ADMIN
-                    $sql = "SELECT * FROM correo where 1";
-                    if(empty($usuario_asignado) && empty($estado) && empty($fecha_inicio) && empty($fecha_fin) && empty($correo_origen) && empty($dias_creacion) && empty($id_ticket) && empty($multirespuesta) && empty($asunto)) {
-                        $sql .= " AND estado = 1 and multirespuesta != 1";
+                    if (!empty($fecha_inicio)) {
+                        $sql .= " AND fecha_envio >= '$inicio'";
+                        $debug .= ".5";
                     }
-                    else{
-                        if(!empty($usuario_asignado)) {
-                            $sql .= " AND asignado = '$usuario_asignado'";
-                            $debug.= ".6";
+
+                    if (!empty($fecha_fin)) {
+                        $sql .= " AND fecha_envio <= '$fin'";
+                        $debug .= ".6";
+                    }
+                    if (!empty($estado)) {
+                        if ($estado == 5) {
+                            $sql .= " AND estado = $estado AND deleted_at is not null";
+                            $debug .= ".7";
+                        } else {
+                            $sql .= " AND estado = $estado";
+                            $debug .= ".8";
                         }
-                        if(!empty($multirespuesta)) {
-                            if($multirespuesta == 2){
-                                $sql .= " AND multirespuesta = 0";
-                                $debug.= ".multi0r";
-                            }
-                            else{
-                                $sql .= " AND multirespuesta = $multirespuesta";
-                                $debug.= ".multi1r";
-                            }
+                    }
+                    if (!empty($correo_origen)) {
+                        $sql .= " AND correo_origen like '%$correo_origen%'";
+                        $debug.=".9";
+                    }
+                    else {
+                        $sql .= " AND (correo_origen = '$idusuario' OR correo_origen IN (SELECT usuario_asociado
+                                                                                    FROM usuariosperfil_asignaciones
+                                                                                    WHERE usuario_principal = '$idusuario'))";
+                        $debug.=".99";
+                    }
+                    if (!empty($asunto)) {
+                        $sql .= " AND asunto like '%$asunto%'";
+                        $debug .= ".10";
+                    }
+                    if (!empty($id_ticket)) {
+                        $sql .= " AND uid like '%$id_ticket%'";
+                        $debug .= ".11";
+                    }
+                    if (!empty($dias_creacion)) {
+                        if ($dias_creacion == "hoy") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 0 ";
+                            $debug .= ".12";
                         }
-                        if (!empty($fecha_inicio)) {
-                            $sql .= " AND fecha_envio >= '$inicio'";
-                            $debug.= ".8";
+                        if ($dias_creacion == "1") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 1 ";
+                            $debug .= ".13";
                         }
-        
-                        if (!empty($fecha_fin)) {
-                            $sql .= " AND fecha_envio <= '$fin'";
-                            $debug.=".9";
+                        if ($dias_creacion == "2") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 2 ";
+                            $debug .= ".14";
                         }
-                        if (!empty($estado)) {
-                            $debug.=".estado";
-                            if($estado == 5) {
-                                $sql .= " AND estado = $estado AND deleted_at is not null";
-                                $debug.=".estado5";
-                            }
-                            else{
-                                $sql .= " AND estado = $estado";
-                                $debug.=".estadoNormal";
-                            }
+                        if ($dias_creacion == "3") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 3 ";
+                            $debug .= ".15";
                         }
-                        if (!empty($correo_origen)) {
-                            $sql .= " AND correo_origen like '%$correo_origen%'";
-                            $debug.=".14";
+                        if ($dias_creacion == "4") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 4 ";
+                            $debug .= ".16";
                         }
-                        if (!empty($asunto)) {
-                            $sql .= " AND asunto like '%$asunto%'";
-                            $debug.=".4asunto99";
+                        if ($dias_creacion == "5") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 5 ";
+                            $debug .= ".17";
                         }
-                        if (!empty($id_ticket)) {
-                            $sql .= " AND uid like '%$id_ticket%'";
-                            $debug.=".99aadminidticket";
-                        }
-                        if (!empty($dias_creacion)) {
-                            if($dias_creacion == "hoy"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 0 ";
-                                $debug.=".15";
-                            }
-                            if($dias_creacion == "1"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 1 ";
-                                $debug.=".16";
-                            }
-                            if($dias_creacion == "2"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 2 ";
-                                $debug.=".17";
-                            }
-                            if($dias_creacion == "3"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 3 ";
-                                $debug.=".18";
-                            }
-                            if($dias_creacion == "4"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 4 ";
-                                $debug.=".19";
-                            }
-                            if($dias_creacion == "5"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 5 ";
-                                $debug.=".20";
-                            }
-                            if($dias_creacion == "mas_de_5"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) > 5";
-                                $debug.=".21";
-                            }   
+                        if ($dias_creacion == "mas_de_5") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) > 5";
+                            $debug .= ".18";
                         }
                     }
                 }
-        
-                // Paginación y orden
-                if($estado!=5){
-                    $sql .= " AND deleted_at is null";
+
+            } else {
+                //  ADMIN
+                $sql = "SELECT * FROM correo where 1";
+                if (empty($usuario_asignado) && empty($estado) && empty($fecha_inicio) && empty($fecha_fin) && empty($correo_origen) && empty($dias_creacion) && empty($id_ticket) && empty($multirespuesta) && empty($asunto)) {
+                    $sql .= " AND estado = 1 and multirespuesta != 1";
+                } else {
+                    if (!empty($usuario_asignado)) {
+                        $sql .= " AND asignado = '$usuario_asignado'";
+                        $debug .= ".6";
+                    }
+                    if (!empty($multirespuesta)) {
+                        if ($multirespuesta == 2) {
+                            $sql .= " AND multirespuesta = 0";
+                            $debug .= ".multi0r";
+                        } else {
+                            $sql .= " AND multirespuesta = $multirespuesta";
+                            $debug .= ".multi1r";
+                        }
+                    }
+                    if (!empty($fecha_inicio)) {
+                        $sql .= " AND fecha_envio >= '$inicio'";
+                        $debug .= ".8";
+                    }
+
+                    if (!empty($fecha_fin)) {
+                        $sql .= " AND fecha_envio <= '$fin'";
+                        $debug .= ".9";
+                    }
+                    if (!empty($estado)) {
+                        $debug .= ".estado";
+                        if ($estado == 5) {
+                            $sql .= " AND estado = $estado AND deleted_at is not null";
+                            $debug .= ".estado5";
+                        } else {
+                            $sql .= " AND estado = $estado";
+                            $debug .= ".estadoNormal";
+                        }
+                    }
+                    if (!empty($correo_origen)) {
+                        $sql .= " AND correo_origen like '%$correo_origen%'";
+                        $debug .= ".14";
+                    }
+                    if (!empty($asunto)) {
+                        $sql .= " AND asunto like '%$asunto%'";
+                        $debug .= ".4asunto99";
+                    }
+                    if (!empty($id_ticket)) {
+                        $sql .= " AND uid like '%$id_ticket%'";
+                        $debug .= ".99aadminidticket";
+                    }
+                    if (!empty($dias_creacion)) {
+                        if ($dias_creacion == "hoy") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 0 ";
+                            $debug .= ".15";
+                        }
+                        if ($dias_creacion == "1") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 1 ";
+                            $debug .= ".16";
+                        }
+                        if ($dias_creacion == "2") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 2 ";
+                            $debug .= ".17";
+                        }
+                        if ($dias_creacion == "3") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 3 ";
+                            $debug .= ".18";
+                        }
+                        if ($dias_creacion == "4") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 4 ";
+                            $debug .= ".19";
+                        }
+                        if ($dias_creacion == "5") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 5 ";
+                            $debug .= ".20";
+                        }
+                        if ($dias_creacion == "mas_de_5") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) > 5";
+                            $debug .= ".21";
+                        }
+                    }
                 }
-                $sql .= " ORDER BY fecha_envio DESC";
+            }
 
-                //Para debuguear
-                //echo "<p> getRegistros </p>";
-                //echo "<pre>";
-                //echo $sql; 
-                //echo "</pre>";
-                //echo "<pre>";
-                //echo $debug;
-                //echo "</pre>";
+            // Paginación y orden
+            if ($estado != 5) {
+                $sql .= " AND deleted_at is null";
+            }
+            $sql .= " ORDER BY fecha_envio DESC";
 
-                // Primero obtenemos el conteo de registros con los mismos filtros
-                $countSql = $sql;  // Guardamos la misma consulta que usamos para obtener los registros
-                $countSql = preg_replace('/SELECT \* FROM/', 'SELECT count(*) as son FROM', $countSql);  // Reemplazamos * por count(*) para obtener el conteo
-                $queryCount = $this->db->connect()->query($countSql);
-                $totalRegistros = $queryCount->fetch(PDO::FETCH_ASSOC)['son'];  // Obtén el total de registros
-    
-                // Ahora obtenemos los registros
-                $queryData = $this->db->connect()->query($sql);
-                $resultados = $queryData->fetchAll(PDO::FETCH_ASSOC); // Obtén los registros de la consulta
-                
-                return ['total' => $totalRegistros, 'registros' => $resultados]; // Devuelve tanto el total de registros como los datos
-    
+            //Para debuguear
+            #echo "<p> getRegistros / PAGINADOR </p>";
+            #echo "<pre>";
+            #echo $sql; 
+            #echo "</pre>";
+            #echo "<pre>";
+            #echo $debug;
+            #echo "</pre>";
+
+            // Primero obtenemos el conteo de registros con los mismos filtros
+            $countSql = $sql;  // Guardamos la misma consulta que usamos para obtener los registros
+            $countSql = preg_replace('/SELECT \* FROM/', 'SELECT count(*) as son FROM', $countSql);  // Reemplazamos * por count(*) para obtener el conteo
+            $queryCount = $this->db->connect()->query($countSql);
+            $totalRegistros = $queryCount->fetch(PDO::FETCH_ASSOC)['son'];  // Obtén el total de registros
+
+            // Ahora obtenemos los registros
+            $queryData = $this->db->connect()->query($sql);
+            $resultados = $queryData->fetchAll(PDO::FETCH_ASSOC); // Obtén los registros de la consulta
+
+            return ['total' => $totalRegistros, 'registros' => $resultados]; // Devuelve tanto el total de registros como los datos
+
         } catch (PDOException $e) {
             return [];
         }
     }
     /* ------ OBTIENE REGISTROS PARA EL PAGINADOR ------ */
 
-    
+
     /* ------ OBTIENE REGISTROS PARA LAS CARDS ------ */
-    public function getpag($iniciar, 
-    $autoporpag, 
-    $s, 
-    $permiso, 
-    $idusuario, 
-    $fecha_inicio = null, 
-    $fecha_fin = null, 
-    $usuario_asignado = null, 
-    $estado = null, 
-    $correo_origen = null,
-    $id_ticket = null,
-    $dias_creacion = null,
-    $multirespuesta,
-    $asunto = null)
-    {
+    public function getpag(
+        $iniciar,
+        $autoporpag,
+        $permiso,
+        $idusuario,
+        $fecha_inicio = null,
+        $fecha_fin = null,
+        $usuario_asignado = null,
+        $estado = null,
+        $correo_origen = null,
+        $id_ticket = null,
+        $dias_creacion = null,
+        $multirespuesta,
+        $asunto = null
+    ) {
         $items = [];
         try {
-            if ($s == null) {
 
-                $inicio = "$fecha_inicio 00:00:00";
-                $fin = "$fecha_fin 23:59:59";
-                $debug = " /inicio - ";
 
-                if ($permiso != 'admin') {
-                    // 🔒 NO ADMIN
-                    $sql = "SELECT *,
+            $inicio = "$fecha_inicio 00:00:00";
+            $fin = "$fecha_fin 23:59:59";
+            $debug = " /inicio - ";
+
+            if ($permiso != 'admin') {
+                //  NO ADMIN
+
+                #echo "<pre>";
+                #var_dump([
+                #    'usuario_asignado' => empty($usuario_asignado),
+                #    'estado' => empty($estado),
+                #    'fecha_inicio' => empty($fecha_inicio),
+                #    'fecha_fin' => empty($fecha_fin),
+                #    'correo_origen' => empty($correo_origen),
+                #    'dias_creacion' => empty($dias_creacion),
+                #    'id_ticket' => empty($id_ticket),
+                #    'multirespuesta' => empty($multirespuesta),
+                #    'asunto' => empty($asunto)
+                #]);
+                #echo "</pre>";
+
+                $sql = "SELECT *,
                             IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) AS dias_desde_creacion,
                             IFNULL(TIMESTAMPDIFF(hour, fecha_envio, NOW()), 0) AS horas_desde_creacion,
                             IFNULL(TIMESTAMPDIFF(minute , fecha_envio, NOW()), 0) AS minutos_desde_creacion,
                             IFNULL(TIMESTAMPDIFF(DAY, updated_at, NOW()), 0) AS dias_desde_actualizacion,
                             IFNULL(TIMESTAMPDIFF(hour , updated_at, NOW()), 0) AS horas_desde_actualizacion,
                             IFNULL(TIMESTAMPDIFF(minute , updated_at, NOW()), 0) AS minutos_desde_actualizacion
-                            FROM correo WHERE correo_origen = '$idusuario'";
-                    if(empty($estado) && empty($fecha_inicio) && empty($fecha_fin) && empty($correo_origen) && empty($dias_creacion) && empty($id_ticket) && empty($multirespuesta) && empty($asunto)) {
-                        $sql .= " AND estado in (1) and multirespuesta != 1";
-                        $debug.=".1";
+                            FROM correo 
+                            WHERE 1";
+                #                if (empty($usuario_asignado) && empty($estado) && empty($fecha_inicio) && empty($fecha_fin) && empty($correo_origen) && empty($dias_creacion) && empty($id_ticket) && empty($multirespuesta) && empty($asunto)) {
+
+                if (empty($correo_origen) && empty($estado) && empty($fecha_inicio) && empty($fecha_fin) && empty($correo_origen) && empty($dias_creacion) && empty($id_ticket) && empty($multirespuesta) && empty($asunto)) {
+                    $sql .= " AND (correo_origen = '$idusuario' OR correo_origen IN (SELECT usuario_asociado
+                                                                                    FROM usuariosperfil_asignaciones
+                                                                                    WHERE usuario_principal = '$idusuario')) AND estado in (1) and multirespuesta != 1";
+                    $debug .= ".1";
+                } else {
+
+                    if (!empty($fecha_inicio)) {
+                        $sql .= " AND fecha_envio >= '$inicio'";
+                        $debug .= ".3";
+                    }
+
+                    if (!empty($multirespuesta)) {
+                        if ($multirespuesta == 2) {
+                            $sql .= " AND multirespuesta = 0";
+                            $debug .= ".4";
+                        } else {
+                            $sql .= " AND multirespuesta = $multirespuesta";
+                            $debug .= ".5";
+                        }
+                    }
+
+                    if (!empty($fecha_fin)) {
+                        $sql .= " AND fecha_envio <= '$fin'";
+                        $debug .= ".6";
+                    }
+
+                    if (!empty($estado)) {
+                        if ($estado == 5) {
+                            $sql .= " AND estado = $estado AND deleted_at is not null";
+                        } else {
+                            $sql .= " AND estado = $estado";
+                        }
+
+                        $debug .= ".7";
+                    }
+                    if (!empty($id_ticket)) {
+                        $sql .= " AND uid like '%$id_ticket%'";
+                        $debug .= ".8";
+                    }
+
+                    /* CORREO DE ORIGEN / JEFES DE GRUPO */
+                    if (!empty($correo_origen)) {
+                        $sql .= " AND correo_origen like '%$correo_origen%'";
+                        $debug .= ".9";
                     }
                     else{
-                        if (!empty($fecha_inicio)) {
-                            $sql .= " AND fecha_envio >= '$inicio'";
-                            $debug.=".3";
-                        }
-
-                        if(!empty($multirespuesta)) {
-                            if($multirespuesta == 2){
-                                $sql .= " AND multirespuesta = 0";
-                                $debug.= ".multi0";
-                            }
-                            else{
-                                $sql .= " AND multirespuesta = $multirespuesta";
-                                $debug.= ".multi1";
-                            }
-                        }
-        
-                        if (!empty($fecha_fin)) {
-                            $sql .= " AND fecha_envio <= '$fin'";
-                            $debug.=".4";
-                        }
-        
-                        if (!empty($estado)) {
-                            if($estado == 5) {
-                                $sql .= " AND estado = $estado AND deleted_at is not null";
-                            }
-                            else{
-                                $sql .= " AND estado = $estado";
-                            }
-                            
-                            $debug.=".5";
-                        }
-                        if (!empty($id_ticket)) {
-                            $sql .= " AND uid like '%$id_ticket%'";
-                            $debug.=".99idticket";
-                        }
-                        if (!empty($correo_origen)) {
-                            $sql .= " AND correo_origen like '%$correo_origen%'";
-                            $debug.=".44";
-                        }
-                        if (!empty($asunto)) {
-                            $sql .= " AND asunto like '%$asunto%'";
-                            $debug.=".4asunto123";
-                        }
-                        if (!empty($dias_creacion)) {
-                            if($dias_creacion == "hoy"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 0 ";
-                                $debug.=".15";
-                            }
-                            if($dias_creacion == "1"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 1 ";
-                                $debug.=".16";
-                            }
-                            if($dias_creacion == "2"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 2 ";
-                                $debug.=".17";
-                            }
-                            if($dias_creacion == "3"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 3 ";
-                                $debug.=".18";
-                            }
-                            if($dias_creacion == "4"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 4 ";
-                                $debug.=".19";
-                            }
-                            if($dias_creacion == "5"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 5 ";
-                                $debug.=".20";
-                            }
-                            if($dias_creacion == "mas_de_5"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) > 5";
-                                $debug.=".21";
-                            }
-                            
-                            
-                        }
+                        $sql .= " AND (correo_origen = '$idusuario' OR correo_origen IN (SELECT usuario_asociado
+                                                                                    FROM usuariosperfil_asignaciones
+                                                                                    WHERE usuario_principal = '$idusuario'))";
                     }
+                    /* CORREO DE ORIGEN / JEFES DE GRUPO */
 
-                } 
-                else {
-                    // ✅ ADMIN
-                    $sql = "SELECT *,
+                    if (!empty($asunto)) {
+                        $sql .= " AND asunto like '%$asunto%'";
+                        $debug .= ".10";
+                    }
+                    if (!empty($dias_creacion)) {
+                        if ($dias_creacion == "hoy") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 0 ";
+                            $debug .= ".11";
+                        }
+                        if ($dias_creacion == "1") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 1 ";
+                            $debug .= ".12";
+                        }
+                        if ($dias_creacion == "2") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 2 ";
+                            $debug .= ".13";
+                        }
+                        if ($dias_creacion == "3") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 3 ";
+                            $debug .= ".14";
+                        }
+                        if ($dias_creacion == "4") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 4 ";
+                            $debug .= ".15";
+                        }
+                        if ($dias_creacion == "5") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 5 ";
+                            $debug .= ".16";
+                        }
+                        if ($dias_creacion == "mas_de_5") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) > 5";
+                            $debug .= ".17";
+                        }
+
+
+                    }
+                }
+
+            } else {
+                //  ADMIN
+                $sql = "SELECT *,
                             IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) AS dias_desde_creacion,
                             IFNULL(TIMESTAMPDIFF(hour, fecha_envio, NOW()), 0) AS horas_desde_creacion,
                             IFNULL(TIMESTAMPDIFF(minute , fecha_envio, NOW()), 0) AS minutos_desde_creacion,
@@ -424,112 +461,107 @@ class CorreoModel extends Model{
                             IFNULL(TIMESTAMPDIFF(hour , updated_at, NOW()), 0) AS horas_desde_actualizacion,
                             IFNULL(TIMESTAMPDIFF(minute , updated_at, NOW()), 0) AS minutos_desde_actualizacion
                             FROM correo where 1";
-                    if(empty($usuario_asignado) && empty($estado) && empty($fecha_inicio) && empty($fecha_fin) && empty($correo_origen) && empty($dias_creacion) && empty($id_ticket) && empty($multirespuesta) && empty($asunto))  {
-                        $sql .= " AND estado = 1 and multirespuesta != 1";
-                    }
-                    else{
-                        if(!empty($multirespuesta)) {
-                            if($multirespuesta == 2){
-                                $sql .= " AND multirespuesta = 0";
-                                $debug.= ".multi0";
-                            }
-                            else{
-                                $sql .= " AND multirespuesta = $multirespuesta";
-                                $debug.= ".multi1";
-                            }
-                        }
-                        if(!empty($usuario_asignado)) {
-                            $sql .= " AND asignado = '$usuario_asignado'";
-                            $debug.= ".6";
-                        }
-                        if (!empty($fecha_inicio)) {
-                            $sql .= " AND fecha_envio >= '$inicio'";
-                            $debug.= ".8";
-                        }
-        
-                        if (!empty($fecha_fin)) {
-                            $sql .= " AND fecha_envio <= '$fin'";
-                            $debug.=".9";
-                        }
-                        if (!empty($estado)) {
-                            if($estado == 5) {
-                                $sql .= " AND estado = $estado AND deleted_at is not null";
-                            }
-                            else{
-                                $sql .= " AND estado = $estado";
-                            }
-                            $debug.=".13";
-                        }
-                        if (!empty($correo_origen)) {
-                            $sql .= " AND correo_origen like '%$correo_origen%'";
-                            $debug.=".14";
-                        }
-                        if (!empty($asunto)) {
-                            $sql .= " AND asunto like '%$asunto%'";
-                            $debug.=".4asunto999";
-                        }
-                        if (!empty($id_ticket)) {
-                            $sql .= " AND uid like '%$id_ticket%'";
-                            $debug.=".989898idticket";
-                        }
-                        if (!empty($dias_creacion)) {
-                            if($dias_creacion == "hoy"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 0 ";
-                                $debug.=".15";
-                            }
-                            if($dias_creacion == "1"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 1 ";
-                                $debug.=".16";
-                            }
-                            if($dias_creacion == "2"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 2 ";
-                                $debug.=".17";
-                            }
-                            if($dias_creacion == "3"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 3 ";
-                                $debug.=".18";
-                            }
-                            if($dias_creacion == "4"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 4 ";
-                                $debug.=".19";
-                            }
-                            if($dias_creacion == "5"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 5 ";
-                                $debug.=".20";
-                            }
-                            if($dias_creacion == "mas_de_5"){
-                                $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) > 5";
-                                $debug.=".21";
-                            }
-                            
-                            
+                if (empty($usuario_asignado) && empty($estado) && empty($fecha_inicio) && empty($fecha_fin) && empty($correo_origen) && empty($dias_creacion) && empty($id_ticket) && empty($multirespuesta) && empty($asunto)) {
+                    $sql .= " AND estado = 1 and multirespuesta != 1";
+                } else {
+                    if (!empty($multirespuesta)) {
+                        if ($multirespuesta == 2) {
+                            $sql .= " AND multirespuesta = 0";
+                            $debug .= ".1";
+                        } else {
+                            $sql .= " AND multirespuesta = $multirespuesta";
+                            $debug .= ".2";
                         }
                     }
+                    if (!empty($usuario_asignado)) {
+                        $sql .= " AND asignado = '$usuario_asignado'";
+                        $debug .= ".3";
+                    }
+                    if (!empty($fecha_inicio)) {
+                        $sql .= " AND fecha_envio >= '$inicio'";
+                        $debug .= ".4";
+                    }
+
+                    if (!empty($fecha_fin)) {
+                        $sql .= " AND fecha_envio <= '$fin'";
+                        $debug .= ".5";
+                    }
+                    if (!empty($estado)) {
+                        if ($estado == 5) {
+                            $sql .= " AND estado = $estado AND deleted_at is not null";
+                        } else {
+                            $sql .= " AND estado = $estado";
+                        }
+                        $debug .= ".6";
+                    }
+                    if (!empty($correo_origen)) {
+                        $sql .= " AND correo_origen like '%$correo_origen%'";
+                        $debug .= ".7";
+                    }
+                    if (!empty($asunto)) {
+                        $sql .= " AND asunto like '%$asunto%'";
+                        $debug .= ".8";
+                    }
+                    if (!empty($id_ticket)) {
+                        $sql .= " AND uid like '%$id_ticket%'";
+                        $debug .= ".9";
+                    }
+                    if (!empty($dias_creacion)) {
+                        if ($dias_creacion == "hoy") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 0 ";
+                            $debug .= ".10";
+                        }
+                        if ($dias_creacion == "1") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 1 ";
+                            $debug .= ".11";
+                        }
+                        if ($dias_creacion == "2") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 2 ";
+                            $debug .= ".12";
+                        }
+                        if ($dias_creacion == "3") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 3 ";
+                            $debug .= ".13";
+                        }
+                        if ($dias_creacion == "4") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 4 ";
+                            $debug .= ".14";
+                        }
+                        if ($dias_creacion == "5") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) = 5 ";
+                            $debug .= ".15";
+                        }
+                        if ($dias_creacion == "mas_de_5") {
+                            $sql .= " AND IFNULL(TIMESTAMPDIFF(DAY, fecha_envio, NOW()), 0) > 5";
+                            $debug .= ".16";
+                        }
+
+
+                    }
                 }
-                
-                if($estado!=5){
-                    $sql .= " AND deleted_at is null";
-                }
-                // Paginación y orden
-                $sql .= " ORDER BY fecha_envio DESC LIMIT $iniciar, $autoporpag";
-
-                //Para debuguear
-                //echo "<p> getpag </p>";
-                //echo "<pre>";
-                //echo $sql; 
-                //echo "</pre>";
-                //echo "<pre>";
-                //echo $debug;
-                //echo "</pre>";
-
-
-                $query = $this->db->connect()->query($sql);
-    
-            } 
-            else {
-                $query = $this->db->connect()->query("SELECT * FROM correo WHERE id = $s ORDER BY fecha_envio DESC LIMIT $iniciar, $autoporpag");
             }
-    
+
+            if ($estado != 5) {
+                $sql .= " AND deleted_at is null";
+            }
+            // Paginación y orden
+            $sql .= " ORDER BY fecha_envio DESC LIMIT $iniciar, $autoporpag";
+
+            //Para debuguear
+            #echo "<p> getpag / CARDS </p>";
+            #echo "<pre>";
+            #echo $sql; 
+            #echo "</pre>";
+            #echo "<pre>";
+            #echo $debug;
+            #echo "</pre>";
+
+
+            $query = $this->db->connect()->query($sql);
+
+
+
+
             while ($row = $query->fetch()) {
                 $item = new CorreoM();
                 $item->id = $row['id'];
@@ -559,10 +591,10 @@ class CorreoModel extends Model{
                 $item->minutos_desde_creacion = $row['minutos_desde_creacion'];
                 $item->dias_desde_actualizacion = $row['dias_desde_actualizacion'];
                 $item->horas_desde_actualizacion = $row['horas_desde_actualizacion'];
-                $item->minutos_desde_actualizacion= $row['minutos_desde_actualizacion'];
+                $item->minutos_desde_actualizacion = $row['minutos_desde_actualizacion'];
                 array_push($items, $item);
             }
-    
+
             return $items;
         } catch (PDOException $e) {
             return [];
@@ -571,11 +603,12 @@ class CorreoModel extends Model{
     /* ------ OBTIENE REGISTROS PARA LAS CARDS ------ */
 
     /* ------ OBTIENE REGISTROS PARA LAS ESTADISTICAS ------ */
-    public function estadisticas(){
+    public function estadisticas()
+    {
         try {
             $resultado = [];
 
-            $sql="SELECT
+            $sql = "SELECT
                     c.asignado AS usuario,
                     COUNT(CASE WHEN c.estado = 2 THEN 1 END) AS asignado,
                     COUNT(CASE WHEN c.estado = 4 THEN 1 END) AS en_progreso,
@@ -605,19 +638,19 @@ class CorreoModel extends Model{
                 $registro->finalizado = $row['finalizados'];
                 $resultado[] = $registro;
             }
-    
+
             return $resultado;
-        }
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             return [];
         }
     }
 
-    public function estadisticasEnProgreso(){
+    public function estadisticasEnProgreso()
+    {
         try {
             $resultado = [];
 
-            $sql="SELECT
+            $sql = "SELECT
                     uid,
                     IFNULL(asignado, 'No asignado') AS asignado,
                     asunto,
@@ -662,10 +695,9 @@ class CorreoModel extends Model{
                 $registro->tiempo_transcurrido = $row['tiempo_transcurrido'];
                 $resultado[] = $registro;
             }
-    
+
             return $resultado;
-        }
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             return [];
         }
     }
@@ -724,11 +756,12 @@ class CorreoModel extends Model{
             return false;
         }
     }
-    
-    public function delete($uid) {
+
+    public function delete($uid)
+    {
         // Ocultar el registro (marcarlo como eliminado)
         $query = $this->db->connect()->prepare('UPDATE correo SET estado=0, deleted_at=NOW() WHERE uid=:uid');
-        
+
         try {
             $query->execute(['uid' => $uid]);
             return true; // Éxito
@@ -738,37 +771,40 @@ class CorreoModel extends Model{
     }
 
     /* -------------------- IMAP -------------------- */
-    public function guardarCorreoComoHTML($uid, $bodyHtml, $imagenesEmbebidasJson) {
+    public function guardarCorreoComoHTML($uid, $bodyHtml, $imagenesEmbebidasJson)
+    {
         // GUARDA CORREOS COMO HTML PARA MOSTRARLOS EN IFRAME
         $imagenesEmbebidas = json_decode($imagenesEmbebidasJson, true); // array PHP
-    
+
         // Ruta donde se guardará el archivo HTML
         $htmlDir = $_SERVER['DOCUMENT_ROOT'] . '/eticket/public/correos_html/';
         if (!is_dir($htmlDir)) {
             mkdir($htmlDir, 0777, true); // Crear carpeta si no existe
         }
-    
+
         $htmlPath = $htmlDir . $uid . '.html'; // Nombre del archivo .html con el UID del correo
-    
+
         // Reemplazar las referencias 'cid:' por la ruta de la imagen en el servidor
         foreach ($imagenesEmbebidas as $imgInfo) {
-            if (!isset($imgInfo['cid']) || !isset($imgInfo['name'])) continue;
-        
+            if (!isset($imgInfo['cid']) || !isset($imgInfo['name']))
+                continue;
+
             $cid = preg_quote($imgInfo['cid'], '/');
             $replacement = "/eticket/public/imagenes_embebidas/" . $imgInfo['name'];
-            
+
             // Reemplaza cualquier coincidencia de cid con ese ID
             $bodyHtml = preg_replace('/cid:' . $cid . '/i', $replacement, $bodyHtml);
         }
-        
-        
+
+
         //sleep(1);
         // Guardar el contenido HTML con referencias corregidas
         file_put_contents($htmlPath, $bodyHtml);
     }
-    
+
     /* NUEVA FUNCION IMPLEMENTADA 30/01/2026 */
-    public function obtenerYGuardarCorreos($esRespuesta = 0) {
+    public function obtenerYGuardarCorreos($esRespuesta = 0)
+    {
         ini_set('max_execution_time', 3000);
         ini_set('memory_limit', '512M');
 
@@ -788,14 +824,14 @@ class CorreoModel extends Model{
 
         foreach ($carpetas as $carpeta) {
             $mbox = imap_open($imap_base . $carpeta, $username, $password) or die("No se pudo conectar a $carpeta: " . imap_last_error());
-            
+
             // --- NUEVA LÓGICA DE OBTENCIÓN EFICIENTE ---
             $check = imap_check($mbox);
             $total_mensajes = $check->Nmsgs;
 
             if ($total_mensajes > 0) {
                 // Definimos un margen de 500 para seguridad total en producción
-                $rango_inicio = max(1, $total_mensajes - $limite); 
+                $rango_inicio = max(1, $total_mensajes - $limite);
                 // Obtenemos solo el resumen de los últimos 500
                 $emails_overview = imap_fetch_overview($mbox, "$rango_inicio:$total_mensajes", 0);
                 // Invertimos para procesar el más reciente primero
@@ -807,8 +843,11 @@ class CorreoModel extends Model{
 
                     // Asignar prefijo según la carpeta
                     $prefijo = '';
-                    if ($carpeta === 'INBOX') { $prefijo = 'R-'; } 
-                    elseif ($carpeta === 'INBOX.Sent') { $prefijo = 'E-'; }
+                    if ($carpeta === 'INBOX') {
+                        $prefijo = 'R-';
+                    } elseif ($carpeta === 'INBOX.Sent') {
+                        $prefijo = 'E-';
+                    }
                     $uid_personalizado = $prefijo . $uid;
 
                     // Verificar si ya existe el correo (Tu lógica original)
@@ -819,8 +858,11 @@ class CorreoModel extends Model{
                     if ($exists == 0) {
                         // --- TODO LO QUE SIGUE ES TU FUNCIÓN ORIGINAL SIN CAMBIOS ---
                         $nombre_carpeta = 'Desconocida';
-                        if ($carpeta === 'INBOX') { $nombre_carpeta = 'Bandeja de entrada'; } 
-                        elseif ($carpeta === 'INBOX.Sent') { $nombre_carpeta = 'Enviado'; }
+                        if ($carpeta === 'INBOX') {
+                            $nombre_carpeta = 'Bandeja de entrada';
+                        } elseif ($carpeta === 'INBOX.Sent') {
+                            $nombre_carpeta = 'Enviado';
+                        }
 
                         $structure = imap_fetchstructure($mbox, $email_num);
                         preg_match('/<(.+)>/', $message->message_id ?? '', $matches);
@@ -833,7 +875,7 @@ class CorreoModel extends Model{
                         // ----------- IN_REPLY_TO -----------
                         preg_match('/<(.+)>/', $message->in_reply_to ?? '', $matches_reply);
                         $in_reply_to_simplificado = explode('@', $matches_reply[1] ?? '')[0] ?? null;
-                        
+
                         // ----------- MULTIRESPUESTA -----------
                         $multirespuesta = !empty($in_reply_to_simplificado) ? 1 : 0;
 
@@ -950,7 +992,8 @@ class CorreoModel extends Model{
     /* NUEVA FUNCION IMPLEMENTADA 30/01/2026 */
 
     /* FUNCION DEPRECADA POR RENDIMIENTO, REVERTIR LA FECHA EN EL NOMBRE DE LA FUNCION A 'public function obtenerYGuardarCorreos' PARA VOLVER A LA FUNCION ORIGINAL */
-    public function obtenerYGuardarCorreos2() {
+    public function obtenerYGuardarCorreos2()
+    {
         ini_set('max_execution_time', 3000);
         ini_set('memory_limit', '512M');
 
@@ -964,7 +1007,7 @@ class CorreoModel extends Model{
         $password = $pwcorreo;
 
         $totalProcesados = 0;
-            
+
         // Carpetas que vamos a procesar: INBOX y Sent
         $carpetas = ['INBOX', 'INBOX.Sent']; // Puedes cambiar 'Sent' si tu servidor usa otro nombre
 
@@ -974,7 +1017,7 @@ class CorreoModel extends Model{
 
             $carpetas = imap_list($mbox, $imap_base, '*');
 
-            
+
 
             /* if ($carpetas === false) {
                 echo "No se pudieron obtener las carpetas: " . imap_last_error();
@@ -989,14 +1032,18 @@ class CorreoModel extends Model{
                 rsort($emails);
                 foreach ($emails as $email_num) {
                     $overview = imap_fetch_overview($mbox, $email_num, 0);
-                    if (!$overview || !isset($overview[0])) continue;
+                    if (!$overview || !isset($overview[0]))
+                        continue;
                     $message = $overview[0];
                     $uid = imap_uid($mbox, $email_num);
 
                     // Asignar prefijo según la carpeta
                     $prefijo = '';
-                    if ($carpeta === 'INBOX') { $prefijo = 'R-'; } 
-                    elseif ($carpeta === 'INBOX.Sent') { $prefijo = 'E-'; }
+                    if ($carpeta === 'INBOX') {
+                        $prefijo = 'R-';
+                    } elseif ($carpeta === 'INBOX.Sent') {
+                        $prefijo = 'E-';
+                    }
                     $uid_personalizado = $prefijo . $uid;
 
                     // Verificar si ya existe el correo
@@ -1007,8 +1054,11 @@ class CorreoModel extends Model{
                     if ($exists == 0) {
 
                         $nombre_carpeta = 'Desconocida';
-                        if ($carpeta === 'INBOX') { $nombre_carpeta = 'Bandeja de entrada'; } 
-                        elseif ($carpeta === 'INBOX.Sent') { $nombre_carpeta = 'Enviado'; }
+                        if ($carpeta === 'INBOX') {
+                            $nombre_carpeta = 'Bandeja de entrada';
+                        } elseif ($carpeta === 'INBOX.Sent') {
+                            $nombre_carpeta = 'Enviado';
+                        }
 
                         $structure = imap_fetchstructure($mbox, $email_num);
                         preg_match('/<(.+)>/', $message->message_id ?? '', $matches);
@@ -1158,18 +1208,19 @@ class CorreoModel extends Model{
     }
     /* FUNCION DEPRECADA POR RENDIMIENTO, REVERTIR LA FECHA EN EL NOMBRE DE LA FUNCION A 'public function obtenerYGuardarCorreos' PARA VOLVER A LA FUNCION ORIGINAL */
 
-    public function getBodyRecursive($inbox, $emailNumber, $structure, $uid, $partNumber = '', &$imageCounter = 1) {
+    public function getBodyRecursive($inbox, $emailNumber, $structure, $uid, $partNumber = '', &$imageCounter = 1)
+    {
         $htmlBody = '';
         $imagePaths = [];
         $foundHtml = false;
         $foundPlain = false;
         $plainBody = '';
-    
+
         // Si tiene partes, recorremos recursivamente
         if (isset($structure->parts)) {
             foreach ($structure->parts as $index => $subPart) {
-                $subPartNumber = $partNumber ? $partNumber . '.' . ($index + 1) : (string)($index + 1);
-    
+                $subPartNumber = $partNumber ? $partNumber . '.' . ($index + 1) : (string) ($index + 1);
+
                 // Imagen embebida (inline)
                 if ($subPart->type == 5 || $subPart->type == 6) {
                     $imageInfo = $this->saveEmbeddedImage($inbox, $emailNumber, $subPart, $subPartNumber, $uid, $imageCounter++);
@@ -1180,29 +1231,37 @@ class CorreoModel extends Model{
                         ];
                     }
                 }
-    
+
                 // Parte HTML
                 if (strtolower($subPart->subtype ?? '') === 'html') {
                     $data = imap_fetchbody($inbox, $emailNumber, $subPartNumber);
                     switch ($subPart->encoding) {
-                        case 3: $data = base64_decode($data); break;
-                        case 4: $data = quoted_printable_decode($data); break;
+                        case 3:
+                            $data = base64_decode($data);
+                            break;
+                        case 4:
+                            $data = quoted_printable_decode($data);
+                            break;
                     }
                     $htmlBody .= $data;
                     $foundHtml = true;
                 }
-    
+
                 // Parte texto plano (solo si no se encontró HTML aún)
                 elseif (strtolower($subPart->subtype ?? '') === 'plain' && !$foundHtml) {
                     $data = imap_fetchbody($inbox, $emailNumber, $subPartNumber);
                     switch ($subPart->encoding) {
-                        case 3: $data = base64_decode($data); break;
-                        case 4: $data = quoted_printable_decode($data); break;
+                        case 3:
+                            $data = base64_decode($data);
+                            break;
+                        case 4:
+                            $data = quoted_printable_decode($data);
+                            break;
                     }
                     $plainBody .= $data;
                     $foundPlain = true;
                 }
-    
+
                 // Recursividad si tiene más partes
                 if (isset($subPart->parts)) {
                     $result = $this->getBodyRecursive($inbox, $emailNumber, $subPart, $uid, $subPartNumber, $imageCounter);
@@ -1219,62 +1278,71 @@ class CorreoModel extends Model{
             if (strtolower($structure->subtype ?? '') === 'html') {
                 $data = imap_fetchbody($inbox, $emailNumber, $partNumber ?: '1');
                 switch ($structure->encoding) {
-                    case 3: $data = base64_decode($data); break;
-                    case 4: $data = quoted_printable_decode($data); break;
+                    case 3:
+                        $data = base64_decode($data);
+                        break;
+                    case 4:
+                        $data = quoted_printable_decode($data);
+                        break;
                 }
                 $htmlBody .= $data;
                 $foundHtml = true;
             } elseif (strtolower($structure->subtype ?? '') === 'plain') {
                 $data = imap_fetchbody($inbox, $emailNumber, $partNumber ?: '1');
                 switch ($structure->encoding) {
-                    case 3: $data = base64_decode($data); break;
-                    case 4: $data = quoted_printable_decode($data); break;
+                    case 3:
+                        $data = base64_decode($data);
+                        break;
+                    case 4:
+                        $data = quoted_printable_decode($data);
+                        break;
                 }
                 $plainBody .= $data;
                 $foundPlain = true;
             }
         }
-    
+
         // Si no se encontró HTML pero sí texto plano, lo convertimos a HTML completo
         if (!$foundHtml && $foundPlain) {
             $htmlBody = $this->plainTextToHtml($plainBody);
         }
-    
+
         return [
             'body' => $htmlBody,
             'imagenes' => $imagePaths
         ];
     }
-    
-    
 
-    public function saveEmbeddedImage($inbox, $emailNumber, $part, $partNumber, $uid, $imageCounter) {
+
+
+    public function saveEmbeddedImage($inbox, $emailNumber, $part, $partNumber, $uid, $imageCounter)
+    {
         $imageData = imap_fetchbody($inbox, $emailNumber, $partNumber);
-    
+
         if ($part->encoding == 3) {
             $imageData = base64_decode($imageData);
         } elseif ($part->encoding == 4) {
             $imageData = quoted_printable_decode($imageData);
         }
-    
-        $rawName = 'imag-e-' . $uid . '-' . md5(uniqid((string)$imageCounter, true));
+
+        $rawName = 'imag-e-' . $uid . '-' . md5(uniqid((string) $imageCounter, true));
         $cleanName = preg_replace('/[^a-zA-Z0-9\-]/', '-', $rawName);
         $extension = strtolower($part->subtype);
         $imageName = $cleanName . '.' . $extension;
-    
+
         $imageDir = $_SERVER['DOCUMENT_ROOT'] . '/eticket/public/imagenes_embebidas/';
         if (!is_dir($imageDir)) {
             mkdir($imageDir, 0777, true);
         }
-    
+
         $imagePath = $imageDir . $imageName;
         $saveResult = file_put_contents($imagePath, $imageData);
-    
+
         if ($saveResult === false) {
             echo "Error al guardar la imagen: $imagePath\n";
             return null;
         }
-    
+
         // Obtener CID desde Content-ID
         $cid = null;
         if (!empty($part->id)) {
@@ -1286,17 +1354,18 @@ class CorreoModel extends Model{
                 }
             }
         }
-    
+
         return ['cid' => $cid, 'name' => $imageName];
     }
 
-    private function plainTextToHtml($text) {
+    private function plainTextToHtml($text)
+    {
         // Escapar caracteres especiales de HTML
         $escaped = htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        
+
         // Reemplazar saltos de línea por <br>
         $formattedText = nl2br($escaped);
-    
+
         // Envolver en un HTML completo con estilos básicos
         return '<!DOCTYPE html>
         <html lang="es">
@@ -1333,100 +1402,102 @@ class CorreoModel extends Model{
         </body>
         </html>';
     }
-    
-    
-    
+
+
+
     /* -------------------- IMAP -------------------- */
-    
-    
+
+
     /* -------------------- CONTANDORES ADMIN -------------------- */
     public function getTicketsNoAsignados()
     {
         try {
-    
-            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 1 and multirespuesta!=1 and deleted_at is null");
-            
+
+            $query = $this->db->connect()->query("SELECT count(uid) as uid FROM correo where estado = 1 and multirespuesta!=1 and deleted_at is null");
+
             while ($row = $query->fetch()) {
                 $sinAsignar = $row['uid'];
             }
             return $sinAsignar;
-        } 
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             return 0;
         }
     }
     public function getTicketsAsignados()
     {
         try {
-    
-            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 2 and deleted_at is null");
-            
+
+            $query = $this->db->connect()->query("SELECT count(uid) as uid FROM correo where estado = 2 and deleted_at is null");
+
             while ($row = $query->fetch()) {
                 $asignados = $row['uid'];
             }
             return $asignados;
-        } 
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             return 0;
         }
     }
     public function getTicketsEnProgreso()
     {
         try {
-    
-            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 4 and deleted_at is null");
-            
+
+            $query = $this->db->connect()->query("SELECT count(uid) as uid FROM correo where estado = 4 and deleted_at is null");
+
             while ($row = $query->fetch()) {
                 $finalizado = $row['uid'];
             }
             return $finalizado;
-        } 
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             return 0;
         }
     }
     public function getTicketsFinalizados()
     {
         try {
-    
-            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 3 and deleted_at is null");
-            
+
+            $query = $this->db->connect()->query("SELECT count(uid) as uid FROM correo where estado = 3 and deleted_at is null");
+
             while ($row = $query->fetch()) {
                 $finalizado = $row['uid'];
             }
             return $finalizado;
-        } 
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             return 0;
         }
     }
     public function getTicketsRealizados()
     {
         try {
-    
-            $query = $this->db->connect()->query("SELECT count(uid)uid FROM correo where estado = 6 and deleted_at is null");
-            
+
+            $query = $this->db->connect()->query("SELECT count(uid) as uid FROM correo where estado = 6 and deleted_at is null");
+
             while ($row = $query->fetch()) {
                 $realizados = $row['uid'];
             }
             return $realizados;
-        } 
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             return 0;
         }
     }
     /* -------------------- COTANDORES ADMIN -------------------- */
 
-    
+
     /* -------------------- COTANDORES USUARIOS -------------------- */
     public function getTicketsNoAsignadosUsuario($idusuario)
     {
         try {
             //$sql = "SELECT COUNT(uid) FROM correo WHERE estado = 2 AND asignado = $idusuario";
             #echo $sql;
-            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 1 AND correo_origen = '$idusuario' AND multirespuesta != 1 and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid) as total 
+                                                    FROM correo 
+                                                    WHERE estado = 1 AND (correo_origen = '$idusuario'
+                                                                            OR correo_origen IN (
+                                                                                SELECT usuario_asociado
+                                                                                FROM usuariosperfil_asignaciones
+                                                                                WHERE usuario_principal = '$idusuario')) 
+                                                            AND multirespuesta != 1 and deleted_at is null");
             $row = $query->fetch();
-            return $row['total']; // ✅
+            return $row['total']; // 
         } catch (PDOException $e) {
             return 0;
         }
@@ -1436,9 +1507,17 @@ class CorreoModel extends Model{
         try {
             //$sql = "SELECT COUNT(uid) FROM correo WHERE estado = 2 AND asignado = $idusuario";
             #echo $sql;
-            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 2 AND correo_origen = '$idusuario' and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid) as total 
+                                                    FROM correo 
+                                                    WHERE estado = 2 
+                                                    AND (correo_origen = '$idusuario'
+                                                        OR correo_origen IN (
+                                                            SELECT usuario_asociado
+                                                            FROM usuariosperfil_asignaciones
+                                                            WHERE usuario_principal = '$idusuario'))
+                                                    and deleted_at is null");
             $row = $query->fetch();
-            return $row['total']; // ✅
+            return $row['total'];
         } catch (PDOException $e) {
             return 0;
         }
@@ -1449,9 +1528,17 @@ class CorreoModel extends Model{
         try {
             //$sql = "SELECT COUNT(uid) FROM correo WHERE estado = 4 AND asignado = $idusuario";
             #echo $sql;
-            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 4 AND correo_origen = '$idusuario' and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid) as total 
+                                                    FROM correo 
+                                                    WHERE estado = 4 
+                                                    AND (correo_origen = '$idusuario'
+                                                        OR correo_origen IN (
+                                                            SELECT usuario_asociado
+                                                            FROM usuariosperfil_asignaciones
+                                                            WHERE usuario_principal = '$idusuario'))
+                                                    and deleted_at is null");
             $row = $query->fetch();
-            
+
             return $row['total'];
         } catch (PDOException $e) {
             return 0;
@@ -1463,9 +1550,17 @@ class CorreoModel extends Model{
         try {
             //$sql = "SELECT COUNT(uid) FROM correo WHERE estado = 4 AND asignado = $idusuario";
             #echo $sql;
-            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 6 AND correo_origen = '$idusuario' and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid) as total 
+                                                    FROM correo 
+                                                    WHERE estado = 6 
+                                                    AND (correo_origen = '$idusuario'
+                                                        OR correo_origen IN (
+                                                            SELECT usuario_asociado
+                                                            FROM usuariosperfil_asignaciones
+                                                            WHERE usuario_principal = '$idusuario')) 
+                                                    and deleted_at is null");
             $row = $query->fetch();
-            
+
             return $row['total'];
         } catch (PDOException $e) {
             return 0;
@@ -1477,10 +1572,18 @@ class CorreoModel extends Model{
         try {
             //$sql = "SELECT COUNT(uid) FROM correo WHERE estado = 3 AND asignado = $idusuario";
             #echo $sql;
-            $query = $this->db->connect()->query("SELECT count(uid) as total FROM correo WHERE estado = 3 AND correo_origen = '$idusuario' and deleted_at is null");
+            $query = $this->db->connect()->query("SELECT count(uid) as total 
+                                                    FROM correo 
+                                                    WHERE estado = 3 
+                                                    AND (correo_origen = '$idusuario'
+                                                        OR correo_origen IN (
+                                                            SELECT usuario_asociado
+                                                            FROM usuariosperfil_asignaciones
+                                                            WHERE usuario_principal = '$idusuario'))
+                                                    and deleted_at is null");
             #echo $query;
             $row = $query->fetch();
-            
+
             return $row['total'];
         } catch (PDOException $e) {
             return 0;
@@ -1488,18 +1591,141 @@ class CorreoModel extends Model{
     }
     /* -------------------- COTANDORES USUARIOS -------------------- */
 
+    /* -------------------- ASIGNACIONES -------------------- */
+    public function obtenerAsignaciones($usuario, $permiso)
+    {
+        try {
+
+            if ($permiso == 'admin') {
+
+                $sql = "SELECT *
+                        FROM usuariosperfil_asignaciones
+                        ORDER BY usuario_principal ASC
+                    ";
+
+                $stmt = $this->db->connect()->prepare($sql);
+
+                $stmt->execute();
+
+            } else {
+
+                $sql = "SELECT *
+                            FROM usuariosperfil_asignaciones
+                            WHERE usuario_principal = :usuario
+                            ORDER BY usuario_asociado ASC
+                        ";
+
+                $stmt = $this->db->connect()->prepare($sql);
+
+                $stmt->execute([
+                    ':usuario' => $usuario
+                ]);
+            }
+
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        } catch (PDOException $e) {
+
+            throw new Exception($e->getMessage());
+        }
+    }
+
+    public function eliminarAsignacion($principal, $asociado)
+    {
+        try {
+
+            $sql = "DELETE FROM usuariosperfil_asignaciones
+                    WHERE usuario_principal = :principal
+                    AND usuario_asociado = :asociado";
+
+            $stmt = $this->db->connect()->prepare($sql);
+
+            return $stmt->execute([
+                ':principal' => $principal,
+                ':asociado' => $asociado
+            ]);
+
+        } catch (PDOException $e) {
+
+            throw new Exception($e->getMessage());
+        }
+    }
+
+    public function crearAsignaciones($principal, $asociados)
+    {
+        try {
+
+            $conexion = $this->db->connect();
+
+            $sql = "
+                INSERT IGNORE INTO usuariosperfil_asignaciones
+                (
+                    usuario_principal,
+                    usuario_asociado
+                )
+                VALUES
+                (
+                    :principal,
+                    :asociado
+                )
+            ";
+
+            $stmt = $conexion->prepare($sql);
+
+            foreach ($asociados as $asociado) {
+
+                $asociado = trim($asociado);
+
+                if (empty($asociado)) {
+                    continue;
+                }
+
+                $stmt->execute([
+                    ':principal' => $principal,
+                    ':asociado' => $asociado
+                ]);
+            }
+
+            return true;
+
+        } catch (PDOException $e) {
+
+            throw new Exception($e->getMessage());
+        }
+    }
+    /* -------------------- ASIGNACIONES -------------------- */
+
+
+    
 
 
 
     /* -------------------- OBTENER LISTADO DE USUARIOS PERMITIDOS -------------------- */
-    public function getAsignacion() {
+    public function getAsignacion()
+    {
         $query = $this->db->connect()->prepare("SELECT idusuario FROM usuariosperfil u WHERE habilitado = 'S' AND menu = 'Correo' AND permiso = 'admin' GROUP BY u.idusuario order by area;");
         $query->execute();
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
+    /* -------------------- OBTENER LISTADO DE USUARIOS PERMITIDOS -------------------- */
+    public function obtenerAsignacionPorGrupo()
+    {
+        $query = $this->db->connect()->prepare("SELECT idusuario FROM usuariosperfil u WHERE habilitado = 'S' AND menu = 'Correo' GROUP BY u.idusuario order by area;");
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+    /* -------------------- OBTENER LISTADO DE USUARIOS PERMITIDOS -------------------- */
+    public function obtenerAsignacionPorGrupoParaUsuario($usuarioLogueado)
+    {
+        $query = $this->db->connect()->prepare("SELECT usuario_asociado FROM usuariosperfil_asignaciones ua WHERE usuario_principal = '$usuarioLogueado';");
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+
     /* -------------------- ASIGNAR UN E-TICKET A UN USUARIO -------------------- */
-    public function asignarUsuario($uid, $idusuario, $usuario) {
+    public function asignarUsuario($uid, $idusuario, $usuario)
+    {
         try {
             $db = $this->db->connect();
 
@@ -1508,25 +1734,25 @@ class CorreoModel extends Model{
             $query->bindParam(':uid', $uid);
 
             //LOGS
-            $usuario= trim($usuario);
+            $usuario = trim($usuario);
             $uid = trim($uid);
             $sqllog = "INSERT INTO logs (uid, usuario, accion, detalle, metodo, modulo, fecha) VALUES ('$uid','$usuario','Asignación','Realizó una asignación en el ticket #$uid: asignado a $idusuario','Botón Asignado: Front','Correo',NOW())";
             $querylog = $db->prepare($sqllog);
             $querylog->execute();
 
             return $query->execute();
-        } 
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             error_log("Error en asignarUsuario: " . $e->getMessage());
             return false;
         }
     }
 
     /* -------------------- ACTUALIZAR UN ESTADO DE UN E-TICKET -------------------- */
-    public function actualizarEstado($uid, $estado, $comentario, $comentarioDesarrollador, $idusuario, $estado_actual, $estado_actualPalabra, $nuevoEstado, $nuevoEstadoPalabra) {
+    public function actualizarEstado($uid, $estado, $comentario, $comentarioDesarrollador, $idusuario, $estado_actual, $estado_actualPalabra, $nuevoEstado, $nuevoEstadoPalabra)
+    {
         try {
             $db = $this->db->connect();
-            
+
             $idusuario = trim($idusuario);
             $uid = trim($uid);
 
@@ -1534,40 +1760,39 @@ class CorreoModel extends Model{
             /* ASIGNADO */
             if ($estado == 2) {
                 $sql = "UPDATE correo SET estado = $estado, updated_at = NOW(), deleted_at = NULL WHERE uid = '$uid'";
-                $sqllog = "INSERT INTO logs (uid, usuario, accion, detalle, metodo, modulo, fecha) VALUES ('$uid','$idusuario','Estado','Realizó un cambio de estado en el ticket #$uid de $estado_actualPalabra a $nuevoEstadoPalabra','Botón Estado: Front','Correo',NOW())";}
+                $sqllog = "INSERT INTO logs (uid, usuario, accion, detalle, metodo, modulo, fecha) VALUES ('$uid','$idusuario','Estado','Realizó un cambio de estado en el ticket #$uid de $estado_actualPalabra a $nuevoEstadoPalabra','Botón Estado: Front','Correo',NOW())";
+            }
 
-            /* SIN ASIGNAR */
-            elseif ($estado == 1) {
+            /* SIN ASIGNAR */ elseif ($estado == 1) {
                 $sql = "UPDATE correo SET asignado = NULL, estado = $estado, respuesta_correo = NULL, comentario_desarrollador = NULL, updated_at = NOW(), deleted_at = NULL WHERE uid = '$uid'";
-                $sqllog = "INSERT INTO logs (uid, usuario, accion, detalle, metodo, modulo, fecha) VALUES ('$uid','$idusuario','Estado','Realizó un cambio de estado en el ticket #$uid de $estado_actualPalabra a $nuevoEstadoPalabra','Botón Estado: Front','Correo',NOW())";}
+                $sqllog = "INSERT INTO logs (uid, usuario, accion, detalle, metodo, modulo, fecha) VALUES ('$uid','$idusuario','Estado','Realizó un cambio de estado en el ticket #$uid de $estado_actualPalabra a $nuevoEstadoPalabra','Botón Estado: Front','Correo',NOW())";
+            }
 
-            /* FINALIZADO */
-            elseif ($estado == 3) {
+            /* FINALIZADO */ elseif ($estado == 3) {
                 if (empty($comentario)) {
                     throw new Exception("Comentario requerido para finalizar el ticket.");
                 }
                 $sql = "UPDATE correo SET estado = $estado, respuesta_correo = '$comentario', updated_at = NOW() WHERE uid = '$uid'";
-                $sqllog = "INSERT INTO logs (uid, usuario, accion, detalle, metodo, modulo, fecha) VALUES ('$uid','$idusuario','Estado','Realizó un cambio de estado en el ticket #$uid de $estado_actualPalabra a $nuevoEstadoPalabra','Botón Estado: Front','Correo',NOW())";} 
+                $sqllog = "INSERT INTO logs (uid, usuario, accion, detalle, metodo, modulo, fecha) VALUES ('$uid','$idusuario','Estado','Realizó un cambio de estado en el ticket #$uid de $estado_actualPalabra a $nuevoEstadoPalabra','Botón Estado: Front','Correo',NOW())";
+            }
 
-            /* EN PROGRESO */ /* NO-ADMIN */
-            elseif ($estado == 4) {
+            /* EN PROGRESO */ /* NO-ADMIN */ elseif ($estado == 4) {
                 $sql = "UPDATE correo SET estado = $estado, updated_at = NOW(), deleted_at = NULL WHERE uid = '$uid'";
-                $sqllog = "INSERT INTO logs (uid, usuario, accion, detalle, metodo, modulo, fecha) VALUES ('$uid','$idusuario','Estado', 'Realizó un cambio de estado en el ticket #$uid de $estado_actualPalabra a $nuevoEstadoPalabra','Botón Estado: Front','Correo',NOW())";}
+                $sqllog = "INSERT INTO logs (uid, usuario, accion, detalle, metodo, modulo, fecha) VALUES ('$uid','$idusuario','Estado', 'Realizó un cambio de estado en el ticket #$uid de $estado_actualPalabra a $nuevoEstadoPalabra','Botón Estado: Front','Correo',NOW())";
+            }
 
-            /* ELIMINADO */
-            elseif ($estado == 5) {
+            /* ELIMINADO */ elseif ($estado == 5) {
                 $sql = "UPDATE correo SET estado = $estado, deleted_at = NOW() WHERE uid = '$uid'";
-                $sqllog = "INSERT INTO logs (uid, usuario, accion, detalle, metodo, modulo, fecha) VALUES ('$uid','$idusuario','Estado','Realizó un cambio de estado en el ticket #$uid de $estado_actualPalabra a $nuevoEstadoPalabra','Botón Estado: Front','Correo',NOW())";}
-                
-            /* REALIZADO */ /* NO-ADMIN */
-            elseif ($estado == 6) {
+                $sqllog = "INSERT INTO logs (uid, usuario, accion, detalle, metodo, modulo, fecha) VALUES ('$uid','$idusuario','Estado','Realizó un cambio de estado en el ticket #$uid de $estado_actualPalabra a $nuevoEstadoPalabra','Botón Estado: Front','Correo',NOW())";
+            }
+
+            /* REALIZADO */ /* NO-ADMIN */ elseif ($estado == 6) {
                 if (empty($comentarioDesarrollador)) {
                     throw new Exception("Comentario de desarrollador requerido para realizar el ticket.");
                 }
                 $sql = "UPDATE correo SET estado = $estado, comentario_desarrollador = '$comentarioDesarrollador', updated_at = NOW(), deleted_at = NULL WHERE uid = '$uid'";
-                $sqllog = "INSERT INTO logs (uid, usuario, accion, detalle, metodo, modulo, fecha) VALUES ('$uid','$idusuario','Estado','Realizó un cambio de estado en el ticket #$uid de $estado_actualPalabra a $nuevoEstadoPalabra','Botón Estado: Front','Correo',NOW())";}
-            
-            else {
+                $sqllog = "INSERT INTO logs (uid, usuario, accion, detalle, metodo, modulo, fecha) VALUES ('$uid','$idusuario','Estado','Realizó un cambio de estado en el ticket #$uid de $estado_actualPalabra a $nuevoEstadoPalabra','Botón Estado: Front','Correo',NOW())";
+            } else {
                 throw new Exception("Estado no válido.");
             }
 
@@ -1589,18 +1814,18 @@ class CorreoModel extends Model{
 
             $querylog = $db->prepare($sqllog);
             $querylog->execute();
-            
+
             //$this->enviarRespuestaEstatica();
-    
+
             return $query->execute();
-        } 
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             error_log("Error actualizarEstado (PDO): " . $e->getMessage());
             return false;
         }
     }
 
-    public function enviarCorreoAsignacion($uid, $idusuario, $asunto, $fecha_envio, $notificar) {
+    public function enviarCorreoAsignacion($uid, $idusuario, $asunto, $fecha_envio, $notificar)
+    {
         $mail = new PHPMailer(true);
         $pwcorreo = constant('PWCORREO');
         $namecorreo = constant('CORREO');
@@ -1611,24 +1836,24 @@ class CorreoModel extends Model{
         try {
             // Configuración del servidor SMTP
             $mail->isSMTP();
-            $mail->Host       = 'mail.iopa.cl'; // Cambia esto si usás otro
-            $mail->SMTPAuth   = true;
-            $mail->Username   = $namecorreo;
-            $mail->Password   = $pwcorreo;
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // o STARTTLS si tu servidor lo requiere
-            $mail->Port       = 465;
-    
+            $mail->Host = 'mail.iopa.cl';
+            $mail->SMTPAuth = true;
+            $mail->Username = $namecorreo;
+            $mail->Password = $pwcorreo;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port = 465;
+
             // Codificacion de caracteres
             $mail->CharSet = 'UTF-8';
             $mail->Encoding = 'base64';
 
             //debbug
             $mail->SMTPDebug = 2; // o 3 para más detalle
-            $mail->Debugoutput = function($str, $level) {
+            $mail->Debugoutput = function ($str, $level) {
                 error_log("SMTP DEBUG: $str");
             };
 
-            
+
             $mensajeHTML = "
                 <body style='background-color: #f4f4f4; padding: 20px; font-family: Arial, sans-serif;'>
                     <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
@@ -1663,32 +1888,33 @@ class CorreoModel extends Model{
                     </div>
                 </body>";
 
-        
+
             // Remitente y destinatario
             $mail->setFrom('soporte@iopa.cl', 'Soporte IOPA');
             $mail->addAddress($idusuario); //correo para notificar al usuario iopa de que se la asigno un ticket
-    
+
             // Contenido
             $mail->isHTML(true);
             $mail->Subject = '#' . trim($uid) . ' - Asignación de Ticket';
-            $mail->Body    = $mensajeHTML;
-    
+            $mail->Body = $mensajeHTML;
+
             $mail->send();
 
             // --- LLAMADA A LA SEGUNDA FUNCIÓN ANTES DEL RETURN ---
-            if ($notificar == 1 && $idusuario!=='soporte@iopa.cl'){
+            if ($notificar == 1 && $idusuario !== 'soporte@iopa.cl') {
                 $this->enviarCorreoAsignacionUsuarioSolicitante($uid, $asunto);
             }
-            
+
             return true;
-    
+
         } catch (Exception $e) {
             error_log("Error al enviar correo: {$mail->ErrorInfo}");
             return false;
         }
     }
 
-    public function enviarCorreoAsignacionUsuarioSolicitante($uid, $asunto) {
+    public function enviarCorreoAsignacionUsuarioSolicitante($uid, $asunto)
+    {
         try {
             // 1. Obtener datos mediante la query
             $db = $this->db->connect();
@@ -1705,10 +1931,11 @@ class CorreoModel extends Model{
             $query->execute(['uid' => $uid]);
             $datos = $query->fetch(PDO::FETCH_OBJ);
 
-            if (!$datos) return false;
+            if (!$datos)
+                return false;
 
             // 2. Procesar nombres (formato nombre.apellido@iopa.cl)
-            $formatearNombre = function($correo) {
+            $formatearNombre = function ($correo) {
                 $nombre_parte = explode('@', $correo)[0];
                 $partes = explode('.', $nombre_parte);
                 return ucwords(implode(' ', $partes));
@@ -1720,13 +1947,13 @@ class CorreoModel extends Model{
             // 3. Configurar PHPMailer para el segundo envío
             $mail = new PHPMailer(true);
             $mail->isSMTP();
-            $mail->Host       = 'mail.iopa.cl';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = constant('CORREO');
-            $mail->Password   = constant('PWCORREO');
+            $mail->Host = 'mail.iopa.cl';
+            $mail->SMTPAuth = true;
+            $mail->Username = constant('CORREO');
+            $mail->Password = constant('PWCORREO');
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-            $mail->Port       = 465;
-            $mail->CharSet    = 'UTF-8';
+            $mail->Port = 465;
+            $mail->CharSet = 'UTF-8';
 
             /* <p style='margin: 5px 0;'><strong>Desarrollador Asignado:</strong> $nombreDesarrollador ($correo_desarrollador)</p> */
 
@@ -1761,7 +1988,7 @@ class CorreoModel extends Model{
             $mail->setFrom('soporte@iopa.cl', 'Soporte IOPA');
             $mail->addAddress($datos->solicitante);
             $mail->isHTML(true);
-            $mail->Subject = '#' . trim($uid) .' - Recepción de Ticket';
+            $mail->Subject = '#' . trim($uid) . ' - Recepción de Ticket';
             $mail->Body = $mensajeHTML;
 
             $mail->send();
@@ -1773,13 +2000,14 @@ class CorreoModel extends Model{
         }
     }
 
-    public function enviarCorreoFinalizado($uid, $idusuario, $asunto, $fecha_envio, $correo_origen, $comentario){
+    public function enviarCorreoFinalizado($uid, $idusuario, $asunto, $fecha_envio, $correo_origen, $comentario)
+    {
         $mail = new PHPMailer(true);
         $pwcorreo = constant('PWCORREO');
         $namecorreo = constant('CORREO');
-        $uid_trim= trim($uid);
+        $uid_trim = trim($uid);
         $nombreDestinatario = $this->obtenerNombreCompletoDesdeCorreo($correo_origen);
-        
+
         // Recuperar comentario desarrollador desde la BD directamente
         $query = $this->db->connect()->prepare("SELECT comentario_desarrollador FROM correo WHERE uid = '$uid_trim';");
         $query->execute();
@@ -1791,20 +2019,20 @@ class CorreoModel extends Model{
         try {
             // Configuración del servidor SMTP
             $mail->isSMTP();
-            $mail->Host       = 'mail.iopa.cl'; // Cambia esto si usás otro
-            $mail->SMTPAuth   = true;
-            $mail->Username   = $namecorreo;
-            $mail->Password   = $pwcorreo;
+            $mail->Host = 'mail.iopa.cl'; // Cambia esto si usás otro
+            $mail->SMTPAuth = true;
+            $mail->Username = $namecorreo;
+            $mail->Password = $pwcorreo;
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // o STARTTLS si tu servidor lo requiere
-            $mail->Port       = 465;
-    
+            $mail->Port = 465;
+
             // Codificacion de caracteres
             $mail->CharSet = 'UTF-8';
             $mail->Encoding = 'base64';
 
             //debbug
             $mail->SMTPDebug = 2; // o 3 para más detalle
-            $mail->Debugoutput = function($str, $level) {
+            $mail->Debugoutput = function ($str, $level) {
                 error_log("SMTP DEBUG: $str");
             };
 
@@ -1817,7 +2045,7 @@ class CorreoModel extends Model{
             $mensajeHTML = "
             <body style='background-color: #f4f4f4; padding: 20px; font-family: Arial, sans-serif;'>
                 <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
-                    <h2 style='color: #2c3e50; text-align: center;'>✅ Ticket Finalizado</h2>
+                    <h2 style='color: #2c3e50; text-align: center;'> Ticket Finalizado</h2>
                     <p>Estimado(a) <strong>$nombreDestinatario</strong>,</p>
                     <p>Le informamos que su solicitud ha sido <strong>resuelta</strong> y el ticket ha sido marcado como <strong>finalizado</strong> exitosamente en nuestro sistema.</p>
                     
@@ -1845,19 +2073,19 @@ class CorreoModel extends Model{
                 </div>
             </body>";
             //
-        
+
             // Remitente y destinatario
             $mail->setFrom('soporte@iopa.cl', 'Soporte IOPA');
             $mail->addAddress($correo_origen); //correo para enviar la respuesta a la persona involucrada
-    
+
             // Contenido
             $mail->isHTML(true);
             $mail->Subject = '#' . $uid_trim . ' Finalización de Ticket';
-            $mail->Body    = $mensajeHTML;
-    
+            $mail->Body = $mensajeHTML;
+
             $mail->send();
             return true;
-    
+
         } catch (Exception $e) {
             error_log("Error al enviar correo: {$mail->ErrorInfo}");
             return false;
@@ -1870,20 +2098,20 @@ class CorreoModel extends Model{
 
         try {
             // --- SMTP ---
-            $pwcorreo   = constant('PWCORREO');
+            $pwcorreo = constant('PWCORREO');
             $namecorreo = constant('CORREO');
 
             $mail->isSMTP();
-            $mail->Host       = 'mail.iopa.cl';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = $namecorreo;
-            $mail->Password   = $pwcorreo;
+            $mail->Host = 'mail.iopa.cl';
+            $mail->SMTPAuth = true;
+            $mail->Username = $namecorreo;
+            $mail->Password = $pwcorreo;
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-            $mail->Port       = 465;
+            $mail->Port = 465;
 
-            $mail->CharSet    = 'UTF-8';
-            $mail->Encoding   = 'base64';
-            $mail->SMTPDebug  = 0;
+            $mail->CharSet = 'UTF-8';
+            $mail->Encoding = 'base64';
+            $mail->SMTPDebug = 0;
 
             // --- Buscar ticket en BD ---
             $uid_trim = trim($uid);
@@ -1892,7 +2120,7 @@ class CorreoModel extends Model{
 
 
             $comentarioDesarrollador = !empty($result['comentario_desarrollador']) ? trim($result['comentario_desarrollador']) : 'Sin comentario del responsable.';
-            $desarrolladorAsignado   = !empty($result['asignado']) ? trim($result['asignado']) : 'Sin desarrollador asignado.';
+            $desarrolladorAsignado = !empty($result['asignado']) ? trim($result['asignado']) : 'Sin desarrollador asignado.';
 
             // --- Determinar destinatario ---
             $programacion = [
@@ -1920,12 +2148,10 @@ class CorreoModel extends Model{
                 # ---------- COMENTADO MIENTRAS CATA ESTA DE VACACIONES ----------
                 #$mail->addAddress('christopher.soto@iopa.cl', 'Christopher Soto');
                 #$nombreDestinatario = 'Christopher Soto';
-            } 
-            elseif (in_array($desarrolladorAsignado, $soporteTI)) {
+            } elseif (in_array($desarrolladorAsignado, $soporteTI)) {
                 $mail->addAddress('luis.plaza@iopa.cl', 'Luis Plaza');
                 $nombreDestinatario = 'Luis Plaza';
-            } 
-            else {
+            } else {
                 $mail->addAddress('christopher.soto@iopa.cl', 'Christopher Soto');
                 $nombreDestinatario = 'Christopher Soto';
             }
@@ -2015,7 +2241,7 @@ class CorreoModel extends Model{
 
             $mail->isHTML(true);
             $mail->Subject = '#' . $uid_trim . ' Realización de Ticket';
-            $mail->Body    = $mensajeHTML;
+            $mail->Body = $mensajeHTML;
             $mail->AltBody = strip_tags("Ticket #$uid_trim - $asunto\n\n" . $comentarioDesarrollador);
 
             $mail->send();
@@ -2042,13 +2268,13 @@ class CorreoModel extends Model{
                 LIMIT 1
             ");
             $resArea = $queryArea->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($resArea && !empty($resArea['area'])) {
                 $areaSoporte = $resArea['area'];
             }
 
             // 2. Procesar nombre del solicitante (formato nombre.apellido@iopa.cl)
-            $formatearNombre = function($correo) {
+            $formatearNombre = function ($correo) {
                 $nombre_parte = explode('@', $correo)[0];
                 $partes = explode('.', $nombre_parte);
                 return ucwords(implode(' ', $partes));
@@ -2057,14 +2283,14 @@ class CorreoModel extends Model{
 
             // 3. Configuración SMTP
             $mail->isSMTP();
-            $mail->Host       = 'mail.iopa.cl';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = constant('CORREO');
-            $mail->Password   = constant('PWCORREO');
+            $mail->Host = 'mail.iopa.cl';
+            $mail->SMTPAuth = true;
+            $mail->Username = constant('CORREO');
+            $mail->Password = constant('PWCORREO');
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-            $mail->Port       = 465;
-            $mail->CharSet    = 'UTF-8';
-            $mail->Encoding   = 'base64';
+            $mail->Port = 465;
+            $mail->CharSet = 'UTF-8';
+            $mail->Encoding = 'base64';
 
             // 4. Plantilla HTML con formato "Asignación Usuario Solicitante"
             $mensajeHTML = "
@@ -2098,12 +2324,12 @@ class CorreoModel extends Model{
 
             // 5. Envío
             $mail->setFrom(constant('CORREO'), 'Soporte IOPA');
-            $mail->addAddress($correo_origen); 
+            $mail->addAddress($correo_origen);
             $mail->isHTML(true);
-            
+
             // Asunto solicitado terminando en "de ticket"
             $mail->Subject = '#' . $uid_trim . ' - Actualización de Ticket ';
-            
+
             $mail->Body = $mensajeHTML;
             $mail->AltBody = "Su ticket #$uid_trim ($asunto) está en progreso por el área de $areaSoporte.";
 
@@ -2172,7 +2398,7 @@ class CorreoModel extends Model{
 
             // Enviar
             if ($mail->send()) {
-                // ✅ Guardar en carpeta Sent vía IMAP
+                //  Guardar en carpeta Sent vía IMAP
                 $imapPath = '{mail.iopa.cl:993/imap/ssl}INBOX.Sent';
                 $imapStream = imap_open($imapPath, $namecorreo, $pwcorreo);
 
@@ -2186,20 +2412,19 @@ class CorreoModel extends Model{
                 }
 
                 return "Correo enviado correctamente y guardado en carpeta Enviados";
-            } 
-            else {
+            } else {
                 return "Error al enviar: " . $mail->ErrorInfo;
             }
 
-        } 
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return 'Excepción al enviar correo: ' . $e->getMessage();
         }
     }
 
 
-    
-    public function marcarSpam($uid, $idusuario, $correo_origen){
+
+    public function marcarSpam($uid, $idusuario, $correo_origen)
+    {
         try {
             $motivo = "Desactivacion desde el front. UID: #$uid";
             $queryInsert = $this->db->connect()->prepare("INSERT INTO correo_spam (correo_spam, motivo, marcado_por, estado, created_at, updated_at, deleted_at) 
@@ -2208,9 +2433,9 @@ class CorreoModel extends Model{
             $queryInsert->bindParam(':idusuario', $idusuario);
             $queryInsert->bindParam(':motivo', $motivo);
 
-            
+
             $insertResult = $queryInsert->execute();
-    
+
             // Actualizar correos existentes del mismo origen
             $queryUpdate = $this->db->connect()->prepare("
                 UPDATE correo 
@@ -2219,7 +2444,7 @@ class CorreoModel extends Model{
             ");
             $queryUpdate->bindParam(':correo_origen', $correo_origen);
             $updateResult = $queryUpdate->execute();
-    
+
             //LOGS
             $db = $this->db->connect();
             $idusuario = trim($idusuario);
@@ -2235,7 +2460,7 @@ class CorreoModel extends Model{
             } else {
                 return false;
             }
-    
+
         } catch (PDOException $e) {
             error_log('Error al marcar como spam: ' . $e->getMessage());
             return false;
@@ -2265,13 +2490,15 @@ class CorreoModel extends Model{
     }
 
 
-    public function obtenerCorreosRespuestas(){
+    public function obtenerCorreosRespuestas()
+    {
         $query = $this->db->connect()->prepare("SELECT * FROM correo where (multirespuesta = 1 or in_reply_to!='')  and (estado!=0 or deleted_at is null) ORDER BY fecha_envio DESC;");
         $query->execute();
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function enviarRespuestaUsuario($uid, $correo_origen, $correo_destino, $cc, $asunto, $fecha_envio, $references, $texto_respuesta, $message_id, $in_reply_to, $idusuario, $fusion) {
+    public function enviarRespuestaUsuario($uid, $correo_origen, $correo_destino, $cc, $asunto, $fecha_envio, $references, $texto_respuesta, $message_id, $in_reply_to, $idusuario, $fusion)
+    {
         try {
             $mail = new PHPMailer(true);
             $pwcorreo = constant('PWCORREO');
@@ -2358,7 +2585,7 @@ class CorreoModel extends Model{
                 <p>Gracias por su mensaje. A continuación, le entregamos la respuesta de nuestro equipo:</p>
 
                 <div style='background-color: #e6f3ff; padding: 15px; border-left: 4px solid #007BFF; border-radius: 5px; margin-bottom: 20px; color: #2c3e50;'>
-                    ".$texto_respuesta."
+                    " . $texto_respuesta . "
                 </div>
 
                 <p>Si desea complementar esta solicitud, puede responder a este mismo correo.</p>
@@ -2380,7 +2607,7 @@ class CorreoModel extends Model{
 
 
             if ($mail->send()) {
-                // ✅ Guardar en carpeta Sent vía IMAP
+                //  Guardar en carpeta Sent vía IMAP
                 // Si el único destinatario es soporte, NO guardar en Sent
                 $destinatarios = [$correo_origen];
                 $cc_limpios = $cc_array;
@@ -2442,56 +2669,59 @@ class CorreoModel extends Model{
     }
 
 
-    public function obtenerNombreCompletoDesdeCorreo($correo) {
+    public function obtenerNombreCompletoDesdeCorreo($correo)
+    {
         $parte_usuario = explode('@', $correo)[0]; // Ej: christopher.soto
         $fragmentos = preg_split('/[\.\-_]/', $parte_usuario); // ['christopher', 'soto']
-        
+
         $nombre = isset($fragmentos[0]) ? ucfirst(strtolower($fragmentos[0])) : '';
         $apellido = isset($fragmentos[1]) ? ucfirst(strtolower($fragmentos[1])) : '';
-        
+
         return trim("$nombre $apellido");
     }
 
-    public function correoExiste($correo) {
+    public function correoExiste($correo)
+    {
         // Buscar en tabla usuarios
         $query = $this->db->connect()->prepare("SELECT * FROM usuarios WHERE email = :correo LIMIT 1");
         $query->execute(['correo' => $correo]);
         $resultadoUsuarios = $query->fetch(PDO::FETCH_OBJ);
-        
+
         // Si existe en usuarios, retornar true
         if ($resultadoUsuarios) {
             return true;
         }
-        
+
         // Buscar en tabla usuariosperfil
         $query = $this->db->connect()->prepare("SELECT * FROM usuariosperfil WHERE idusuario = :correo LIMIT 1");
         $query->execute(['correo' => $correo]);
         $resultadoPerfil = $query->fetch(PDO::FETCH_OBJ);
-        
+
         // Si existe en usuariosperfil, retornar true
         if ($resultadoPerfil) {
             return true;
         }
-        
+
         // No existe en ninguna tabla
         return false;
     }
-    
+
     // Agregar nuevo usuario
-    public function agregarUsuario($datos) {
+    public function agregarUsuario($datos)
+    {
         try {
             $pdo = $this->db->connect();
-            
+
             // Iniciar transacción
             $pdo->beginTransaction();
-            
+
             // 1. INSERTAR EN TABLA USUARIOS
             $query = $pdo->prepare("INSERT INTO usuarios (email, pass, foto) VALUES (:email, :pass, NULL)");
             $query->execute([
                 'email' => $datos['correo'],
                 'pass' => $datos['contrasena']
             ]);
-            
+
             // 2. INSERTAR EN TABLA USUARIOSPERFIL (4 registros)
             $menus = [
                 ['menu' => 'tablas', 'principal' => ''],
@@ -2499,10 +2729,10 @@ class CorreoModel extends Model{
                 ['menu' => 'medicos', 'principal' => 'Tablas'],
                 ['menu' => 'correo', 'principal' => 'Tablas']
             ];
-            
+
             $query = $pdo->prepare("INSERT INTO usuariosperfil (idusuario, menu, habilitado, principal, permiso, area) 
                                    VALUES (:idusuario, :menu, 'S', :principal, 'admin', :area)");
-            
+
             foreach ($menus as $item) {
                 $query->execute([
                     'idusuario' => $datos['correo'],
@@ -2511,11 +2741,11 @@ class CorreoModel extends Model{
                     'area' => $datos['area']
                 ]);
             }
-            
+
             // Confirmar transacción
             $pdo->commit();
             return true;
-            
+
         } catch (Exception $e) {
             // Revertir cambios si hay error
             $pdo->rollBack();
@@ -2523,7 +2753,8 @@ class CorreoModel extends Model{
         }
     }
 
-    public function eliminarUsuario($id_usuario) {
+    public function eliminarUsuario($id_usuario)
+    {
         try {
             $pdo = $this->db->connect();
 
@@ -2551,11 +2782,13 @@ class CorreoModel extends Model{
             return false;
         }
     }
-    public function getTicketsFiltrados($estadoID, $permiso, $usuario) {
+    
+    public function getTicketsFiltrados($estadoID, $permiso, $usuario)
+    {
         try {
             $usuariotrim = trim($usuario);
             $permisotrim = trim($permiso);
-            
+
             // BASE de la query
             $query = "SELECT 
                     uid as uid, 
@@ -2569,10 +2802,10 @@ class CorreoModel extends Model{
                 FROM correo
                 WHERE estado = :estadoID
                 AND deleted_at IS NULL";
-            
+
             // Parámetros
             $params = [':estadoID' => $estadoID];
-            
+
             // Si es admin, mostrar multirespuesta = 0 solo si estado es 1
             if ($permisotrim === 'admin') {
                 if ($estadoID == 1) {
@@ -2580,27 +2813,36 @@ class CorreoModel extends Model{
                 }
             } else {
                 // Si NO es admin, filtrar por usuario Y multirespuesta = 0 si estado es 1
-                $query .= " AND correo_origen = :usuario";
-                $params[':usuario'] = $usuariotrim;
-                
+                $query .= " AND (
+                    correo_origen = :usuario1
+                    OR correo_origen IN (
+                        SELECT usuario_asociado
+                        FROM usuariosperfil_asignaciones
+                        WHERE usuario_principal = :usuario2
+                    )
+                )";
+
+                $params[':usuario1'] = $usuariotrim;
+                $params[':usuario2'] = $usuariotrim;
+
                 if ($estadoID == 1) {
                     $query .= " AND multirespuesta = 0";
                 }
             }
-            
+
             $query .= " ORDER BY fecha_envio DESC";
-            
+
             $stmt = $this->db->connect()->prepare($query);
             $result = $stmt->execute($params);
-            
+
             if (!$result) {
                 throw new Exception("Error ejecutando query: " . json_encode($stmt->errorInfo()));
             }
-            
+
             $data = $stmt->fetchAll(PDO::FETCH_OBJ);
-            
+
             return $data;
-            
+
         } catch (PDOException $e) {
             error_log("PDOException en getTicketsFiltrados: " . $e->getMessage());
             throw new Exception("PDOException: " . $e->getMessage());
@@ -2609,6 +2851,6 @@ class CorreoModel extends Model{
             throw new Exception("Exception: " . $e->getMessage());
         }
     }
-    
+
 }
 ?>
