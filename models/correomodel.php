@@ -856,7 +856,6 @@ class CorreoModel extends Model
                     $exists = $query->fetchColumn();
 
                     if ($exists == 0) {
-                        // --- TODO LO QUE SIGUE ES TU FUNCIÓN ORIGINAL SIN CAMBIOS ---
                         $nombre_carpeta = 'Desconocida';
                         if ($carpeta === 'INBOX') {
                             $nombre_carpeta = 'Bandeja de entrada';
@@ -907,9 +906,9 @@ class CorreoModel extends Model
                             continue;
                         }
 
-                        if (stripos($asunto, 'de Ticket') !== false) {
-                            continue;
-                        }
+                        //if (stripos($asunto, 'de Ticket') !== false && stripos($asunto, 'Finalización de Ticket') === false) {
+                        //    continue;
+                        //}
 
                         $fecha_envio = $message->date ?? null;
                         $timestamp = strtotime($fecha_envio);
@@ -979,6 +978,19 @@ class CorreoModel extends Model
                             'deleted_at' => null
                         ]);
 
+                        // Normalizar el asunto antes de comparar
+                        //file_put_contents(__DIR__ . '/debug_asunto.txt', 
+                        //    "ASUNTO: " . $asunto . "\n" .
+                        //    "HEX: " . bin2hex($asunto) . "\n" .
+                        //    "MB_STRIPOS: " . (mb_stripos($asunto, 'Finalización de Ticket') !== false ? 'ENCONTRADO' : 'NO ENCONTRADO') . "\n"
+                        //, FILE_APPEND);
+                        // Normalizar NFD → NFC
+                        $asuntoNFC = Normalizer::normalize($asunto, Normalizer::FORM_C);
+
+                        if (mb_stripos($asuntoNFC, 'Finalización de Ticket') !== false) {
+                            $this->vincularCorreoFinalizacion($uid_personalizado);
+                        }
+
                         $totalProcesados++;
                     }
                 }
@@ -990,6 +1002,102 @@ class CorreoModel extends Model
         return $totalProcesados;
     }
     /* NUEVA FUNCION IMPLEMENTADA 30/01/2026 */
+
+    public function vincularCorreoFinalizacion(string $uidFinalizacion): bool
+    {
+        $conn = $this->db->connect();
+
+        // ── 1. Obtener el correo de finalización ──────────────────────
+        $queryFin = $conn->prepare("SELECT id, asunto, in_reply_to 
+            FROM correo 
+            WHERE uid = :uid 
+            LIMIT 1
+        ");
+        $queryFin->execute(['uid' => $uidFinalizacion]);
+        $correoFin = $queryFin->fetch(PDO::FETCH_ASSOC);
+
+        if (!$correoFin) {
+            error_log("vincularCorreoFinalizacion: no se encontró uid=$uidFinalizacion");
+            return false;
+        }
+
+        // Si ya tiene in_reply_to, ya fue vinculado antes
+        if (!empty($correoFin['in_reply_to'])) {
+            error_log("vincularCorreoFinalizacion: uid=$uidFinalizacion ya tiene in_reply_to, se omite");
+            return false;
+        }
+
+        // ── 2. Extraer el ID del ticket del asunto ────────────────────
+        // Asunto ejemplo: "#R-100467 Finalización de Ticket"
+        preg_match('/#(R-\d+)/', $correoFin['asunto'], $matchesUid);
+        $uidTicketRaiz = $matchesUid[1] ?? null;
+
+        if (!$uidTicketRaiz) {
+            error_log("vincularCorreoFinalizacion: no se pudo extraer UID del asunto: " . $correoFin['asunto']);
+            return false;
+        }
+
+        // ── 3. Obtener el correo raíz del ticket ──────────────────────
+        $queryRaiz = $conn->prepare("
+            SELECT message_id 
+            FROM correo 
+            WHERE uid = :uid 
+            LIMIT 1
+        ");
+        $queryRaiz->execute(['uid' => $uidTicketRaiz]);
+        $correoRaiz = $queryRaiz->fetch(PDO::FETCH_ASSOC);
+
+        if (!$correoRaiz || empty($correoRaiz['message_id'])) {
+            error_log("vincularCorreoFinalizacion: no se encontró correo raíz uid=$uidTicketRaiz");
+            return false;
+        }
+
+        // ── 4. Recorrer el hilo hasta el último nodo ──────────────────
+        $messageIdActual = $correoRaiz['message_id'];
+        $maxIteraciones  = 50; // tope de seguridad para evitar loops infinitos
+        $iteracion       = 0;
+
+        while ($iteracion < $maxIteraciones) {
+            $queryHijo = $conn->prepare("
+                SELECT message_id 
+                FROM correo 
+                WHERE in_reply_to = :in_reply_to 
+                AND uid != :uid_fin
+                ORDER BY fecha_envio ASC
+                LIMIT 1
+            ");
+            $queryHijo->execute([
+                'in_reply_to' => $messageIdActual,
+                'uid_fin'     => $uidFinalizacion,
+            ]);
+            $hijo = $queryHijo->fetch(PDO::FETCH_ASSOC);
+
+            if (!$hijo || empty($hijo['message_id'])) {
+                // No hay más respuestas, $messageIdActual es el último nodo
+                break;
+            }
+
+            $messageIdActual = $hijo['message_id'];
+            $iteracion++;
+        }
+
+        // ── 5. Actualizar el correo de finalización ───────────────────
+        $queryUpdate = $conn->prepare("
+            UPDATE correo 
+            SET in_reply_to  = :in_reply_to,
+                multirespuesta = 1,
+                updated_at   = :updated_at
+            WHERE uid = :uid
+        ");
+        $queryUpdate->execute([
+            'in_reply_to' => $messageIdActual,
+            'updated_at'  => date('Y-m-d H:i:s'),
+            'uid'         => $uidFinalizacion,
+        ]);
+
+        error_log("vincularCorreoFinalizacion: uid=$uidFinalizacion vinculado a message_id=$messageIdActual (raíz: $uidTicketRaiz, iteraciones: $iteracion)");
+        return true;
+    }
 
     /* FUNCION DEPRECADA POR RENDIMIENTO, REVERTIR LA FECHA EN EL NOMBRE DE LA FUNCION A 'public function obtenerYGuardarCorreos' PARA VOLVER A LA FUNCION ORIGINAL */
     public function obtenerYGuardarCorreos2()
@@ -2083,8 +2191,34 @@ class CorreoModel extends Model
             $mail->Subject = '#' . $uid_trim . ' Finalización de Ticket';
             $mail->Body = $mensajeHTML;
 
-            $mail->send();
-            return true;
+            if ($mail->send()) {
+
+                $imapPath = '{mail.iopa.cl:993/imap/ssl}INBOX.Sent';
+
+                $imapStream = imap_open(
+                    $imapPath,
+                    $namecorreo,
+                    $pwcorreo
+                );
+
+                if ($imapStream) {
+
+                    $mime = $mail->getSentMIMEMessage();
+
+                    if (!imap_append($imapStream, $imapPath, $mime)) {
+                        error_log('No se pudo guardar correo en Sent: ' . imap_last_error());
+                    }
+
+                    imap_close($imapStream);
+
+                } else {
+
+                    error_log('No se pudo abrir IMAP Sent: ' . imap_last_error());
+
+                }
+
+                return true;
+            }
 
         } catch (Exception $e) {
             error_log("Error al enviar correo: {$mail->ErrorInfo}");
