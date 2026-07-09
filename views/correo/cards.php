@@ -540,7 +540,7 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
                   <!-- Header: badge + uid -->
                   <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                     <span class="ticket-badge <?php echo $badgeClass; ?>"><?php echo $badgeText; ?></span>
-                    <?php if (!empty($correo->asignado)): ?>
+                    <?php if (!empty($correo->asignado) && $permiso == 'admin'): ?>
                       <span style="font-size:11px; color:#64748b; font-weight:500;">
                         → <strong><?php echo htmlspecialchars($correo->asignado); ?></strong>
                       </span>
@@ -681,14 +681,16 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
             <!-- FOOTER -->
             <div class="ticket-footer">
               <div style="display:flex; gap:16px;">
-                <button class="btn-ticket-link open-historial"
-                  data-id="<?php echo $correo->uid; ?>"
-                  data-toggle="modal"
-                  data-target="#modalHistorial"
-                  data-tooltip="tooltip"
-                  title="Historial de cambios del ticket #<?php echo $correo->uid; ?>">
-                  <i class="fas fa-history"></i> Historial
-                </button>
+                <?php if ($permiso == 'admin'){ ?>
+                  <button class="btn-ticket-link open-historial"
+                    data-id="<?php echo $correo->uid; ?>"
+                    data-toggle="modal"
+                    data-target="#modalHistorial"
+                    data-tooltip="tooltip"
+                    title="Historial de cambios del ticket #<?php echo $correo->uid; ?>">
+                    <i class="fas fa-history"></i> Historial
+                  </button>
+                <?php }?>
                 <button class="btn-ticket-link open-hilo"
                   style="display:none;"
                   data-message-id="<?php echo htmlspecialchars($correo->message_id, ENT_QUOTES); ?>"

@@ -20,11 +20,11 @@ if (PROYECTO == '0') {
     define('DB','eticket');
     define('USER','tecadmin');
     define('PASSWORD','NSloteria2015');
-    define('IPHOST_REBSOL','dnsiopa.fortiddns.com:3308');
+    define('IPHOST_REBSOL','dnsiopa.fortiddns.com:3306'); //acceso al .15
     define('DBNAME_REBSOL','IOPA');
     define('CHARSET_REBSOL','utf8');
-    define('USER_REBSOL','lfarias');
-    define('PW_REBSOL','iopa2022$');
+    define('USER_REBSOL','rebsolll');
+    define('PW_REBSOL','iopa2019');
 }
 
 define('CHARSET','utf8mb4');

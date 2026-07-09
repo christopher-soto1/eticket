@@ -1,5 +1,5 @@
 instalar composer
-php 8.0.30
+php 7.3.33
 instalar y habilitar imap
 descomentar imap
 descomentar ssl

@@ -2029,7 +2029,7 @@
             const correo = correos.find(c => c.uid == uid);
             const asignado = $(this).data('asignado');
             const estado_actual = $(this).data('estado-actual');
-            //console.log("estado_actual:", estado_actual);
+            console.log("estado_actual:", estado_actual);
             const esFinalizado = (estado_actual == 3) ? 'readonly style="background-color: #e9ecef;"' : '';
 
             if (correo) {
@@ -2098,11 +2098,22 @@
               // ---------------  TEXT AREA FINALIZADO ---------------
               $(`#selectEstado-${correo.uid}`).on('change', function () {
                 const selectedValue = $(this).val();
-                if (selectedValue == "3") { // Finalizado
-                  $('#textareaContainer').show();
-                  $('#checkEnvioCorreoFinalizado').show();
+                if (selectedValue == "3") {
+                  
+                        
+                    $('#textareaContainer').show();
+
+                    if (parseInt(estado_actual) !== 3) {
+                        $('#checkEnvioCorreoFinalizado').show();
+                        console.log("Mostrando check de notificación");
+                    } else {
+                        $('#checkEnvioCorreoFinalizado').hide();
+                        console.log("Ocultando check de notificación");
+                    }
                 } else {
-                  $('#textareaContainer').hide();
+                    $('#textareaContainer').hide();
+                    $('#checkEnvioCorreoFinalizado').hide();
+                    console.log("Ocultando textarea y check de notificación");
                 }
               });
 
@@ -2110,6 +2121,8 @@
               if (correo.estado == 3) {
                 $('#textareaContainer').show();
                 $('#checkEnvioCorreoFinalizado').show();
+                $('#checkEnvioCorreoFinalizado').hide();
+                console.log("Mostrando textarea y check de notificación2");
               }
               // ---------------  FIN TEXT AREA FINALIZADO ---------------
 
@@ -2635,7 +2648,7 @@
             var asignado = e.target.getAttribute('data-asignado');
             var nuevoEstadoPalabra = '';
             var estado_actualPalabra = '';
-            let estado_actual = e.target.getAttribute('data-estado-actual');
+            var estado_actual = e.target.getAttribute('data-estado-actual');
             var notificar = document.getElementById('checkNotificarCorreoFinalizado').checked ? 1 : 0;
 
             estado_actual = parseInt(estado_actual, 10);
@@ -2670,7 +2683,9 @@
             }
 
             const estadosQueRequierenAsignacion = [1, 2, 4, 6];
-            if (estado_actual != 5) {
+            // Si el estado actual no es "Eliminado" (5) y el nuevo estado es uno de los que requieren asignación, verificar si el ticket está asignado
+            if (parseInt(nuevoEstado) !== 1 && parseInt(estado_actual) != 5) {
+              // Si el ticket no está asignado y el nuevo estado es uno de los que requieren asignación, mostrar alerta y cortar la ejecución
               if (!asignado && estadosQueRequierenAsignacion.includes(parseInt(nuevoEstado))) {
                 Swal.fire({
                   icon: 'warning',
@@ -2690,6 +2705,7 @@
                 return;
               }
             }
+            //Si el estado actual es "Eliminado" (5) y el nuevo estado no es "Sin asignar" (1), mostrar alerta y cortar la ejecución
             if (parseInt(estado_actual) === 5 && parseInt(nuevoEstado) !== 1) {
               Swal.fire({
                 icon: 'warning',
