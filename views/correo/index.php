@@ -2939,7 +2939,8 @@
           let valor = $(this).val();
 
           // Eliminar todo lo que no sea r, e, números o guión
-          let limpio = valor.replace(/[^reRE0-9\-]/g, '');
+          // let limpio = valor.replace(/[^reRE0-9\-]/g, '');
+          let limpio = valor.replace(/[^a-zA-Z0-9\-]/g, '');
 
           $(this).val(limpio);
         });
