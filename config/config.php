@@ -30,6 +30,7 @@ if (PROYECTO == '0') {
 define('CHARSET','utf8mb4');
 define('CORREO','soporte@iopa.cl');
 define('PWCORREO','P&[03IeFu@sw');
+define('API_TOKEN', 'IOPA_ETICKET_API_2026_X7K9P2M4');
 
 
 

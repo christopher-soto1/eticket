@@ -2276,12 +2276,8 @@ class CorreoModel extends Model
             $mail->setFrom('soporte@iopa.cl', 'Soporte IOPA');
 
             if (in_array($desarrolladorAsignado, $programacion)) {
-                # ---------- COMENTADO MIENTRAS CATA ESTA DE VACACIONES ----------
-                $mail->addAddress('catalina.henriquez@iopa.cl', 'Catalina Henriquez');
-                $nombreDestinatario = 'Catalina Henriquez';
-                # ---------- COMENTADO MIENTRAS CATA ESTA DE VACACIONES ----------
-                #$mail->addAddress('christopher.soto@iopa.cl', 'Christopher Soto');
-                #$nombreDestinatario = 'Christopher Soto';
+                $mail->addAddress('christopher.soto@iopa.cl', 'Christopher Soto');
+                $nombreDestinatario = 'Christopher Soto';
             } elseif (in_array($desarrolladorAsignado, $soporteTI)) {
                 $mail->addAddress('luis.plaza@iopa.cl', 'Luis Plaza');
                 $nombreDestinatario = 'Luis Plaza';
@@ -2986,5 +2982,148 @@ class CorreoModel extends Model
         }
     }
 
+    #API 
+    public function crearTicket($datos)
+    {
+        $db = $this->db->connect();
+
+        $fecha = date('Y-m-d H:i:s');
+
+        // ============= UID =============
+        $hash = hash('sha256', $fecha);
+        $codigo = strtoupper(substr(base_convert(substr($hash, 0, 12), 16, 36),0,8));
+        // UID final
+        $uid = 'SVA-' . $codigo;
+        // ============= UID =============
+
+        // ============= MESSAGE_ID =============
+        $message_id = rtrim(strtr(base64_encode(random_bytes(33)),'+/','-_'),'=');
+        // ============= MESSAGE_ID =============
+
+        $rutaCuerpo = $this->guardarCuerpoTicketAPIComoHTML($uid,$datos['cuerpo']);
+
+        $query = $db->prepare('INSERT INTO correo (
+                                    id_correo_original,
+                                    message_id,
+                                    in_reply_to,
+                                    uid,
+                                    multirespuesta,
+                                    correo_origen,
+                                    correo_destino,
+                                    asunto,
+                                    fecha_envio,
+                                    cuerpo,
+                                    asignado,
+                                    imagenes_embebidas,
+                                    respuesta_correo,
+                                    comentario_desarrollador,
+                                    `references`,
+                                    cc,
+                                    carpeta,
+                                    estado,
+                                    created_at,
+                                    updated_at,
+                                    deleted_at
+                                ) VALUES (
+                                    :id_correo_original,
+                                    :message_id,
+                                    :in_reply_to,
+                                    :uid,
+                                    :multirespuesta,
+                                    :correo_origen,
+                                    :correo_destino,
+                                    :asunto,
+                                    :fecha_envio,
+                                    :cuerpo,
+                                    :asignado,
+                                    :imagenes_embebidas,
+                                    :respuesta_correo,
+                                    :comentario_desarrollador,
+                                    :references,
+                                    :cc,
+                                    :carpeta,
+                                    :estado,
+                                    :created_at,
+                                    :updated_at,
+                                    :deleted_at
+                                )
+                            ');
+
+        $query->execute([
+            'id_correo_original' => null,
+            'message_id' => $message_id,
+            'in_reply_to' => null,
+            'uid' => $uid,
+            'multirespuesta' => 0,
+            'correo_origen' => $datos['correo_origen'],
+            'correo_destino' => $datos['correo_destino'],
+            'asunto' => $datos['asunto'],
+            'fecha_envio' => $fecha,
+            'cuerpo' => $rutaCuerpo,
+            'asignado' => null,
+            'imagenes_embebidas' => null,
+            'respuesta_correo' => null,
+            'comentario_desarrollador' => null,
+            'references' => null,
+            'cc' => $datos['cc'] ?? null,
+            'carpeta' => 'Solicitud Via API',
+            'estado' => 1,
+            'created_at' => $fecha,
+            'updated_at' => null,
+            'deleted_at' => null
+        ]);
+
+        return [
+            'id' => $db->lastInsertId(),
+            'uid' => $uid,
+            'message_id' => $message_id,
+            'cuerpo' => $rutaCuerpo
+        ];
+    }
+
+    public function guardarCuerpoTicketAPIComoHTML($uid, $cuerpo)
+    {
+        $rutaCarpeta = $_SERVER['DOCUMENT_ROOT'] . '/eticket/public/correos_html/';
+
+        if (!is_dir($rutaCarpeta)) {
+            mkdir($rutaCarpeta, 0777, true);
+        }
+
+        $nombreArchivo = $uid . '.html';
+        $rutaArchivo = $rutaCarpeta . $nombreArchivo;
+
+        $cuerpoHTML = nl2br(
+            htmlspecialchars(
+                $cuerpo,
+                ENT_QUOTES | ENT_SUBSTITUTE,
+                'UTF-8'
+            )
+        );
+
+        $html = '<!DOCTYPE html>
+                <html lang="es">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Solicitud de soporte</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                font-size: 14px;
+                                line-height: 1.6;
+                                color: #333;
+                                margin: 20px;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ' . $cuerpoHTML . '
+                    </body>
+                </html>';
+
+        file_put_contents($rutaArchivo, $html);
+
+        return '/eticket/public/correos_html/' . $nombreArchivo;
+    }
 }
 ?>

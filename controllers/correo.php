@@ -4,20 +4,44 @@ session_start();
 //ini_set('ignore_repeated_errors', TRUE);
 //ini_set('display_errors', TRUE);
 class Correo extends Controller{
-    function __construct(){
+    //function __construct(){
+    //    parent::__construct();
+    //    /* Validacion de login */
+    //    $this->view->correo=[];
+    //    if (!isset($_SESSION['usuario'])){
+    //    echo "Acceso Negado";
+    //    session_destroy();
+    //    $location=constant('URL');
+    //    header("Location: " . $location);
+    //    exit;
+    //    }
+    //    else{
+    //    }
+    //}
+
+    function __construct()
+    {
         parent::__construct();
-        /* Validacion de login */
-        $this->view->correo=[];
-        if (!isset($_SESSION['usuario'])){
-        echo "Acceso Negado";
-        session_destroy();
-        $location=constant('URL');
-        header("Location: " . $location);
-        exit;
+
+        $this->view->correo = [];
+
+        // Si estamos accediendo al endpoint de API,
+        // no necesitamos sesión.
+        if (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], '/correo/crearTicket') !== false) {
+            return;
         }
-        else{
+
+        // Validación normal del sistema web
+        if (!isset($_SESSION['usuario'])) {
+            echo "Acceso Negado";
+            session_destroy();
+
+            $location = constant('URL');
+            header("Location: " . $location);
+            exit;
         }
     }
+
     function render(){
         $correo=$this->model->get(); 	
         $this->view->correo=$correo;
@@ -299,6 +323,109 @@ class Correo extends Controller{
             'success' => true,
             'procesados' => $correosProcesados
         ]);
+    }
+
+    # Crear ticket via API
+    public function crearTicket()
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        // ==========================================================
+        // VALIDAR TOKEN
+        // ==========================================================
+
+        $headers = getallheaders();
+
+        $token = $headers['Authorization'] ?? '';
+
+        // Esperamos:
+        // Authorization: Bearer XXXXX
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        if (empty($token) || !hash_equals(constant('API_TOKEN'), $token)) {
+
+            http_response_code(401);
+
+            echo json_encode([
+                'success' => false,
+                'mensaje' => 'Token inválido o no proporcionado.'
+            ]);
+
+            return;
+        }
+
+
+        // ==========================================================
+        // RECIBIR JSON
+        // ==========================================================
+
+        $json = file_get_contents('php://input');
+
+        $datos = json_decode($json, true);
+
+        if (!is_array($datos)) {
+
+            http_response_code(400);
+
+            echo json_encode([
+                'success' => false,
+                'mensaje' => 'El JSON enviado no es válido.'
+            ]);
+
+            return;
+        }
+
+
+        // ==========================================================
+        // VALIDAR CAMPOS
+        // ==========================================================
+
+        if (
+            empty($datos['correo_origen']) ||
+            empty($datos['correo_destino']) ||
+            empty($datos['asunto']) ||
+            empty($datos['cuerpo'])
+        ) {
+
+            http_response_code(400);
+
+            echo json_encode([
+                'success' => false,
+                'mensaje' => 'Faltan campos obligatorios.'
+            ]);
+
+            return;
+        }
+
+
+        // ==========================================================
+        // CREAR TICKET
+        // ==========================================================
+
+        try {
+
+            $resultado = $this->model->crearTicket($datos);
+
+            echo json_encode([
+                'success' => true,
+                'mensaje' => 'Ticket creado correctamente.',
+                'id_ticket' => $resultado['id'],
+                'uid' => $resultado['uid']
+            ]);
+
+        } catch (Exception $e) {
+
+            http_response_code(500);
+
+            echo json_encode([
+                'success' => false,
+                'mensaje' => 'Error al crear el ticket.',
+                'error' => $e->getMessage()
+            ]);
+        }
     }
     
     public function enviarCorreoPrueba() {
