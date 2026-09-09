@@ -1937,8 +1937,16 @@ class CorreoModel extends Model
         $mail = new PHPMailer(true);
         $pwcorreo = constant('PWCORREO');
         $namecorreo = constant('CORREO');
+        $texto_notificar = '';
 
         $nombreDestinatario = $this->obtenerNombreCompletoDesdeCorreo($idusuario);
+
+        if ($notificar == 1){
+            $texto_notificar = "Se enviará un correo de notificación al usuario solicitante acerca de esta asignación.";
+        }
+        else{ 
+            $texto_notificar = "No se enviará un correo de notificación al usuario solicitante acerca de esta asignación.";
+        }
 
 
         try {
@@ -1974,6 +1982,7 @@ class CorreoModel extends Model
                             <p style='margin: 5px 0;'><strong>Asunto:</strong> $asunto</p>
                             <!-- <p style='margin: 5px 0;'><strong>Prioridad:</strong> <span style='color: #e74c3c; font-weight: bold;'>Alta</span></p> -->
                             <p style='margin: 5px 0;'><strong>Fecha:</strong> $fecha_envio</p>
+                            <p style='margin: 5px 0;'><strong>Notificación:</strong> $texto_notificar</p>
                         </div>
 
                         <p style='color: #555; font-size: 14px; line-height: 1.5;'>
