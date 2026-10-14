@@ -1683,15 +1683,21 @@
 
             // HILO EN CADENA
             const message_id = $(this).data('message-id'); // message_id del correo principal
+            const anexo = $(this).data('anexo'); // anexo del correo principal
+            const rut_origen = $(this).data('rut-origen'); // rut del remitente
+            const nombre_origen = $(this).data('nombre-origen'); // nombre del remitente
 
             // ------------ DEBUG ------------
             //console.log("UID clickeado:", uid);
             //console.log("Message ID clickeado:", message_id);
             const payload = {
               UID_clickeado: uid,
-              Message_ID_clickeado: message_id
+              Message_ID_clickeado: message_id,
+              Anexo_clickeado: anexo,
+              Rut_Origen_clickeado: rut_origen,
+              Nombre_Origen_clickeado: nombre_origen
             };
-            //console.log("CONTENIDO - HILO: ",payload);
+            console.log("CONTENIDO - HILO: ",payload);
             // ------------ DEBUG ------------
 
             const hiloDescendente = [];
@@ -1739,6 +1745,7 @@
             $('[data-tooltip="tooltip"]').tooltip();
             
 
+            // Mostrar contenido para correos
             if (correo) {
                 let html = `
                   <div style="margin-bottom: 40px; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background-color: #f9f9f9;">`;
@@ -1747,31 +1754,55 @@
                             Las respuestas asociadas a este ticket están ordenadas cronológicamente: la respuesta #1 es la más antigua y la ultima respuesta es la más reciente.
                           </em>`;
                   }
-                  html += `
-                    <h5 style="margin-bottom: 10px; color: #555;">
-                      Correo principal
-                    </h5>
-                    <p><strong>Asunto Ticket #${correo.uid}:</strong> ${correo.asunto}</p>
-                        <p style="margin-top: -20px;"><strong>Respuesta de:</strong> ${correo.correo_origen}</p>
-                        <p style="margin-top: -20px;"><strong>Dirigido a:</strong> ${correo.correo_destino}</p>
-                        <p style="margin-top: -20px;"><strong>CC:</strong> ${correo.cc}</p>
-                        <p style="margin-top: -20px;">
-                          <strong>Fecha de recepción:</strong> ${correo.fecha_envio}
-                          <i class="text-success" data-tooltip="tooltip" title="Tiempo transcurrido desde su creación en la base de datos.">ⓘ</i>
-                        </p>
-                    <iframe 
-                      src="/eticket/public/correos_html/${correo.uid}.html" 
-                      width="100%" 
-                      height="600px" 
-                      style="border: 1px solid #ddd; border-radius: 8px;" 
-                      frameborder="0"
-                      onerror="this.parentNode.innerHTML='<p class=\\'text-danger\\'>No se pudo cargar el contenido.</p>'">
-                    </iframe>
-                  </div>
-                `;
+                  if (anexo && anexo !== '') {
+                    html += `
+                        <p><strong>Asunto Ticket #${correo.uid}:</strong> ${correo.asunto}</p>
+                            <p style="margin-top: -20px;"><strong>Anexo:</strong> ${correo.anexo}</p>
+                            <p style="margin-top: -20px;"><strong>Nombre Solicitante:</strong> ${correo.nombre_origen}</p>
+                            <p style="margin-top: -20px;"><strong>Rut Solicitante:</strong> ${correo.rut_origen}</p>
+                            <p style="margin-top: -20px;">
+                              <strong>Fecha de recepción llamada:</strong> ${correo.fecha_envio}
+                              <i class="text-success" data-tooltip="tooltip" title="Tiempo transcurrido desde su creación en la base de datos.">ⓘ</i>
+                            </p>
+                        <iframe 
+                          src="/eticket/public/correos_html/${correo.uid}.html" 
+                          width="100%" 
+                          height="600px" 
+                          style="border: 1px solid #ddd; border-radius: 8px;" 
+                          frameborder="0"
+                          onerror="this.parentNode.innerHTML='<p class=\\'text-danger\\'>No se pudo cargar el contenido.</p>'">
+                        </iframe>
+                      </div>
+                    `;
+                  }
+                  else{
+                    html += `
+                        <h5 style="margin-bottom: 10px; color: #555;">
+                          Correo principal
+                        </h5>
+                        <p><strong>Asunto Ticket #${correo.uid}:</strong> ${correo.asunto}</p>
+                            <p style="margin-top: -20px;"><strong>Respuesta de:</strong> ${correo.correo_origen}</p>
+                            <p style="margin-top: -20px;"><strong>Dirigido a:</strong> ${correo.correo_destino}</p>
+                            <p style="margin-top: -20px;"><strong>CC:</strong> ${correo.cc}</p>
+                            <p style="margin-top: -20px;">
+                              <strong>Fecha de recepción:</strong> ${correo.fecha_envio}
+                              <i class="text-success" data-tooltip="tooltip" title="Tiempo transcurrido desde su creación en la base de datos.">ⓘ</i>
+                            </p>
+                        <iframe 
+                          src="/eticket/public/correos_html/${correo.uid}.html" 
+                          width="100%" 
+                          height="600px" 
+                          style="border: 1px solid #ddd; border-radius: 8px;" 
+                          frameborder="0"
+                          onerror="this.parentNode.innerHTML='<p class=\\'text-danger\\'>No se pudo cargar el contenido.</p>'">
+                        </iframe>
+                      </div>
+                    `;
+                  }
+                  
 
                 if (hiloDescendente.length === 0) {
-                  if(permiso=='admin'){
+                  if(permiso=='admin' && (!anexo && anexo == '')){
                     html += `
                     <div class="mt-4 p-3 border rounded bg-light shadow-sm" style="border-left: 5px solid #0d6efd;">
                       <h6 class="text-primary mb-3">Respuesta al usuario</h6>
@@ -1822,7 +1853,7 @@
 
                 }
                 else{
-                  if(permiso=='admin'){
+                  if(permiso=='admin' && (!anexo && anexo == '')){
                     html += `
                     <div class="mt-4 p-3 border rounded bg-light shadow-sm" style="border-left: 5px solid #0d6efd;">
                       <h6 class="text-primary mb-3">Respuesta al usuario</h6>
@@ -1875,7 +1906,7 @@
                 }
                 
 
-                if (hiloDescendente.length === 0) {
+                if (hiloDescendente.length === 0 && (!anexo && anexo == '')) {
                   html += `
                     <div class="text-center p-4" style="color: #666;">
                       <i class="bi bi-info-circle" style="font-size: 2rem;"></i>
@@ -1952,19 +1983,25 @@
               $('#modalDetalleLabel').text('Detalles de Ticket #' + correo.uid);
               
               let html = `
-                <h5><strong>Estado:</strong> ${correo.estado == 1 ? 'No asignado' : (correo.estado == 2 ? 'Asignado' : 'Finalizado')}</h5>
+                <h5>
+                  <strong>Estado:</strong> 
+                  ${({1: 'Sin asignar', 2: 'Asignado', 3: 'Finalizado', 4: 'En progreso', 5: 'Eliminado', 6: 'Realizado'})[correo.estado] || 'Desconocido'}
+                </h5>
                 <h5><strong>Origen:</strong> ${correo.correo_origen}</h5>
                 <h5><strong>Destino:</strong> <span style="word-break: break-all;">${correo.correo_destino ? correo.correo_destino : 'No posee'}</span></h5>
                 <h5><strong>Asunto:</strong> <span style="word-break: break-all;">${correo.asunto ? correo.asunto : 'No posee'}</span></h5>
                 <h5><strong>Fecha:</strong> ${correo.fecha_envio}</h5>
+                <h5><strong>Anexo:</strong> ${correo.anexo ? correo.anexo : 'N/A'}</h5>
+                <h5><strong>Nombre:</strong> ${correo.nombre_origen ? correo.nombre_origen : 'N/A'}</h5>
+                <h5><strong>Rut:</strong> ${correo.rut_origen ? correo.rut_origen : 'N/A'}</h5>
               `;
               
               if (permiso === 'admin') {
                 html += `
                   <hr class="detalle">
-                  <h5><strong>Identificador único:</strong> <span style="word-break: break-all;">${correo.message_id ? correo.message_id : 'No posee'}</span></h5>
+                  <h5><strong>Identificador único:</strong> <span style="word-break: break-all;">${correo.message_id ? correo.message_id : 'N/A'}</span></h5>
                   <h5><strong>Correo respuesta:</strong> ${correo.multirespuesta == 1 ? 'Sí' : 'No'}</h5>
-                  <h5><strong>En respuesta a:</strong> <span style="word-break: break-all;">${correo.in_reply_to ? correo.in_reply_to : 'No aplica'}</span></h5>
+                  <h5><strong>En respuesta a:</strong> <span style="word-break: break-all;">${correo.in_reply_to ? correo.in_reply_to : 'No responde a otro correo'}</span></h5>
                 `;
               }
               
@@ -2015,6 +2052,7 @@
                   data-uid="${correo.uid}"
                   data-fecha="${fecha_envio}" 
                   data-asunto="${asunto}"
+                  data-anexo="${correo.anexo}"
                   data-estado-actual="${correo.estado}">
                   Guardar
                 </button>
@@ -2092,7 +2130,7 @@
 
               $('#modalEditar .modal-footer').html(`
           <button type="button" class="btn btn-light" data-bs-dismiss="modal" data-dismiss="modal">Cerrar</button>
-          <button type="button" class="btn btn-success guardar-editar-estado" data-estado-actual="${estado_actual}" data-asignado="${asignado}" data-uid="${correo.uid}" data-asunto='${correo.asunto}' data-fecha='${correo.fecha_envio}' data-correo-origen='${correo.correo_origen}'>Guardar</button>
+          <button type="button" class="btn btn-success guardar-editar-estado" data-estado-actual="${estado_actual}" data-asignado="${asignado}" data-anexo="${correo.anexo}" data-uid="${correo.uid}" data-asunto='${correo.asunto}' data-fecha='${correo.fecha_envio}' data-correo-origen='${correo.correo_origen}'>Guardar</button>
         `);
 
               // ---------------  TEXT AREA FINALIZADO ---------------
@@ -2523,6 +2561,8 @@
             var usuario = "<?php echo $_SESSION['idusuario']; ?>";
             const notificar = document.getElementById('checkNotificar').checked ? 1 : 0;
             const uid = e.target.getAttribute('data-uid');
+            let anexo = e.target.getAttribute('data-anexo');
+            if (anexo === 'null' || anexo === '') { anexo = null;}
             const estado_actual = e.target.getAttribute('data-estado-actual');
             const select = document.getElementById('selectUsuario-' + uid);
             const fecha_envio = e.target.getAttribute('data-fecha');
@@ -2546,7 +2586,8 @@
 
             const idusuario = select.value;
 
-            if (idusuario == "0") return alert("Selecciona un usuario válido");
+            if (idusuario == "0") 
+              return alert("Selecciona un usuario válido");
 
             const payload = {
               uid: uid,
@@ -2555,7 +2596,8 @@
               asunto: asunto,
               pagina: pagina,
               usuario: usuario,
-              notificar: notificar
+              notificar: notificar,
+              anexo: anexo || null
             };
 
             //console.log("GUARDAR ASIGNACION (no modificar listener): ", payload);
@@ -2571,7 +2613,8 @@
                 fecha_envio,
                 asunto,
                 usuario,
-                notificar
+                notificar,
+                anexo
               })
             })
               .then(response => response.json())
@@ -2635,6 +2678,8 @@
         document.addEventListener('click', function (e) {
           if (e.target && e.target.classList.contains('guardar-editar-estado')) {
             const uid = e.target.getAttribute('data-uid');
+            let anexo = e.target.getAttribute('data-anexo');
+            if (anexo === 'null' || anexo === '') { anexo = null; }
             var select = document.getElementById(`selectEstado-${uid}`);
             var nuevoEstado = select ? select.value : null;
             const comentario = document.getElementById('comentarioEstado') ? document.getElementById('comentarioEstado').value.trim() : null;
@@ -2735,10 +2780,11 @@
               nuevoEstado: nuevoEstado,
               nuevoEstadoPalabra: nuevoEstadoPalabra,
               comentarioDesarrollador: comentarioDesarrollador,
-              notificar: notificar
+              notificar: notificar,
+              anexo: anexo || null
 
             };
-            //console.log("ESTADO (ADMIN): ", payload);
+            console.log("ESTADO (ADMIN): ", payload);
 
             if (!uid || !nuevoEstado || nuevoEstado === "0") {
               alert("Selecciona un estado válido");
@@ -2789,6 +2835,7 @@
                       &nuevoEstadoPalabra=${encodeURIComponent(nuevoEstadoPalabra)}
                       &estado_actual=${encodeURIComponent(estado_actual)}
                       &estado_actualPalabra=${encodeURIComponent(estado_actualPalabra)}
+                      &anexo=${encodeURIComponent(anexo === null ? '' : anexo)}
                       &notificar=${encodeURIComponent(notificar)}`
             })
               .then(response => response.text())

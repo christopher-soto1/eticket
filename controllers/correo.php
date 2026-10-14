@@ -472,14 +472,21 @@ class Correo extends Controller{
         }
     
         $uid = $data['uid'];
+        $anexo = $data['anexo'] ?? null;
         $idusuario = $data['idusuario'];
         $fecha_envio = $data['fecha_envio'];
         $asunto = $data['asunto'];
         $usuario = $data['usuario'];
-        $notificar = $data['notificar'];
+
+        if ($anexo === null) {
+            $notificar = $data['notificar'];
+        } else{
+            $notificar = 0;
+        }
+        
     
         if ($this->model->asignarUsuario($uid, $idusuario, $usuario)) {
-            $correo_enviado = $this->model->enviarCorreoAsignacion($uid, $idusuario, $asunto, $fecha_envio, $notificar);
+            $correo_enviado = $this->model->enviarCorreoAsignacion($uid, $idusuario, $asunto, $fecha_envio, $notificar, $anexo);
             $response = [
                 'success' => true,
                 'message' => 'Desarrollador asignado correctamente',
@@ -498,6 +505,9 @@ class Correo extends Controller{
     public function cambiarEstado() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $uid = $_POST['uid'] ?? null;
+            $anexo = $_POST['anexo'] ?? null;
+            if ($anexo !== null) { $anexo = trim($anexo); }
+            if ($anexo === '' || $anexo === 'null') { $anexo = null; }
             $estado = $_POST['estado'] ?? null;
             $comentario = isset($_POST['comentario']) ? trim($_POST['comentario']) : null;
             $comentarioDesarrollador = isset($_POST['comentarioDesarrollador']) ? trim($_POST['comentarioDesarrollador']) : null;
@@ -513,6 +523,7 @@ class Correo extends Controller{
             #$nuevoEstadoPalabra = $_POST['nuevoEstadoPalabra'] ?? null;
             $nuevoEstadoPalabra = isset($_POST['nuevoEstadoPalabra']) ? trim($_POST['nuevoEstadoPalabra']) : null;
             $notificar = isset($_POST['notificar']) ? trim($_POST['notificar']) : null;
+            $correoEnviado = false; // Inicializamos la variable
             
     
             if ($uid && $estado) {
@@ -520,12 +531,19 @@ class Correo extends Controller{
                 
                 /* FINALIZADO */
                 if ($actualizado && $estado == 3) {
-                    if ($notificar == 1){
+                    //echo "DEBUG BACKEND<br>";
+                    //echo "notificar: [" . var_export($notificar, true) . "]<br>";
+                    //echo "anexo: [" . var_export($anexo, true) . "]<br>";
+                    //echo "empty(anexo): [" . (empty($anexo) ? 'TRUE' : 'FALSE') . "]<br>";
+                    //echo "comparacion notificar == 1: [" . ($notificar == 1 ? 'TRUE' : 'FALSE') . "]<br>";
+                    if ($notificar == 1 && empty($anexo)) {
+                        //echo "ENTRO AL IF DE ENVIO<br>";
                         $correoEnviado = $this->model->enviarCorreoFinalizado($uid, $idusuario, $asunto, $fecha_envio, $correo_origen, $comentario, $comentarioDesarrollador);
                         if ($correoEnviado) { echo "Estado actualizado a 'Finalizado' y correo enviado correctamente.";} 
                         else { echo "Estado actualizado a 'Finalizado', pero error al enviar el correo.";}
                     }
                     else{
+                        //echo "NO ENTRO AL IF DE ENVIO<br>";
                         echo "Estado actualizado a 'Finalizado' y sin notificación de finalización a usuario.";
                     }
                 }
@@ -537,12 +555,21 @@ class Correo extends Controller{
                 elseif ($actualizado && $estado == 2) { echo "Estado actualizado a 'Asignado'.";} 
 
                 /* EN PROGRESO */
-                elseif ($actualizado && $estado == 4) { 
+                elseif ($actualizado && $estado == 4 ) { 
                     //echo "Estado actualizado a 'En progreso'.";
-                    $correoEnviado = $this->model->enviarCorreoEnProgresoUsuario($uid, $idusuario, $asunto, $fecha_envio, $correo_origen, $comentario);
+                    if(empty($anexo)){
+                        $correoEnviado = $this->model->enviarCorreoEnProgresoUsuario($uid, $idusuario, $asunto, $fecha_envio, $correo_origen, $comentario);
+                    }
 
-                    if ($correoEnviado) { echo "Estado actualizado a 'En Progreso' y correo enviado correctamente.";} 
-                    else { echo "Estado actualizado a 'En Progreso', pero error al enviar el correo.";}
+                    if ($correoEnviado) { 
+                        echo "Estado actualizado a 'En Progreso' y correo enviado correctamente.";
+                    }
+                    elseif ($correoEnviado === false && $anexo !== null) {
+                        echo "Estado actualizado a 'En Progreso', no se envia notificación al usuario.";
+                    }
+                    else { 
+                        echo "Estado actualizado a 'En Progreso', pero error al enviar el correo.";
+                    }
                 } 
 
                 elseif ($actualizado && $estado == 5) { echo "Estado actualizado a 'Eliminado'.";} 

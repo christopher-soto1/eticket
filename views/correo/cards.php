@@ -155,6 +155,9 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
         .badge-realizado    { background: #ede9fe; color: #6d28d9; }
         .badge-finalizado   { background: #dcfce7; color: #15803d; }
         .badge-eliminado    { background: #fee2e2; color: #b91c1c; }
+        /* estilos tipo de solicitud */
+        .badge-via-telefonica { background: #d1fae5; color: #047857;}
+        .badge-via-correo { background: #fce7f3; color: #be185d;}
         /* Borde lateral de color según estado */
         .ticket-card-modern.estado-1 { border-left: 4px solid #0ea5e9; }
         .ticket-card-modern.estado-2 { border-left: 4px solid #3b82f6; }
@@ -501,6 +504,14 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
             case 6: $badgeClass = 'badge-realizado';    $badgeText = 'Realizado';    break;
             default: $badgeClass = 'badge-asignado';   $badgeText = 'Desconocido';
           }
+
+          if (!empty($correo->anexo)) {
+              $badgeClassSolicitud = 'badge-via-telefonica';
+              $badgeTextSolicitud  = 'Vía Telefónica';
+          } else {
+              $badgeClassSolicitud = 'badge-via-correo';
+              $badgeTextSolicitud  = 'Vía Correo';
+          }
           // Asignado texto
           $asignadoTexto = !empty($correo->asignado) ? $correo->asignado : 'Sin asignar';
           // Correos destino
@@ -540,12 +551,13 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
                   <!-- Header: badge + uid -->
                   <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                     <span class="ticket-badge <?php echo $badgeClass; ?>"><?php echo $badgeText; ?></span>
+                    <span class="ticket-badge <?php echo $badgeClassSolicitud; ?>"><?php echo $badgeTextSolicitud; ?></span>
                     <?php if (!empty($correo->asignado) && $permiso == 'admin'): ?>
                       <span style="font-size:11px; color:#64748b; font-weight:500;">
                         → <strong><?php echo htmlspecialchars($correo->asignado); ?></strong>
                       </span>
                     <?php endif; ?>
-                    <span class="ticket-uid">#<?php echo $correo->uid; ?></span>
+                    <span class="ticket-uid" style="color: black;">#<?php echo $correo->uid; ?></span>
                   </div>
 
                   <!-- Asunto -->
@@ -553,31 +565,64 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
 
                   <!-- Grid de info -->
                   <div class="ticket-info-grid">
-                    <div class="ticket-info-item">
-                      <div class="ticket-info-icon"><i class="fas fa-envelope-open-text"></i></div>
-                      <div style="min-width:0;">
-                        <div class="ticket-info-label">Correo origen</div>
-                        <div class="ticket-info-value" title="<?php echo $correo->correo_origen; ?>"><?php echo $correo->correo_origen; ?></div>
-                      </div>
-                    </div>
-                    <div class="ticket-info-item">
-                      <div class="ticket-info-icon"><i class="fas fa-inbox"></i></div>
-                      <div style="min-width:0;">
-                        <div class="ticket-info-label">Destinatario</div>
-                        <div class="ticket-info-value" title="<?php echo $destinatario; ?>"><?php echo $destinatario; ?></div>
-                      </div>
-                    </div>
-                    <div class="ticket-info-item">
-                      <div class="ticket-info-icon"><i class="fas fa-users"></i></div>
-                      <div style="min-width:0;">
-                        <div class="ticket-info-label">CC</div>
-                        <div class="ticket-info-value" title="<?php echo $cc; ?>"><?php echo $cc; ?></div>
-                      </div>
-                    </div>
+                      <?php if (!empty($correo->anexo)){ ?>
+                        <!-- Anexo -->
+                        <div class="ticket-info-item">
+                          <div class="ticket-info-icon"><i class="fas fa-phone-alt"></i></div>
+                          <div style="min-width:0;">
+                            <div class="ticket-info-label">Anexo</div>
+                            <div class="ticket-info-value"><?php echo $correo->anexo; ?></div>
+                          </div>
+                        </div>
+                        <!-- Nombre -->
+                        <div class="ticket-info-item">
+                          <div class="ticket-info-icon"><i class="fas fa-user"></i></div>
+                          <div style="min-width:0;">
+                            <div class="ticket-info-label">Nombre Solicitante</div>
+                            <div class="ticket-info-value"><?php echo $correo->nombre_origen; ?></div>
+                          </div>
+                        </div>
+
+                        <!-- RUT -->
+                        <div class="ticket-info-item">
+                          <div class="ticket-info-icon"><i class="fas fa-id-card"></i></div>
+                          <div style="min-width:0;">
+                            <div class="ticket-info-label">Rut Solicitante</div>
+                            <div class="ticket-info-value"><?php echo $correo->rut_origen; ?></div>
+                          </div>
+                        </div>
+                      <?php } else{ ?>
+                        <!-- Correo Origen -->
+                        <div class="ticket-info-item">
+                          <div class="ticket-info-icon"><i class="fas fa-envelope-open-text"></i></div>
+                          <div style="min-width:0;">
+                            <div class="ticket-info-label">Correo origen</div>
+                            <div class="ticket-info-value" title="<?php echo $correo->correo_origen; ?>"><?php echo $correo->correo_origen; ?></div>
+                          </div>
+                        </div>
+                        <!-- Correo Destinatario -->
+                        <div class="ticket-info-item">
+                          <div class="ticket-info-icon"><i class="fas fa-inbox"></i></div>
+                          <div style="min-width:0;">
+                            <div class="ticket-info-label">Destinatario</div>
+                            <div class="ticket-info-value" title="<?php echo $destinatario; ?>"><?php echo $destinatario; ?></div>
+                          </div>
+                        </div>
+                        <!-- CC / Con copia -->
+                        <div class="ticket-info-item">
+                          <div class="ticket-info-icon"><i class="fas fa-users"></i></div>
+                          <div style="min-width:0;">
+                            <div class="ticket-info-label">CC</div>
+                            <div class="ticket-info-value" title="<?php echo $cc; ?>"><?php echo $cc; ?></div>
+                          </div>
+                        </div>
+                      <?php }?>
+                      
+                    <!-- Fecha de envio del correo -->
                     <div class="ticket-info-item">
                       <div class="ticket-info-icon"><i class="fas fa-calendar-alt"></i></div>
                       <div style="min-width:0;">
-                        <div class="ticket-info-label">Fecha recepción</div>
+                        <div class="ticket-info-label"><?php echo !empty($correo->anexo) ? 'Fecha llamada' : 'Fecha recepción correo'; ?></div>
                         <div class="ticket-info-value"><?php echo $correo->fecha_envio; ?></div>
                       </div>
                     </div>
@@ -606,6 +651,9 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
                     <button class="btn-ticket-primary open-contenido-modal"
                       data-id="<?php echo $correo->uid; ?>"
                       data-message-id="<?php echo $correo->message_id; ?>"
+                      data-anexo="<?php echo $correo->anexo; ?>"
+                      data-rut-origen="<?php echo $correo->rut_origen; ?>"
+                      data-nombre-origen="<?php echo $correo->nombre_origen; ?>"
                       data-toggle="modal"
                       data-target="#modalContenido"
                       data-tooltip="tooltip"
@@ -663,14 +711,16 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
                         title="Actualizar el estado de este ticket">
                         <i class="fas fa-flag" style="font-size:11px;"></i> Estado
                       </button>
-                      <button class="btn-ticket-outline danger spam"
-                        data-id="<?php echo $correo->uid; ?>"
-                        data-correo-origen="<?php echo $correo->correo_origen; ?>"
-                        data-tooltip="tooltip"
-                        title="Marcar correo como spam"
-                        onclick="marcarSpam();">
-                        <i class="fas fa-ban" style="font-size:11px;"></i> Spam
-                      </button>
+                      <?php if (empty($correo->anexo)){ ?>
+                        <button class="btn-ticket-outline danger spam"
+                          data-id="<?php echo $correo->uid; ?>"
+                          data-correo-origen="<?php echo $correo->correo_origen; ?>"
+                          data-tooltip="tooltip"
+                          title="Marcar correo como spam"
+                          onclick="marcarSpam();">
+                          <i class="fas fa-ban" style="font-size:11px;"></i> Spam
+                        </button>
+                      <?php } ?>
                     <?php endif; ?>
 
                   </div>
@@ -702,7 +752,7 @@ $finalizadosUsuario = $correoModel->getTicketsFinalizadosUsuario($asignacion);
                   <i class="fas fa-comments"></i> Ver hilo
                 </button>
               </div>
-              <span style="font-size:11px; color:#cbd5e1; font-weight:500;">
+              <span style="font-size:11px; color: black; font-weight:500;">
                 #<?php echo $correo->uid; ?>
               </span>
             </div>

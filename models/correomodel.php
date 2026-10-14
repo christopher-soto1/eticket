@@ -50,7 +50,10 @@ class CorreoModel extends Model
                 $item->message_id = $row['message_id'];
                 $item->in_reply_to = $row['in_reply_to'];
                 $item->uid = $row['uid'];
+                $item->anexo = $row['anexo'];
                 $item->multirespuesta = $row['multirespuesta'];
+                $item->nombre_origen = $row['nombre_origen'];
+                $item->rut_origen = $row['rut_origen'];
                 $item->correo_origen = $row['correo_origen'];
                 $item->correo_destino = $row['correo_destino'];
                 $item->asunto = $row['asunto'];
@@ -562,6 +565,7 @@ class CorreoModel extends Model
 
 
 
+            // aqui agregar mas atributos de ser que se agreguen mas a la tabla correo
             while ($row = $query->fetch()) {
                 $item = new CorreoM();
                 $item->id = $row['id'];
@@ -569,7 +573,10 @@ class CorreoModel extends Model
                 $item->message_id = $row['message_id'];
                 $item->in_reply_to = $row['in_reply_to'];
                 $item->uid = $row['uid'];
+                $item->anexo = $row['anexo']; // 22/09/2026
                 $item->multirespuesta = $row['multirespuesta'];
+                $item->nombre_origen = $row['nombre_origen']; // 22/09/2026
+                $item->rut_origen = $row['rut_origen']; // 22/09/2026
                 $item->correo_origen = $row['correo_origen'];
                 $item->correo_destino = $row['correo_destino'];
                 $item->asunto = $row['asunto'];
@@ -1932,7 +1939,7 @@ class CorreoModel extends Model
         }
     }
 
-    public function enviarCorreoAsignacion($uid, $idusuario, $asunto, $fecha_envio, $notificar)
+    public function enviarCorreoAsignacion($uid, $idusuario, $asunto, $fecha_envio, $notificar, $anexo)
     {
         $mail = new PHPMailer(true);
         $pwcorreo = constant('PWCORREO');
@@ -2018,7 +2025,7 @@ class CorreoModel extends Model
             $mail->send();
 
             // --- LLAMADA A LA SEGUNDA FUNCIÓN ANTES DEL RETURN ---
-            if ($notificar == 1 && $idusuario !== 'soporte@iopa.cl') {
+            if ($notificar == 1 && $idusuario !== 'soporte@iopa.cl' && empty($anexo)) {
                 $this->enviarCorreoAsignacionUsuarioSolicitante($uid, $asunto);
             }
 

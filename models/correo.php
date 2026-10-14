@@ -6,7 +6,10 @@ class CorreoM
     public $message_id;
     public $in_reply_to;
     public $uid;
+    public $anexo;
     public $multirespuesta;
+    public $nombre_origen;
+    public $rut_origen;
     public $correo_origen;
     public $correo_destino;
     public $asunto;
